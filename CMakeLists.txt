@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.8)
 
-project("SolarySystemSim")
+project("SolarSystemSim")
 
 add_subdirectory("src")
 add_subdirectory("dependencies/glfw")
