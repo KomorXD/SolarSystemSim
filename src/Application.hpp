@@ -19,8 +19,10 @@ public:
 
 	void Run();
 
-	inline Application* GetInstance() const { return s_Instance; }
+	inline GLFWwindow* GetWindow()	  const { return m_Window; }
 	inline WindowSpec GetWindowSpec() const { return m_WindowSpec; }
+
+	inline static Application* GetInstance() { return s_Instance; }
 
 private:
 	GLFWwindow* m_Window = nullptr;
