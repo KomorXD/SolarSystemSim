@@ -1,4 +1,5 @@
 #include "Application.hpp"
+#include "Logger.hpp"
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -9,17 +10,23 @@
 Application::Application(const WindowSpec& spec)
 	: m_WindowSpec(spec)
 {
+	Logger::Init();
+
+	LOG_INFO("Logger initialized");
+
 	if (glfwInit() == GLFW_FALSE)
 	{
-		fprintf(stderr, "Failed to load GLFW.");
+		LOG_CRITICAL("Failed to initialize GLFW!");
 
 		return;
 	}
 
+	LOG_INFO("GLFW initialized");
+
 	glfwSetErrorCallback(
 		[](int32_t errorCode, const char* description)
 		{
-			fprintf(stderr, "GLFW error #%d: %s\n", errorCode, description);
+			LOG_ERROR("GLFW error #{}: {}", errorCode, description);
 		});
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -31,20 +38,24 @@ Application::Application(const WindowSpec& spec)
 
 	if (!m_Window)
 	{
-		fprintf(stderr, "Failed to create window!");
+		LOG_CRITICAL("Failed to create a window!");
 
 		return;
 	}
 
+	LOG_INFO("Window created");
+
 	glfwMakeContextCurrent(m_Window);
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		fprintf(stderr, "Failed to load GLAD!");
+		LOG_CRITICAL("Failed to load GLAD!");
 
 		return;
 	}
+
+	LOG_INFO("GLAD loaded");
 
 	s_Instance = this;
 }
@@ -62,7 +73,7 @@ void Application::Run()
 {
 	if (!s_Instance)
 	{
-		printf("xd");
+		LOG_ERROR("Application loop was run without a valid Application instance!");
 
 		return;
 	}
@@ -70,6 +81,7 @@ void Application::Run()
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
+
 	ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 	ImGui_ImplOpenGL3_Init();
 
@@ -83,17 +95,12 @@ void Application::Run()
 
 		ImGui::NewFrame();
 
-		ImGui::Begin("Siema");
-
-		if (ImGui::Button("LOOOOOOOOOL"))
-		{
-			printf("xddddddddddd");
-		}
-
-		ImGui::End();
+		// OnUpdate
+		// OnInput
+		// OnRender
 
 		ImGui::Render();
-
+		
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		glfwPollEvents();
