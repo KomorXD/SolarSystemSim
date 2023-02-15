@@ -3,6 +3,7 @@
 #include "../Event.hpp"
 
 #include <imgui/imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
 DebugScene::DebugScene()
 {
@@ -53,6 +54,8 @@ void DebugScene::OnInput()
 
 }
 
+static glm::vec4 color{ 1.0f, 0.0f, 0.0f, 1.0f };
+
 void DebugScene::OnUpdate(float ts)
 {
 	m_TimePassedInSeconds += ts;
@@ -64,9 +67,16 @@ void DebugScene::OnUpdate(float ts)
 		LOG_INFO("1 second passed, FPS: {}", 1.0f / ts);
 		LOG_WARN("Mouse position: {}x{}", Input::GetMousePosition().x, Input::GetMousePosition().y);
 	}
+
+	m_Shader->SetUniform4f("u_Color", color);
 }
 
 void DebugScene::OnRender()
 {
+	ImGui::Begin("Triangle color picker");
+	ImGui::SetWindowFontScale(1.5f);
+	ImGui::ColorEdit4("Color", glm::value_ptr(color));
+	ImGui::End();
+
 	GLCall(glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr));
 }

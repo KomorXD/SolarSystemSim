@@ -55,6 +55,11 @@ Application::Application(const WindowSpec& spec)
 
 	LOG_INFO("GLAD loaded");
 
+	GLCall(glEnable(GL_DEPTH_TEST));
+	GLCall(glDepthFunc(GL_LESS));
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
 	s_Instance = this;
 }
 

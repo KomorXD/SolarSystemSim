@@ -1,9 +1,11 @@
 #pragma once
 
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+
 #include <unordered_map>
 #include <string>
 #include <optional>
-#include <glad/glad.h>
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define ASSERT(x) if(!(x)) __debugbreak()
@@ -122,6 +124,7 @@ public:
 
 	void SetUniform1i(const std::string& name, int32_t val);
 	void SetUniform1f(const std::string& name, float val);
+	void SetUniform4f(const std::string& name, const glm::vec4& vec);
 
 	bool ReloadShader();
 
