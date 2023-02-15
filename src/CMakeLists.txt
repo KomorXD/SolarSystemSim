@@ -31,6 +31,8 @@ file(GLOB PROJECT_CONFIGS
 	"../.gitmodules"
 )
 
+file(COPY res DESTINATION "${CMAKE_BINARY_DIR}/${PROJECT_NAME}")
+
 source_group("Headers" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
 source_group("Vendors" FILES ${VENDORS_SOURCES})
