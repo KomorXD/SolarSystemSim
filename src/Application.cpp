@@ -1,5 +1,6 @@
 #include "Application.hpp"
 #include "Logger.hpp"
+#include "scenes/DebugScene.hpp"
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -75,6 +76,8 @@ void Application::Run()
 		return;
 	}
 
+	m_CurrentScene = std::make_unique<DebugScene>();
+
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
@@ -82,8 +85,16 @@ void Application::Run()
 	ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 	ImGui_ImplOpenGL3_Init();
 
+	double prevTime = 0.0f;
+	double currTime = 0.0f;
+	double timestep = 1.0f / 60.0f;
+
 	while (!glfwWindowShouldClose(m_Window))
 	{
+		prevTime = currTime;
+		currTime = glfwGetTime();
+		timestep = std::min(1.0 / 60.0, currTime - prevTime);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.33f, 0.33f, 0.33f, 1.0f);
 
@@ -92,22 +103,16 @@ void Application::Run()
 
 		ImGui::NewFrame();
 
-		// OnEvents
-		// Event ev{};
-		// 
-		// while(m_EventQueue.PollEvents(ev))
-		// {
-		//	   m_CurrentScene->OnEvent(ev, ts);
-		// }
-		// 
-		// OnUpdate
-		// m_CurrentScene->OnUpdate(ts);
-		// 
-		// OnInput
-		// m_CurretnScene->OnInput();
-		// 
-		// OnRender
-		// m_CurrentScene->OnRender();
+		Event ev{};
+		
+		while(m_EventQueue.PollEvents(ev))
+		{
+			m_CurrentScene->OnEvent(ev);
+		}
+		
+		m_CurrentScene->OnUpdate((float)timestep);
+		m_CurrentScene->OnInput();
+		m_CurrentScene->OnRender();
 
 		ImGui::Render();
 		

@@ -3,8 +3,10 @@
 #include "Event.hpp"
 
 #include <string>
+#include <memory>
 
 struct GLFWwindow;
+class Scene;
 
 class Application
 {
@@ -28,6 +30,8 @@ public:
 
 private:
 	void SetWindowCallbacks();
+
+	std::unique_ptr<Scene> m_CurrentScene;
 
 	GLFWwindow* m_Window = nullptr;
 	WindowSpec  m_WindowSpec;
