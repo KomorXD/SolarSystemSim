@@ -191,5 +191,10 @@ void Application::SetWindowCallbacks()
 			ev.Size.Height = height;
 
 			app->m_EventQueue.SubmitEvent(ev);
+
+			app->m_WindowSpec.Width = width;
+			app->m_WindowSpec.Height = height;
+
+			LOG_INFO("Window resized to {}x{}", app->GetWindowSpec().Width, app->GetWindowSpec().Height);
 		});
 }
