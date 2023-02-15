@@ -10,12 +10,21 @@ include_directories(
 	"vendors/"
 )
 
-file(GLOB PROJECT_HEADERS "*.hpp")
-file(GLOB PROJECT_SOURCES "*.cpp")
+file(GLOB PROJECT_HEADERS 
+	"*.hpp" 
+	"scenes/*.hpp"
+)
+
+file(GLOB PROJECT_SOURCES 
+	"*.cpp" 
+	"scenes/*.cpp"
+)
+
 file(GLOB VENDORS_SOURCES 
 	"../dependencies/glad/src/glad.c"
 	"vendors/imgui/*.cpp"
 )
+
 file(GLOB PROJECT_CONFIGS
 	"../CMakeLists.txt"
 	"../.gitignore"
