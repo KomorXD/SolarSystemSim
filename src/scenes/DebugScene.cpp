@@ -6,6 +6,30 @@
 
 DebugScene::DebugScene()
 {
+	float vertices[] =
+	{
+		-0.5f, -0.5f,
+		 0.5f, -0.5f,
+		 0.0f,  0.5f
+	};
+
+	uint32_t indices[] =
+	{
+		0, 1, 2
+	};
+
+	m_VAO = std::make_unique<VertexArray>();
+	m_VBO = std::make_unique<VertexBuffer>(vertices, 6 * sizeof(float));
+	m_IBO = std::make_unique<IndexBuffer>(indices, 3);
+
+	VertexBufferLayout layout;
+
+	layout.Push<float>(2);
+	m_VAO->AddBuffer(*m_VBO, layout);
+
+	m_Shader = std::make_shared<Shader>("res/shaders/Triangle.vert", "res/shaders/Triangle.frag");
+	m_Shader->Bind();
+
 	LOG_INFO("DebugScene initialized.");
 }
 
@@ -44,18 +68,5 @@ void DebugScene::OnUpdate(float ts)
 
 void DebugScene::OnRender()
 {
-	if (!m_ShouldBeRendered)
-	{
-		return;
-	}
-
-	ImGui::Begin("DebugWindow");
-	ImGui::SetWindowFontScale(2.0f);
-	
-	if (ImGui::Button("Click :3"))
-	{
-		LOG_INFO("DebugWindow button clicked.");
-	}
-
-	ImGui::End();
+	GLCall(glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr));
 }
