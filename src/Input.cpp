@@ -3,7 +3,7 @@
 
 #include <glfw/glfw3.h>
 
-bool Input::IsKeyPressed(Keyboard key)
+bool Input::IsKeyPressed(Key key)
 {
 	Application* app = Application::GetInstance();
 

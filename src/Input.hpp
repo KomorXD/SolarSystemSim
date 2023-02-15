@@ -9,15 +9,19 @@ enum class MouseButton
 	Middle = 2
 };
 
-enum class Keyboard
+enum class Key
 {
-	Escape = 256
+	A = 65,
+	Escape = 256,
+	LeftShift = 340,
+	LeftCtrl = 341,
+	LeftAlt = 342
 };
 
 class Input
 {
 public:
-	static bool IsKeyPressed(Keyboard key);
+	static bool IsKeyPressed(Key key);
 
 	static bool IsMouseButtonPressed(MouseButton button);
 };
