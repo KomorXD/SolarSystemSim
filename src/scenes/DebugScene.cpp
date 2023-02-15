@@ -38,6 +38,7 @@ void DebugScene::OnUpdate(float ts)
 		m_TimePassedInSeconds = 0.0f;
 
 		LOG_INFO("1 second passed, FPS: {}", 1.0f / ts);
+		LOG_WARN("Mouse position: {}x{}", Input::GetMousePosition().x, Input::GetMousePosition().y);
 	}
 }
 

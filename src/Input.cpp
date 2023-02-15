@@ -16,3 +16,14 @@ bool Input::IsMouseButtonPressed(MouseButton button)
 	
 	return glfwGetMouseButton(app->GetWindow(), (int32_t)button) == GLFW_PRESS;
 }
+
+glm::vec2 Input::GetMousePosition()
+{
+	Application* app = Application::GetInstance();
+	double xPos{};
+	double yPos{};
+
+	glfwGetCursorPos(app->GetWindow(), &xPos, &yPos);
+
+	return { (float)xPos, (float)yPos };
+}

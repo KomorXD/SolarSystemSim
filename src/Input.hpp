@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <glm/glm.hpp>
 
 enum class MouseButton
 {
@@ -24,4 +24,5 @@ public:
 	static bool IsKeyPressed(Key key);
 
 	static bool IsMouseButtonPressed(MouseButton button);
+	static glm::vec2 GetMousePosition();
 };
