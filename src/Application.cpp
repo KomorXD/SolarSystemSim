@@ -23,12 +23,6 @@ Application::Application(const WindowSpec& spec)
 
 	LOG_INFO("GLFW initialized");
 
-	glfwSetErrorCallback(
-		[](int32_t errorCode, const char* description)
-		{
-			LOG_ERROR("GLFW error #{}: {}", errorCode, description);
-		});
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -47,6 +41,9 @@ Application::Application(const WindowSpec& spec)
 
 	glfwMakeContextCurrent(m_Window);
 	glfwSwapInterval(1);
+
+	glfwSetWindowUserPointer(m_Window, this);
+	SetWindowCallbacks();
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -95,9 +92,22 @@ void Application::Run()
 
 		ImGui::NewFrame();
 
+		// OnEvents
+		// Event ev{};
+		// 
+		// while(m_EventQueue.PollEvents(ev))
+		// {
+		//	   m_CurrentScene->OnEvent(ev, ts);
+		// }
+		// 
 		// OnUpdate
+		// m_CurrentScene->OnUpdate(ts);
+		// 
 		// OnInput
+		// m_CurretnScene->OnInput();
+		// 
 		// OnRender
+		// m_CurrentScene->OnRender();
 
 		ImGui::Render();
 		
@@ -106,4 +116,80 @@ void Application::Run()
 		glfwPollEvents();
 		glfwSwapBuffers(m_Window);
 	}
+}
+
+void Application::SetWindowCallbacks()
+{
+	glfwSetErrorCallback(
+		[](int32_t errorCode, const char* description)
+		{
+			LOG_ERROR("GLFW error #{}: {}", errorCode, description);
+		});
+
+	glfwSetKeyCallback(m_Window,
+		[](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+		{
+			if (action != GLFW_PRESS)
+			{
+				return;
+			}
+
+			Application* app = (Application*)glfwGetWindowUserPointer(window);
+
+			Event ev{};
+
+			ev.Type = Event::KeyPressed;
+			ev.Key.Code = (Key)key;
+			ev.Key.AltPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_ALT);
+			ev.Key.CtrlPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_CONTROL);
+			ev.Key.ShiftPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_SHIFT);
+
+			app->m_EventQueue.SubmitEvent(ev);
+		});
+
+	glfwSetMouseButtonCallback(m_Window,
+		[](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+		{
+			if (action != GLFW_PRESS)
+			{
+				return;
+			}
+
+			Application* app = (Application*)glfwGetWindowUserPointer(window);
+
+			Event ev{};
+
+			ev.Type = Event::MouseButtonPressed;
+			ev.MouseButton.Button = (MouseButton)button;
+
+			app->m_EventQueue.SubmitEvent(ev);
+		});
+
+	glfwSetScrollCallback(m_Window,
+		[](GLFWwindow* window, double xOffset, double yOffset)
+		{
+			Application* app = (Application*)glfwGetWindowUserPointer(window);
+
+			Event ev{};
+
+			ev.Type = Event::MouseWheelScrolled;
+			ev.MouseWheel.OffsetX = (float)xOffset;
+			ev.MouseWheel.OffsetY = (float)yOffset;
+
+			app->m_EventQueue.SubmitEvent(ev);
+		});
+
+	glfwSetWindowSizeCallback(m_Window,
+		[](GLFWwindow* window, int32_t width, int32_t height)
+		{
+			Application* app = (Application*)glfwGetWindowUserPointer(window);
+
+			Event ev{};
+
+			ev.Type = Event::WindowResized;
+			ev.Size.Width = width;
+			ev.Size.Height = height;
+
+			app->m_EventQueue.SubmitEvent(ev);
+		});
 }

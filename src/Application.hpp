@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Event.hpp"
+
 #include <string>
 
 struct GLFWwindow;
@@ -25,8 +27,12 @@ public:
 	inline static Application* GetInstance() { return s_Instance; }
 
 private:
+	void SetWindowCallbacks();
+
 	GLFWwindow* m_Window = nullptr;
 	WindowSpec  m_WindowSpec;
+
+	EventQueue m_EventQueue;
 
 	inline static Application* s_Instance = nullptr;
 };
