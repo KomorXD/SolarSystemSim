@@ -12,12 +12,18 @@ struct Event
 		uint32_t Height;
 	};
 
-	struct KeyboardEvent
+	struct KeyEvent
 	{
 		Key  Code;
 		bool AltPressed;
 		bool ShiftPressed;
 		bool CtrlPressed;
+	};
+
+	struct MouseMoveEvent
+	{
+		float PosX;
+		float PosY;
 	};
 
 	struct MouseButtonEvent
@@ -36,7 +42,10 @@ struct Event
 		None,
 		WindowResized,
 		KeyPressed,
+		KeyReleased,
+		MouseMoved,
 		MouseButtonPressed,
+		MouseButtonReleased,
 		MouseWheelScrolled
 	};
 
@@ -45,7 +54,8 @@ struct Event
 	union
 	{
 		ResizeEvent Size;
-		KeyboardEvent Key;
+		KeyEvent Key;
+		MouseMoveEvent Mouse;
 		MouseButtonEvent MouseButton;
 		MouseScrollEvent MouseWheel;
 	};

@@ -134,16 +134,11 @@ void Application::SetWindowCallbacks()
 	glfwSetKeyCallback(m_Window,
 		[](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
 		{
-			if (action != GLFW_PRESS)
-			{
-				return;
-			}
-
 			Application* app = (Application*)glfwGetWindowUserPointer(window);
 
 			Event ev{};
 
-			ev.Type = Event::KeyPressed;
+			ev.Type = action == GLFW_RELEASE ? Event::KeyReleased : Event::KeyPressed;
 			ev.Key.Code = (Key)key;
 			ev.Key.AltPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_ALT);
 			ev.Key.CtrlPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_CONTROL);
@@ -152,19 +147,28 @@ void Application::SetWindowCallbacks()
 			app->m_EventQueue.SubmitEvent(ev);
 		});
 
-	glfwSetMouseButtonCallback(m_Window,
-		[](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+	glfwSetCursorPosCallback(m_Window,
+		[](GLFWwindow* window, double xPos, double yPos)
 		{
-			if (action != GLFW_PRESS)
-			{
-				return;
-			}
-
 			Application* app = (Application*)glfwGetWindowUserPointer(window);
 
 			Event ev{};
 
-			ev.Type = Event::MouseButtonPressed;
+			ev.Type = Event::MouseMoved;
+			ev.Mouse.PosX = (float)xPos;
+			ev.Mouse.PosY = (float)yPos;
+
+			app->m_EventQueue.SubmitEvent(ev);
+		});
+
+	glfwSetMouseButtonCallback(m_Window,
+		[](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+		{
+			Application* app = (Application*)glfwGetWindowUserPointer(window);
+
+			Event ev{};
+
+			ev.Type = action == GLFW_RELEASE ? Event::MouseButtonReleased : Event::MouseButtonPressed;
 			ev.MouseButton.Button = (MouseButton)button;
 
 			app->m_EventQueue.SubmitEvent(ev);
@@ -195,11 +199,9 @@ void Application::SetWindowCallbacks()
 			ev.Size.Width = width;
 			ev.Size.Height = height;
 
-			app->m_EventQueue.SubmitEvent(ev);
-
 			app->m_WindowSpec.Width = width;
 			app->m_WindowSpec.Height = height;
 
-			LOG_INFO("Window resized to {}x{}", app->GetWindowSpec().Width, app->GetWindowSpec().Height);
+			app->m_EventQueue.SubmitEvent(ev);
 		});
 }
