@@ -1,6 +1,7 @@
 #include "Application.hpp"
 #include "Logger.hpp"
-#include "scenes/DebugScene.hpp"
+#include "scenes/MainLayer.hpp"
+#include "OpenGL.hpp"
 
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
@@ -81,7 +82,7 @@ void Application::Run()
 		return;
 	}
 
-	m_CurrentScene = std::make_unique<DebugScene>();
+	m_CurrentLayer = std::make_unique<MainLayer>();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -101,7 +102,7 @@ void Application::Run()
 		timestep = std::min(1.0 / 60.0, currTime - prevTime);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.33f, 0.33f, 0.33f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -112,12 +113,12 @@ void Application::Run()
 		
 		while(m_EventQueue.PollEvents(ev))
 		{
-			m_CurrentScene->OnEvent(ev);
+			m_CurrentLayer->OnEvent(ev);
 		}
-		
-		m_CurrentScene->OnUpdate((float)timestep);
-		m_CurrentScene->OnInput();
-		m_CurrentScene->OnRender();
+
+		m_CurrentLayer->OnInput();
+		m_CurrentLayer->OnUpdate((float)timestep);
+		m_CurrentLayer->OnImGuiRender();
 
 		ImGui::Render();
 		

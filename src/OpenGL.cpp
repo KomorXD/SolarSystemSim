@@ -266,27 +266,6 @@ bool Shader::ReloadShader()
 
 std::optional<std::string> Shader::ShaderParse(const std::string& filepath)
 {
-	/*FILE* file;
-
-	fopen_s(&file, filepath.c_str(), "r");
-
-	if (!file)
-	{
-		std::cout << "[ERROR] Unable to open file: " << filepath << std::endl;
-
-		return "";
-	}
-
-	char line[512];
-	std::stringstream ss;
-
-	while (fgets(line, 512, file) != NULL)
-		ss << line;
-
-	fclose(file);
-
-	return ss.str();*/
-
 	std::ifstream shaderSourceFile(filepath);
 
 	if (!shaderSourceFile.good())
@@ -434,4 +413,95 @@ int32_t Shader::GetUniformLocation(const std::string& name)
 	m_UniformLocations[name] = location;
 
 	return location;
+}
+
+Framebuffer::Framebuffer()
+{
+	GLCall(glGenFramebuffers(1, &m_ID));
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
+}
+
+Framebuffer::~Framebuffer()
+{
+	if (m_ID != 0)
+	{
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		GLCall(glDeleteFramebuffers(1, &m_ID));
+	}
+
+	if (m_TextureID != 0)
+	{
+		GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+		GLCall(glDeleteTextures(1, &m_TextureID));
+	}
+
+	if (m_RenderbufferID != 0)
+	{
+		GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+		GLCall(glDeleteRenderbuffers(1, &m_RenderbufferID));
+	}
+}
+
+void Framebuffer::AttachTexture(uint32_t width, uint32_t height)
+{
+	GLCall(glGenTextures(1, &m_TextureID));
+	GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr));
+
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
+	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_TextureID, 0));
+
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void Framebuffer::AttachRenderBuffer(uint32_t width, uint32_t height)
+{
+	GLCall(glGenRenderbuffers(1, &m_RenderbufferID));
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID));
+
+	GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+	GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RenderbufferID));
+
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+}
+
+void Framebuffer::BindBuffer() const
+{
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
+}
+
+void Framebuffer::BindTexture(uint32_t slot) const
+{
+	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+	GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+}
+
+void Framebuffer::BindRenderBuffer() const
+{
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID));
+}
+
+void Framebuffer::UnbindBuffer() const
+{
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
+void Framebuffer::UnbindTexture() const
+{
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void Framebuffer::UnbindRenderBuffer() const
+{
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+}
+
+bool Framebuffer::IsComplete() const
+{
+	GLCall(bool complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	return complete;
 }

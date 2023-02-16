@@ -143,3 +143,29 @@ private:
 	uint32_t m_ID = 0;
 	std::unordered_map<std::string, int32_t> m_UniformLocations;
 };
+
+class Framebuffer
+{
+public:
+	Framebuffer();
+	~Framebuffer();
+
+	void AttachTexture(uint32_t width, uint32_t height);
+	void AttachRenderBuffer(uint32_t width, uint32_t height);
+
+	void BindBuffer()					const;
+	void BindTexture(uint32_t slot = 0)	const;
+	void BindRenderBuffer()				const;
+	void UnbindBuffer()					const;
+	void UnbindTexture()				const;
+	void UnbindRenderBuffer()			const;
+
+	inline uint32_t GetTextureID() const { return m_TextureID; }
+
+	bool IsComplete() const;
+
+private:
+	uint32_t m_ID = 0;
+	uint32_t m_TextureID = 0;
+	uint32_t m_RenderbufferID = 0;
+};

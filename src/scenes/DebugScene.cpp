@@ -1,6 +1,7 @@
 #include "DebugScene.hpp"
 #include "../Logger.hpp"
 #include "../Event.hpp"
+#include "../Application.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -18,6 +19,10 @@ DebugScene::DebugScene()
 	{
 		0, 1, 2
 	};
+
+	m_FB = std::make_unique<Framebuffer>();
+	m_FB->AttachTexture(Application::GetInstance()->GetWindowSpec().Width, Application::GetInstance()->GetWindowSpec().Height);
+	m_FB->UnbindBuffer();
 
 	m_VAO = std::make_unique<VertexArray>();
 	m_VBO = std::make_unique<VertexBuffer>(vertices, 6 * sizeof(float));
@@ -54,8 +59,6 @@ void DebugScene::OnInput()
 
 }
 
-static glm::vec4 color{ 1.0f, 0.0f, 0.0f, 1.0f };
-
 void DebugScene::OnUpdate(float ts)
 {
 	m_TimePassedInSeconds += ts;
@@ -68,15 +71,23 @@ void DebugScene::OnUpdate(float ts)
 		LOG_WARN("Mouse position: {}x{}", Input::GetMousePosition().x, Input::GetMousePosition().y);
 	}
 
-	m_Shader->SetUniform4f("u_Color", color);
+	m_Shader->Bind();
+	m_Shader->SetUniform4f("u_Color", m_TriangleColor);
 }
 
 void DebugScene::OnRender()
 {
-	ImGui::Begin("Triangle color picker");
-	ImGui::SetWindowFontScale(1.5f);
-	ImGui::ColorEdit4("Color", glm::value_ptr(color));
-	ImGui::End();
+	m_FB->BindBuffer();
 
+	GLCall(glClearColor(0.3f, 0.3f, 0.3f, 1.0f));
+	
 	GLCall(glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr));
+
+	m_FB->UnbindBuffer();
+	m_FB->BindTexture(1);
+}
+
+uint32_t DebugScene::GetFramebufferTextureID() const
+{
+	return m_FB->GetTextureID();
 }
