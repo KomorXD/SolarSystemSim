@@ -16,8 +16,8 @@ What I plan for it to feature:
 - Other things I did not think about while writing this  
   
 # Libraries used  
-- <a href="https://github.com/glfw/glfw" target="_blank">glfw</a>
-- <a href="https://github.com/Dav1dde/glad" target="_blank">glad</a>  
-- <a href="https://github.com/g-truc/glm" target="_blank">glm</a>  
-- <a href="https://github.com/gabime/spdlog" target="_blank">spdlog</a>
-- <a href="https://github.com/ocornut/imgui" target="_blank">Dear ImGui</a>
+- [glfw](https://github.com/glfw/glfw)
+- [glad](https://github.com/Dav1dde/glad)
+- [glm](https://github.com/g-truc/glm)
+- [spdlog](https://github.com/gabime/spdlog)
+- [Dear ImGui](https://github.com/ocornut/imgui)
