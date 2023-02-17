@@ -1,4 +1,5 @@
 #include "MainLayer.hpp"
+#include "DebugScene.hpp"
 #include "../Application.hpp"
 
 #include <imgui/imgui.h>

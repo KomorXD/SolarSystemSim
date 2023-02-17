@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Layer.hpp"
-#include "DebugScene.hpp"
+#include "Scene.hpp"
 
 #include <memory>
 
@@ -16,5 +16,5 @@ public:
 	virtual void OnImGuiRender()	override;
 
 private:
-	std::unique_ptr<DebugScene> m_Scene;
+	std::unique_ptr<Scene> m_Scene;
 };
