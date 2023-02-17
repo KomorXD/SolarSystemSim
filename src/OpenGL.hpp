@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <string>
 #include <optional>
+#include <memory>
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define ASSERT(x) if(!(x)) __debugbreak()
@@ -104,12 +105,15 @@ public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
+	void AddBuffer(const VertexBuffer& vb, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout);
 	void Bind() const;
 	void Unbind() const;
 
+	inline const std::unique_ptr<IndexBuffer>& GetIndexBuffer() const { return m_IBO; }
+
 private:
 	uint32_t m_ID = 0;
+	std::unique_ptr<IndexBuffer> m_IBO;
 };
 
 class Shader
@@ -125,6 +129,7 @@ public:
 	void SetUniform1i(const std::string& name, int32_t val);
 	void SetUniform1f(const std::string& name, float val);
 	void SetUniform4f(const std::string& name, const glm::vec4& vec);
+	void SetUniformMat4(const std::string& name, const glm::mat4& vec);
 
 	bool ReloadShader();
 

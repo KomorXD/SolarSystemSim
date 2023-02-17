@@ -100,10 +100,11 @@ VertexArray::~VertexArray()
 	}
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
+void VertexArray::AddBuffer(const VertexBuffer& vb, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout)
 {
 	Bind();
 	vb.Bind();
+	ibo->Bind();
 
 	const auto& elements = layout.GetElements();
 	uint32_t offset = 0;
@@ -117,6 +118,8 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}
+
+	m_IBO = std::move(ibo);
 }
 
 void VertexArray::Bind() const
@@ -218,6 +221,11 @@ void Shader::SetUniform1f(const std::string& name, float val)
 void Shader::SetUniform4f(const std::string& name, const glm::vec4& vec)
 {
 	GLCall(glUniform4f(GetUniformLocation(name), vec.r, vec.g, vec.b, vec.a));
+}
+
+void Shader::SetUniformMat4(const std::string& name, const glm::mat4& vec)
+{
+	GLCall(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &vec[0][0]));
 }
 
 bool Shader::ReloadShader()
