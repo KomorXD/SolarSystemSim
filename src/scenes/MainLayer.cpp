@@ -47,13 +47,5 @@ void MainLayer::OnImGuiRender()
 
 	ImGui::SetNextWindowPos({ windowSpec.Width * 0.66f, 0.0f });
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.34f, windowSpec.Height * 1.0f });
-	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-
-	ImGui::Text("Triangle color picker");
-	ImGui::ColorEdit4("Color", m_Scene->GetTriangleColorPtr());
-	ImGui::Separator();
-	ImGui::Text("Visibility");
-	ImGui::Checkbox("Show triangle", &s_RenderTriangle);
-
-	ImGui::End();
+	m_Scene->OnConfigRender();
 }
