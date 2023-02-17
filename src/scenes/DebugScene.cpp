@@ -2,6 +2,7 @@
 #include "../Logger.hpp"
 #include "../Event.hpp"
 #include "../Application.hpp"
+#include "../renderer/Renderer.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,17 +25,23 @@ DebugScene::DebugScene()
 	m_FB->AttachTexture(Application::GetInstance()->GetWindowSpec().Width, Application::GetInstance()->GetWindowSpec().Height);
 	m_FB->UnbindBuffer();
 
-	m_VAO = std::make_unique<VertexArray>();
-	m_VBO = std::make_unique<VertexBuffer>(vertices, 6 * sizeof(float));
-	m_IBO = std::make_unique<IndexBuffer>(indices, 3);
+	m_VAO = std::make_shared<VertexArray>();
+
+	VertexBuffer vbo(vertices, 6 * sizeof(float));
+	std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(indices, 3);
 
 	VertexBufferLayout layout;
 
 	layout.Push<float>(2);
-	m_VAO->AddBuffer(*m_VBO, layout);
+	m_VAO->AddBuffer(vbo, ibo, layout);
+	m_VAO->Unbind();
 
 	m_Shader = std::make_shared<Shader>("res/shaders/Triangle.vert", "res/shaders/Triangle.frag");
 	m_Shader->Bind();
+
+	Renderer::Init();
+
+	m_Camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
 
 	LOG_INFO("DebugScene initialized.");
 }
@@ -46,30 +53,25 @@ DebugScene::~DebugScene()
 
 void DebugScene::OnEvent(Event& ev)
 {
-	if(ev.Type == Event::KeyPressed && ev.Key.Code == Key::A)
+	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::K)
 	{
-		m_ShouldBeRendered = !m_ShouldBeRendered;
+		glm::vec3 pos = m_Camera.GetPosition();
 
-		LOG_INFO("Event caught, flag is now: {}", m_ShouldBeRendered ? "true" : "false");
+		LOG_INFO("Camera position: ({}, {}, {})", pos.x, pos.y, pos.z);
 	}
+
+	m_Camera.OnEvent(ev);
 }
 
 void DebugScene::OnInput()
 {
-
 }
 
 void DebugScene::OnUpdate(float ts)
 {
-	m_TimePassedInSeconds += ts;
+	m_FPS = 1.0f / ts;
 
-	if (m_TimePassedInSeconds > 1.0f)
-	{
-		m_TimePassedInSeconds = 0.0f;
-
-		LOG_INFO("1 second passed, FPS: {}", 1.0f / ts);
-		LOG_WARN("Mouse position: {}x{}", Input::GetMousePosition().x, Input::GetMousePosition().y);
-	}
+	m_Camera.OnUpdate(ts);
 
 	m_Shader->Bind();
 	m_Shader->SetUniform4f("u_Color", m_TriangleColor);
@@ -79,12 +81,35 @@ void DebugScene::OnRender()
 {
 	m_FB->BindBuffer();
 
-	GLCall(glClearColor(0.3f, 0.3f, 0.3f, 1.0f));
+	Renderer::Clear();
+	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
+	Renderer::SceneBegin(m_Camera);
 	
-	GLCall(glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr));
+	if (m_ShouldBeRendered)
+	{
+		Renderer::SubmitIndexed(m_Shader, m_VAO,
+			glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -4.0f)), glm::vec3(2.0f, 0.8f, 2.0f)));
+	}
 
 	m_FB->UnbindBuffer();
 	m_FB->BindTexture(1);
+}
+
+void DebugScene::OnConfigRender()
+{
+	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+	ImGui::Text("FPS: %.2f", m_FPS);
+	ImGui::Separator();
+
+	ImGui::Text("Triangle color picker");
+	ImGui::ColorEdit4("Color", glm::value_ptr(m_TriangleColor));
+	ImGui::Separator();
+	
+	ImGui::Text("Visibility");
+	ImGui::Checkbox("Show triangle", &m_ShouldBeRendered);
+
+	ImGui::End();
 }
 
 uint32_t DebugScene::GetFramebufferTextureID() const
