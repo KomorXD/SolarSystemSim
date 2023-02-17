@@ -13,11 +13,13 @@ include_directories(
 file(GLOB PROJECT_HEADERS 
 	"*.hpp" 
 	"scenes/*.hpp"
+	"renderer/*.hpp"
 )
 
 file(GLOB PROJECT_SOURCES 
 	"*.cpp" 
 	"scenes/*.cpp"
+	"renderer/*.cpp"
 )
 
 file(GLOB VENDORS_SOURCES 
