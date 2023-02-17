@@ -137,7 +137,13 @@ void Application::SetWindowCallbacks()
 
 			Event ev{};
 
-			ev.Type = action == GLFW_RELEASE ? Event::KeyReleased : Event::KeyPressed;
+			switch (action)
+			{
+			case GLFW_PRESS:   ev.Type = Event::KeyPressed;  break;
+			case GLFW_RELEASE: ev.Type = Event::KeyReleased; break;
+			case GLFW_REPEAT:  ev.Type = Event::KeyHeld;	 break;
+			}
+
 			ev.Key.Code = (Key)key;
 			ev.Key.AltPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_ALT);
 			ev.Key.CtrlPressed = Input::IsKeyPressed((Key)GLFW_KEY_LEFT_CONTROL);

@@ -43,6 +43,7 @@ struct Event
 		WindowResized,
 		KeyPressed,
 		KeyReleased,
+		KeyHeld,
 		MouseMoved,
 		MouseButtonPressed,
 		MouseButtonReleased,

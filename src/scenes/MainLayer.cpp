@@ -12,20 +12,27 @@ MainLayer::MainLayer()
 
 void MainLayer::OnEvent(Event& ev)
 {
-	m_Scene->OnEvent(ev);
+	if (m_IsViewportFocused)
+	{
+		m_Scene->OnEvent(ev);
+	}
 }
 
 void MainLayer::OnInput()
 {
-	m_Scene->OnInput();
+	if (m_IsViewportFocused)
+	{
+		m_Scene->OnInput();
+	}
 }
 
 void MainLayer::OnUpdate(float ts)
 {
-	m_Scene->OnUpdate(ts);
+	if (m_IsViewportFocused)
+	{
+		m_Scene->OnUpdate(ts);
+	}
 }
-
-static bool s_RenderTriangle = true;
 
 void MainLayer::OnImGuiRender()
 {
@@ -38,10 +45,8 @@ void MainLayer::OnImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-	if (s_RenderTriangle)
-	{
-		ImGui::Image((ImTextureID)m_Scene->GetFramebufferTextureID(), ImGui::GetContentRegionAvail(), { 0.0f, 1.0f }, { 1.0f, 0.0f });
-	}
+	m_IsViewportFocused = ImGui::IsWindowHovered();
+	ImGui::Image((ImTextureID)m_Scene->GetFramebufferTextureID(), ImGui::GetContentRegionAvail(), { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
 	ImGui::End();
 	ImGui::PopStyleVar();

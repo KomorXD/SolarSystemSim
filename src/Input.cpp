@@ -2,6 +2,7 @@
 #include "Application.hpp"
 
 #include <glfw/glfw3.h>
+#include <imgui/imgui.h>
 
 bool Input::IsKeyPressed(Key key)
 {
@@ -17,7 +18,7 @@ bool Input::IsMouseButtonPressed(MouseButton button)
 	return glfwGetMouseButton(app->GetWindow(), (int32_t)button) == GLFW_PRESS;
 }
 
-MouseCoords Input::GetMousePosition()
+glm::vec2 Input::GetMousePosition()
 {
 	Application* app = Application::GetInstance();
 	double xPos{};

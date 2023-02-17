@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 enum class MouseButton
 {
 	// From glfw3.h
@@ -153,17 +155,11 @@ enum class Key
 	Menu = 348
 };
 
-struct MouseCoords
-{
-	float x;
-	float y;
-};
-
 class Input
 {
 public:
 	static bool IsKeyPressed(Key key);
 
 	static bool IsMouseButtonPressed(MouseButton button);
-	static MouseCoords GetMousePosition();
+	static glm::vec2 GetMousePosition();
 };

@@ -17,4 +17,6 @@ public:
 
 private:
 	std::unique_ptr<Scene> m_Scene;
+
+	bool m_IsViewportFocused = true;
 };
