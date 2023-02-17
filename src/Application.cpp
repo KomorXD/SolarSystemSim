@@ -6,6 +6,7 @@
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
@@ -56,11 +57,6 @@ Application::Application(const WindowSpec& spec)
 
 	LOG_INFO("GLAD loaded");
 
-	GLCall(glEnable(GL_DEPTH_TEST));
-	GLCall(glDepthFunc(GL_LESS));
-	GLCall(glEnable(GL_BLEND));
-	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
 	s_Instance = this;
 }
 
@@ -101,9 +97,6 @@ void Application::Run()
 		currTime = glfwGetTime();
 		timestep = std::min(1.0 / 60.0, currTime - prevTime);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 
@@ -132,13 +125,13 @@ void Application::Run()
 void Application::SetWindowCallbacks()
 {
 	glfwSetErrorCallback(
-		[](int32_t errorCode, const char* description)
+		[](int errorCode, const char* description)
 		{
 			LOG_ERROR("GLFW error #{}: {}", errorCode, description);
 		});
 
 	glfwSetKeyCallback(m_Window,
-		[](GLFWwindow* window, int32_t key, int32_t scancode, int32_t action, int32_t mods)
+		[](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			Application* app = (Application*)glfwGetWindowUserPointer(window);
 
@@ -168,7 +161,7 @@ void Application::SetWindowCallbacks()
 		});
 
 	glfwSetMouseButtonCallback(m_Window,
-		[](GLFWwindow* window, int32_t button, int32_t action, int32_t mods)
+		[](GLFWwindow* window, int button, int action, int mods)
 		{
 			Application* app = (Application*)glfwGetWindowUserPointer(window);
 
@@ -195,7 +188,7 @@ void Application::SetWindowCallbacks()
 		});
 
 	glfwSetWindowSizeCallback(m_Window,
-		[](GLFWwindow* window, int32_t width, int32_t height)
+		[](GLFWwindow* window, int width, int height)
 		{
 			Application* app = (Application*)glfwGetWindowUserPointer(window);
 
