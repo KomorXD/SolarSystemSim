@@ -1,5 +1,6 @@
 #include "Camera.hpp"
 #include "../Event.hpp"
+#include "../Logger.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
@@ -23,40 +24,8 @@ void Camera::OnEvent(Event& ev)
 
 void Camera::OnUpdate(float ts)
 {
-	glm::vec3 moveVec(0.0f);
-
-	if (Input::IsKeyPressed(Key::A))
-	{
-		moveVec.x = -1.0f;
-	}
-	else if (Input::IsKeyPressed(Key::D))
-	{
-		moveVec.x = 1.0f;
-	}
-
-	if (Input::IsKeyPressed(Key::W))
-	{
-		moveVec.z = -1.0f;
-	}
-	else if (Input::IsKeyPressed(Key::S))
-	{
-		moveVec.z = 1.0f;
-	}
-
-	if (Input::IsKeyPressed(Key::Space))
-	{
-		moveVec.y = 1.0f;
-	}
-	else if (Input::IsKeyPressed(Key::LeftShift))
-	{
-		moveVec.y = -1.0f;
-	}
-
-	if (glm::length(moveVec) != 0.0f)
-	{
-		m_Position += glm::normalize(moveVec) * ts;
-		UpdateView();
-	}
+	CheckForMouseMovement(ts);
+	CheckForMoveInput(ts);
 }
 
 void Camera::SetViewportSize(const glm::vec2& viewportSize)
@@ -103,4 +72,70 @@ void Camera::UpdateView()
 
 	m_View = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
 	m_View = glm::inverse(m_View);
+}
+
+void Camera::CheckForMoveInput(float ts)
+{
+	glm::vec3 moveVec(0.0f);
+
+	if (Input::IsKeyPressed(Key::A))
+	{
+		moveVec.x = -1.0f;
+	}
+	else if (Input::IsKeyPressed(Key::D))
+	{
+		moveVec.x = 1.0f;
+	}
+
+	if (Input::IsKeyPressed(Key::W))
+	{
+		moveVec.z = -1.0f;
+	}
+	else if (Input::IsKeyPressed(Key::S))
+	{
+		moveVec.z = 1.0f;
+	}
+
+	if (Input::IsKeyPressed(Key::Space))
+	{
+		moveVec.y = 1.0f;
+	}
+	else if (Input::IsKeyPressed(Key::LeftShift))
+	{
+		moveVec.y = -1.0f;
+	}
+
+	if (glm::length(moveVec) != 0.0f)
+	{
+		m_Position += glm::normalize(moveVec) * ts;
+		UpdateView();
+	}
+}
+
+void Camera::CheckForMouseMovement(float ts)
+{
+	glm::vec2 mousePos = Input::GetMousePosition();
+	glm::vec2 delta = mousePos - m_InitialMousePos;
+
+	m_InitialMousePos = mousePos;
+
+	if (glm::length(delta) == 0.0f)
+	{
+		return;
+	}
+
+	if (Input::IsKeyPressed(Key::LeftControl))
+	{
+		m_Yaw   += delta.x * ts * 0.3f;
+		m_Pitch += delta.y * ts * 0.3f;
+
+		UpdateView();
+	}
+	else if (Input::IsMouseButtonPressed(MouseButton::Right))
+	{
+		m_Position += GetRightDirection() * glm::vec3(delta.x, 0.0f, 0.0f) * ts * 0.3f;
+		m_Position += GetUpDirection() * glm::vec3(0.0f, -delta.y, 0.0f) * ts * 0.3f;
+
+		UpdateView();
+	}
 }

@@ -32,6 +32,9 @@ private:
 	void UpdateProjection();
 	void UpdateView();
 
+	void CheckForMoveInput(float ts);
+	void CheckForMouseMovement(float ts);
+
 	float m_FOV			= 90.0f;
 	float m_AspectRatio = 16.0f / 9.0f;
 	float m_NearClip	= 0.1f;
