@@ -2,7 +2,6 @@
 #include "../OpenGL.hpp"
 #include "../renderer/Camera.hpp"
 
-#include <glm/gtc/type_ptr.hpp>
 #include <memory>
 
 class DebugScene : public Scene

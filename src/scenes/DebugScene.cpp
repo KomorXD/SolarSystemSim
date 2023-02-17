@@ -59,6 +59,12 @@ void DebugScene::OnEvent(Event& ev)
 
 		LOG_INFO("Camera position: ({}, {}, {})", pos.x, pos.y, pos.z);
 	}
+	else if (ev.Type == Event::WindowResized)
+	{
+		m_Camera.SetViewportSize(glm::vec2(ev.Size.Width, ev.Size.Height));
+
+		LOG_INFO("Window resized to: {}x{}", ev.Size.Width, ev.Size.Height);
+	}
 
 	m_Camera.OnEvent(ev);
 }
