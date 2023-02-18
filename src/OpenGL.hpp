@@ -32,6 +32,8 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
+	void SetData(const void* data, uint32_t size);
+
 private:
 	uint32_t m_ID = 0;
 };
