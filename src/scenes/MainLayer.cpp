@@ -12,7 +12,7 @@ MainLayer::MainLayer()
 
 void MainLayer::OnEvent(Event& ev)
 {
-	if (m_IsViewportFocused)
+	if (m_IsViewportFocused || ev.Type == Event::WindowResized)
 	{
 		m_Scene->OnEvent(ev);
 	}
