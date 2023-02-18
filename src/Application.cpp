@@ -29,9 +29,18 @@ Application::Application(const WindowSpec& spec)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
 	m_Window = glfwCreateWindow(m_WindowSpec.Width, m_WindowSpec.Height,
 		m_WindowSpec.Title.c_str(), nullptr, nullptr);
+
+	int width{};
+	int height{};
+
+	glfwGetWindowSize(m_Window, &width, &height);
+
+	m_WindowSpec.Width = width;
+	m_WindowSpec.Height = height;
 
 	if (!m_Window)
 	{
@@ -84,6 +93,13 @@ void Application::Run()
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 
+	ImGuiIO& io = ImGui::GetIO();
+
+	io.Fonts->AddFontDefault();
+
+	ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/tahoma.ttf", 24.0f);
+	IM_ASSERT(font != nullptr);
+
 	ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
 	ImGui_ImplOpenGL3_Init();
 
@@ -101,6 +117,7 @@ void Application::Run()
 		ImGui_ImplGlfw_NewFrame();
 
 		ImGui::NewFrame();
+		ImGui::PushFont(font);
 
 		Event ev{};
 		
@@ -113,6 +130,7 @@ void Application::Run()
 		m_CurrentLayer->OnUpdate((float)timestep);
 		m_CurrentLayer->OnImGuiRender();
 
+		ImGui::PopFont();
 		ImGui::Render();
 		
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
