@@ -49,8 +49,7 @@ void VertexBuffer::Unbind() const
 void VertexBuffer::SetData(const void* data, uint32_t size)
 {
 	Bind();
-	GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW));
-	Unbind();
+	GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 
 IndexBuffer::IndexBuffer(const uint32_t* data, uint32_t count)
