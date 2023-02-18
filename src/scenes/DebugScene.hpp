@@ -19,14 +19,11 @@ public:
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 private:
-	bool m_ShouldBeRendered = true;
-	float m_FPS = 1.0f / 60.0f;
+	float m_FPS = 60.0f;
 
 	Camera m_Camera;
 
-	glm::vec4 m_TriangleColor{ 1.0f, 0.0f, 0.0f, 1.0f };
+	glm::vec4 m_SphereColor{ 1.0f, 0.0f, 0.0f, 1.0f };
 
 	std::unique_ptr<Framebuffer> m_FB;
-	std::shared_ptr<VertexArray> m_VAO;
-	std::shared_ptr<Shader>		 m_Shader;
 };
