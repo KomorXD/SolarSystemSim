@@ -106,10 +106,10 @@ VertexArray::~VertexArray()
 	}
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vb, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout)
+void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout)
 {
 	Bind();
-	vb.Bind();
+	vbo->Bind();
 	ibo->Bind();
 
 	const auto& elements = layout.GetElements();
@@ -126,6 +126,25 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, std::unique_ptr<IndexBuffer>
 	}
 
 	m_IBO = std::move(ibo);
+}
+
+void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout)
+{
+	Bind();
+	vbo->Bind();
+
+	const auto& elements = layout.GetElements();
+	uint32_t offset = 0;
+
+	for (uint32_t i = 0; i < elements.size(); ++i)
+	{
+		const VertexBufferElement& element = elements[i];
+
+		GLCall(glEnableVertexAttribArray(i));
+		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
+
+		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
+	}
 }
 
 void VertexArray::Bind() const

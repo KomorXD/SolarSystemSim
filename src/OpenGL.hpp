@@ -107,7 +107,9 @@ public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(const VertexBuffer& vb, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout);
+	void AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout);
+	void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout);
+
 	void Bind() const;
 	void Unbind() const;
 
