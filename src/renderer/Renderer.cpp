@@ -25,6 +25,8 @@ static void OpenGLMessageCallback(
 }
 
 glm::mat4 Renderer::s_ViewProjection = glm::mat4(1.0f);
+glm::mat4 Renderer::s_Projection = glm::mat4(1.0f);
+glm::mat4 Renderer::s_View = glm::mat4(1.0f);
 
 struct SphereVertex
 {
@@ -71,6 +73,10 @@ struct RendererData
 	std::shared_ptr<VertexBuffer> LineVertexBuffer;
 	std::shared_ptr<Shader>		  LineShader;
 
+	std::shared_ptr<VertexArray>  SkyboxVertexArray;
+	std::shared_ptr<VertexBuffer> SkyboxVertexBuffer;
+	std::shared_ptr<Shader>		  SkyboxShader;
+
 	uint32_t	QuadIndexCount = 0;
 	QuadVertex* QuadBufferBase = nullptr;
 	QuadVertex* QuadBufferPtr  = nullptr;
@@ -89,6 +95,8 @@ struct RendererData
 	std::vector<glm::vec3> SphereNormals;
 
 	float LineWidth = 2.0f;
+
+	std::array<glm::vec4, 36> SkyboxVertices;
 };
 
 static RendererData s_Data{};
@@ -275,7 +283,66 @@ void Renderer::Init()
 
 		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, layout);
 		s_Data.LineBufferBase = new LineVertex[s_Data.MaxVertices];
-		s_Data.LineShader = std::make_unique<Shader>("res/shaders/Line.vert", "res/shaders/Line.frag");
+		s_Data.LineShader = std::make_shared<Shader>("res/shaders/Line.vert", "res/shaders/Line.frag");
+	}
+
+	{
+		SCOPE_PROFILE("Skybox data init");
+
+		s_Data.SkyboxVertexArray = std::make_shared<VertexArray>();
+
+		float skyboxVertices[] = {
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
+		s_Data.SkyboxVertexBuffer = std::make_shared<VertexBuffer>(skyboxVertices, sizeof(skyboxVertices));
+
+		VertexBufferLayout layout;
+
+		layout.Push<float>(3);
+
+		s_Data.SkyboxVertexArray->AddVertexBuffer(s_Data.SkyboxVertexBuffer, layout);
+		s_Data.SkyboxShader = std::make_shared<Shader>("res/shaders/Skybox.vert", "res/shaders/Skybox.frag");
 	}
 }
 
@@ -294,6 +361,8 @@ void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 void Renderer::SceneBegin(Camera& camera)
 {
 	s_ViewProjection = camera.GetViewProjection();
+	s_Projection = camera.GetProjection();
+	s_View = camera.GetViewMatrix();
 
 	StartBatch();
 }
@@ -437,6 +506,22 @@ void Renderer::SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::s
 	vao->Bind();
 
 	GLCall(glDrawElements(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr));
+}
+
+void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
+{
+	cubemap->Bind();
+
+	s_Data.SkyboxShader->Bind();
+	s_Data.SkyboxShader->SetUniformMat4("u_Projection", s_Projection);
+	s_Data.SkyboxShader->SetUniformMat4("u_View", glm::mat4(glm::mat3(s_View)));
+	s_Data.SkyboxShader->SetUniform1i("u_SkyboxTex", 0);
+
+	s_Data.SkyboxVertexArray->Bind();
+
+	GLCall(glDepthFunc(GL_LEQUAL));
+	GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
+	GLCall(glDepthFunc(GL_LESS));
 }
 
 void Renderer::ToggleWireframe()

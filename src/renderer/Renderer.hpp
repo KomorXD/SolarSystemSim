@@ -6,6 +6,7 @@
 #include <memory>
 
 class Shader;
+class Cubemap;
 class VertexArray;
 
 class Renderer
@@ -30,6 +31,7 @@ public:
 	static void DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count = 0);
 	static void DrawLines(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t vertexCount);
 	static void SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, const glm::mat4& transform = glm::mat4(1.0f));
+	static void DrawSkybox(const std::shared_ptr<Cubemap>& cubemap);
 
 	static void ToggleWireframe();
 	static void SetLineWidth(float width);
@@ -39,4 +41,6 @@ private:
 	static void NextBatch();
 
 	static glm::mat4 s_ViewProjection;
+	static glm::mat4 s_Projection;
+	static glm::mat4 s_View;
 };
