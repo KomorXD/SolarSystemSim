@@ -26,7 +26,8 @@ private:
 
 	Camera m_Camera;
 
-	glm::vec4 m_SphereColor{ 1.0f, 0.0f, 0.0f, 1.0f };
-
 	std::unique_ptr<Framebuffer> m_FB;
+	std::shared_ptr<Cubemap> m_SkyboxTex;
+
+	glm::vec4 m_SphereColor{ 1.0f, 0.0f, 0.0f, 1.0f };
 };

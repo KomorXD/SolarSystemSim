@@ -24,6 +24,18 @@ DebugScene::DebugScene()
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.66f, (float)spec.Height });
 
+	std::array<std::string, 6> faces =
+	{
+		"res/textures/skybox/right.png",
+		"res/textures/skybox/left.png",
+		"res/textures/skybox/top.png",
+		"res/textures/skybox/bottom.png",
+		"res/textures/skybox/front.png",
+		"res/textures/skybox/back.png"
+	};
+
+	m_SkyboxTex = std::make_shared<Cubemap>(faces);
+
 	LOG_INFO("DebugScene initialized.");
 }
 
@@ -73,6 +85,7 @@ void DebugScene::OnRender()
 	Renderer::DrawSphere({ 2.0f, 0.0f, -10.0f }, 0.5f, m_SphereColor);
 	Renderer::DrawSphere({ 0.0f, -0.5f, -8.0f }, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	Renderer::DrawQuad({ -2.0f, 0.0f, -7.0f }, glm::vec3(0.75f), { 0.0f, 1.0f, 1.0f, 1.0f });
+	Renderer::DrawSkybox(m_SkyboxTex);
 	Renderer::SceneEnd();
 
 	m_FB->UnbindRenderBuffer();
