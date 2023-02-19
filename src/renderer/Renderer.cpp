@@ -33,6 +33,12 @@ struct SphereVertex
 	glm::vec4 Color;
 };
 
+struct QuadVertex
+{
+	glm::vec3 Position;
+	glm::vec4 Color;
+};
+
 struct LineVertex
 {
 	glm::vec3 Position;
@@ -47,19 +53,29 @@ struct BasicVertex
 
 struct RendererData
 {
-	static constexpr uint32_t MaxQuads		   = 10000;
+	static constexpr uint32_t MaxQuads		   = 20000;
 	static constexpr uint32_t MaxVertices	   = MaxQuads * 4;
 	static constexpr uint32_t MaxIndices	   = MaxQuads * 6;
+
 	static constexpr uint32_t IndicesPerSphere = 5952;
+
+	std::shared_ptr<VertexArray>  QuadVertexArray;
+	std::shared_ptr<VertexBuffer> QuadVertexBuffer;
+	std::shared_ptr<Shader>		  QuadShader;
 
 	std::shared_ptr<VertexArray>  SphereVertexArray;
 	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
 	std::shared_ptr<Shader>		  SphereShader;
 
+	uint32_t QuadIndexCount = 0;
+	QuadVertex* QuadBufferBase = nullptr;
+	QuadVertex* QuadBufferPtr = nullptr;
+
 	uint32_t SphereIndexCount	   = 0;
 	SphereVertex* SphereBufferBase = nullptr;
 	SphereVertex* SphereBufferPtr  = nullptr;
 
+	std::array<glm::vec4, 4> QuadVertices;
 	std::vector<BasicVertex> SphereVertices;
 };
 
@@ -167,30 +183,75 @@ void Renderer::Init()
 	GLCall(glEnable(GL_CULL_FACE));
 	GLCall(glEnable(GL_LINE_SMOOTH));
 
-	s_Data.SphereVertexArray = std::make_shared<VertexArray>();
-	s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereVertex));
+	{
+		SCOPE_PROFILE("Quad data init");
 
-	VertexBufferLayout layout;
+		s_Data.QuadVertexArray = std::make_shared<VertexArray>();
+		s_Data.QuadVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(QuadVertex));
 
-	layout.Push<float>(3);
-	layout.Push<float>(3);
-	layout.Push<float>(4);
+		VertexBufferLayout layout;
 
-	std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32, s_Data.MaxIndices);
+		layout.Push<float>(3);
+		layout.Push<float>(4);
 
-	std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), sphereIndices.size());
+		std::vector<uint32_t> quadIndices(s_Data.MaxIndices);
 
-	s_Data.SphereVertexArray->AddBuffer(*s_Data.SphereVertexBuffer, ibo, layout);
-	s_Data.SphereVertexArray->Unbind();
+		uint32_t offset = 0;
 
-	s_Data.SphereBufferBase = new SphereVertex[s_Data.MaxVertices];
-	s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
+		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
+		{
+			quadIndices[i + 0] = offset + 0;
+			quadIndices[i + 1] = offset + 1;
+			quadIndices[i + 2] = offset + 2;
 
-	s_Data.SphereVertices = GenerateUVSphereVertices(32, 32);
+			quadIndices[i + 3] = offset + 2;
+			quadIndices[i + 4] = offset + 3;
+			quadIndices[i + 5] = offset + 0;
+
+			offset += 4;
+		}
+
+		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(quadIndices.data(), quadIndices.size());
+
+		s_Data.QuadVertexArray->AddBuffer(*s_Data.QuadVertexBuffer, ibo, layout);
+
+		s_Data.QuadBufferBase = new QuadVertex[s_Data.MaxVertices];
+		s_Data.QuadShader = std::make_shared<Shader>("res/shaders/Quad.vert", "res/shaders/Quad.frag");
+
+		s_Data.QuadVertices[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data.QuadVertices[1] = {  0.5f, -0.5f, 0.0f, 1.0f };
+		s_Data.QuadVertices[2] = {  0.5f,  0.5f, 0.0f, 1.0f };
+		s_Data.QuadVertices[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
+	}
+
+	{
+		SCOPE_PROFILE("Sphere data init");
+
+		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
+		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereVertex));
+
+		VertexBufferLayout layout;
+
+		layout.Push<float>(3);
+		layout.Push<float>(3);
+		layout.Push<float>(4);
+
+		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32, s_Data.MaxIndices);
+
+		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), sphereIndices.size());
+
+		s_Data.SphereVertexArray->AddBuffer(*s_Data.SphereVertexBuffer, ibo, layout);
+
+		s_Data.SphereBufferBase = new SphereVertex[s_Data.MaxVertices];
+		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
+
+		s_Data.SphereVertices = GenerateUVSphereVertices(32, 32);
+	}
 }
 
 void Renderer::Shutdown()
 {
+	delete[] s_Data.QuadBufferBase;
 	delete[] s_Data.SphereBufferBase;
 }
 
@@ -213,12 +274,22 @@ void Renderer::SceneEnd()
 
 void Renderer::Flush()
 {
+	if (s_Data.QuadIndexCount)
+	{
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadBufferPtr - (uint8_t*)s_Data.QuadBufferBase);
+
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadBufferBase, dataSize);
+
+		GLCall(glDisable(GL_CULL_FACE));
+		DrawIndexed(s_Data.QuadShader, s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+		GLCall(glEnable(GL_CULL_FACE));
+	}
+
 	if (s_Data.SphereIndexCount)
 	{
 		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.SphereBufferPtr - (uint8_t*)s_Data.SphereBufferBase);
 
 		s_Data.SphereVertexBuffer->SetData(s_Data.SphereBufferBase, dataSize);
-		s_Data.SphereShader->Bind();
 
 		DrawIndexed(s_Data.SphereShader, s_Data.SphereVertexArray, s_Data.SphereIndexCount);
 	}
@@ -232,6 +303,26 @@ void Renderer::ClearColor(const glm::vec4& color)
 void Renderer::Clear()
 {
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+}
+
+void Renderer::DrawQuad(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color)
+{
+	if (s_Data.QuadIndexCount + 6 > s_Data.MaxIndices)
+	{
+		NextBatch();
+	}
+
+	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), size);
+
+	for (size_t i = 0; i < s_Data.QuadVertices.size(); ++i)
+	{
+		s_Data.QuadBufferPtr->Position = transform * s_Data.QuadVertices[i];
+		s_Data.QuadBufferPtr->Color = color;
+
+		++s_Data.QuadBufferPtr;
+	}
+
+	s_Data.QuadIndexCount += 6;
 }
 
 void Renderer::DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color)
@@ -289,6 +380,9 @@ void Renderer::ToggleWireframe()
 
 void Renderer::StartBatch()
 {
+	s_Data.QuadIndexCount = 0;
+	s_Data.QuadBufferPtr = s_Data.QuadBufferBase;
+
 	s_Data.SphereIndexCount = 0;
 	s_Data.SphereBufferPtr = s_Data.SphereBufferBase;
 }
