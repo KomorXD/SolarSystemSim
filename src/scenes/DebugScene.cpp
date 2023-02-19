@@ -62,8 +62,17 @@ void DebugScene::OnRender()
 	Renderer::ClearColor(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
 
 	Renderer::SceneBegin(m_Camera);
-	Renderer::DrawSphere(glm::vec3( 2.0f, 0.0f, -4.0f), 1.0f, m_SphereColor);
-	Renderer::DrawSphere(glm::vec3(-2.0f, 0.0f, -4.0f), 1.0f, m_SphereColor);
+	Renderer::DrawQuad({ -1.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  0.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  1.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+
+	Renderer::DrawQuad({ -1.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  0.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  1.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+
+	Renderer::DrawQuad({ -1.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  0.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawQuad({  1.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
 	Renderer::SceneEnd();
 
 	m_FB->UnbindBuffer();
