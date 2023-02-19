@@ -33,6 +33,12 @@ struct SphereVertex
 	glm::vec4 Color;
 };
 
+struct SphereData
+{
+	std::vector<glm::vec4> Vertices;
+	std::vector<glm::vec3> Normals;
+};
+
 struct QuadVertex
 {
 	glm::vec3 Position;
@@ -43,12 +49,6 @@ struct LineVertex
 {
 	glm::vec3 Position;
 	glm::vec4 Color;
-};
-
-struct BasicVertex
-{
-	glm::vec4 Position;
-	glm::vec3 Normal;
 };
 
 struct RendererData
@@ -67,26 +67,28 @@ struct RendererData
 	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
 	std::shared_ptr<Shader>		  SphereShader;
 
-	uint32_t QuadIndexCount = 0;
+	uint32_t	QuadIndexCount = 0;
 	QuadVertex* QuadBufferBase = nullptr;
-	QuadVertex* QuadBufferPtr = nullptr;
+	QuadVertex* QuadBufferPtr  = nullptr;
 
-	uint32_t SphereIndexCount	   = 0;
+	uint32_t	  SphereIndexCount = 0;
 	SphereVertex* SphereBufferBase = nullptr;
 	SphereVertex* SphereBufferPtr  = nullptr;
 
 	std::array<glm::vec4, 4> QuadVertices;
-	std::vector<BasicVertex> SphereVertices;
+
+	std::vector<glm::vec4> SphereVertices;
+	std::vector<glm::vec3> SphereNormals;
 };
 
 static RendererData s_Data{};
 
-std::vector<BasicVertex> GenerateUVSphereVertices(int32_t sectorCount, int32_t stackCount)
+static SphereData GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
 {
 	constexpr float PI = 3.14159265358979323846f;
 	constexpr float radius = 1.0f;
 
-	std::vector<BasicVertex> vertices{};
+	SphereData data{};
 
 	float lengthInv = 1.0f / radius;
 	float sectorStep = 2.0f * PI / sectorCount;
@@ -110,21 +112,18 @@ std::vector<BasicVertex> GenerateUVSphereVertices(int32_t sectorCount, int32_t s
 			float ny = y * lengthInv;
 			float nz = z * lengthInv;
 
-			BasicVertex v;
-
-			v.Position = glm::vec4(x, y, z, 1.0f);
-			v.Normal   = glm::vec3(nx, ny, nz);
-
-			vertices.push_back(v);
+			data.Vertices.push_back(glm::vec4(x, y, z, 1.0f));
+			data.Normals.push_back(glm::vec3(nx, ny, nz));
 		}
 	}
 
-	return vertices;
+	return data;
 }
 
-std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stackCount, int32_t maxIndices)
+static std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stackCount, int32_t maxIndices)
 {
 	int32_t offset = 0;
+	int32_t indicesAdded = 0;
 
 	std::vector<uint32_t> indices{};
 	int32_t k1{};
@@ -132,7 +131,9 @@ std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stack
 
 	indices.reserve(maxIndices);
 
-	while (offset + s_Data.IndicesPerSphere < maxIndices)
+	bool print = true;
+
+	while (indicesAdded + s_Data.IndicesPerSphere < maxIndices)
 	{
 		for (int32_t i = 0; i < stackCount; ++i)
 		{
@@ -157,7 +158,8 @@ std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stack
 			}
 		}
 		
-		offset += s_Data.IndicesPerSphere;
+		offset += 1089;
+		indicesAdded += s_Data.IndicesPerSphere;
 	}
 
 	return indices;
@@ -174,11 +176,11 @@ void Renderer::Init()
 	GLCall(glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE));
 #endif
 
-	GLCall(glEnable(GL_BLEND));
-	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
 	GLCall(glEnable(GL_DEPTH_TEST));
 	GLCall(glDepthFunc(GL_LESS));
+
+	GLCall(glEnable(GL_BLEND));
+	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 	
 	GLCall(glEnable(GL_CULL_FACE));
 	GLCall(glEnable(GL_LINE_SMOOTH));
@@ -237,7 +239,6 @@ void Renderer::Init()
 		layout.Push<float>(4);
 
 		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32, s_Data.MaxIndices);
-
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), sphereIndices.size());
 
 		s_Data.SphereVertexArray->AddBuffer(*s_Data.SphereVertexBuffer, ibo, layout);
@@ -245,7 +246,10 @@ void Renderer::Init()
 		s_Data.SphereBufferBase = new SphereVertex[s_Data.MaxVertices];
 		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
 
-		s_Data.SphereVertices = GenerateUVSphereVertices(32, 32);
+		SphereData data = GenerateUVSphereData(32, 32);
+
+		s_Data.SphereVertices = std::move(data.Vertices);
+		s_Data.SphereNormals  = std::move(data.Normals);
 	}
 }
 
@@ -336,8 +340,8 @@ void Renderer::DrawSphere(const glm::vec3& position, float radius, const glm::ve
 
 	for (size_t i = 0; i < s_Data.SphereVertices.size(); ++i)
 	{
-		s_Data.SphereBufferPtr->Position = transform * s_Data.SphereVertices[i].Position;
-		s_Data.SphereBufferPtr->Normal = s_Data.SphereVertices[i].Normal;
+		s_Data.SphereBufferPtr->Position = transform * s_Data.SphereVertices[i];
+		s_Data.SphereBufferPtr->Normal = s_Data.SphereNormals[i];
 		s_Data.SphereBufferPtr->Color = color;
 
 		++s_Data.SphereBufferPtr;
