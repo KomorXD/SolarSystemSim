@@ -137,8 +137,8 @@ void Camera::CheckForMouseMovement(float ts)
 	}
 	else if (Input::IsMouseButtonPressed(MouseButton::Right))
 	{
-		m_Position += GetRightDirection() * delta.x * ts * 0.3f;
-		m_Position += GetUpDirection() * -delta.y * ts * 0.3f;
+		m_Position += GetRightDirection() * -delta.x * ts * 0.3f;
+		m_Position += GetUpDirection() * delta.y * ts * 0.3f;
 
 		UpdateView();
 	}
