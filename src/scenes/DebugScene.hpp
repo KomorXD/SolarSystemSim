@@ -19,7 +19,10 @@ public:
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 private:
+	void DrawGridPlane();
+
 	float m_FPS = 60.0f;
+	bool m_ShowGrid = true;
 
 	Camera m_Camera;
 
