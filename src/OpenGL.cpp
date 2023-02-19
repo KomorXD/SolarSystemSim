@@ -1,7 +1,9 @@
 #include "OpenGL.hpp"
 #include "Logger.hpp"
+#include "Timer.hpp"
 
 #include <fstream>
+#include <stb_image/stb_image.h>
 
 void GLClearErrors()
 {
@@ -537,4 +539,57 @@ bool Framebuffer::IsComplete() const
 	GLCall(bool complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
 	return complete;
+}
+
+Cubemap::Cubemap(const std::array<std::string, 6>& texFaces)
+{
+	FUNC_PROFILE();
+
+	GLCall(glGenTextures(1, &m_ID));
+	GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID));
+
+	stbi_set_flip_vertically_on_load(0);
+
+	for (size_t i = 0; i < texFaces.size(); ++i)
+	{
+		m_LocalBuffer = stbi_load(texFaces[i].c_str(), &m_Width, &m_Height, &m_BPP, 0);
+
+		if (m_LocalBuffer)
+		{
+			GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+				m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer));
+			stbi_image_free(m_LocalBuffer);
+		}
+		else
+		{
+			LOG_ERROR("Failed to load texture cubemap: {}", texFaces[i]);
+			stbi_image_free(m_LocalBuffer);
+		}
+	}
+
+	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+	GLCall(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
+}
+
+Cubemap::~Cubemap()
+{
+	if (m_ID != 0)
+	{
+		Unbind();
+		GLCall(glDeleteTextures(1, &m_ID));
+	}
+}
+
+void Cubemap::Bind(uint32_t slot)
+{
+	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+	GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, m_ID));
+}
+
+void Cubemap::Unbind()
+{
+	GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 }

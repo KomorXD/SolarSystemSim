@@ -178,3 +178,20 @@ private:
 	uint32_t m_TextureID = 0;
 	uint32_t m_RenderbufferID = 0;
 };
+
+class Cubemap
+{
+public:
+	Cubemap(const std::array<std::string, 6>& texFaces);
+	~Cubemap();
+
+	void Bind(uint32_t slot = 0);
+	void Unbind();
+
+private:
+	uint32_t m_ID		   = 0;
+	uint8_t* m_LocalBuffer = nullptr;
+	int32_t m_Width		   = 0;
+	int32_t m_Height	   = 0;
+	int32_t m_BPP		   = 0;
+};
