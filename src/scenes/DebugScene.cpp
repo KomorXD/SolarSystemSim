@@ -15,7 +15,8 @@ DebugScene::DebugScene()
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
 	m_FB = std::make_unique<Framebuffer>();
-	m_FB->AttachTexture((uint32_t)(spec.Width), spec.Height);
+	m_FB->AttachTexture(spec.Width, spec.Height);
+	m_FB->AttachRenderBuffer(spec.Width, spec.Height);
 	m_FB->UnbindBuffer();
 
 	Renderer::Init();
@@ -57,24 +58,18 @@ void DebugScene::OnUpdate(float ts)
 void DebugScene::OnRender()
 {
 	m_FB->BindBuffer();
+	m_FB->BindRenderBuffer();
 
-	Renderer::Clear();
 	Renderer::ClearColor(glm::vec4(0.05f, 0.05f, 0.05f, 1.0f));
+	Renderer::Clear();
 
 	Renderer::SceneBegin(m_Camera);
-	Renderer::DrawQuad({ -1.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  0.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  1.0f,  1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-
-	Renderer::DrawQuad({ -1.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  0.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  1.0f,  0.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-
-	Renderer::DrawQuad({ -1.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  0.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
-	Renderer::DrawQuad({  1.0f, -1.0f, -4.0f }, glm::vec3(0.5f), m_SphereColor);
+	Renderer::DrawSphere({ 2.0f, 0.0f, -3.0f }, 0.5f, m_SphereColor);
+	Renderer::DrawSphere({ 0.0f, -0.5f, -6.0f }, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
+	Renderer::DrawQuad({ -2.0f, 0.0f, -5.0f }, glm::vec3(0.75f), { 0.0f, 1.0f, 1.0f, 1.0f });
 	Renderer::SceneEnd();
 
+	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
 	m_FB->BindTexture(1);
 }
