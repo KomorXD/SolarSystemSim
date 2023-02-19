@@ -6,15 +6,15 @@ layout(location = 2) in vec4 a_Color;
 
 uniform mat4 u_ViewProjection;
 
-out vec4 outColor;
 out vec3 worldPos;
 out vec3 vertexNormal;
+out vec4 outColor;
 
 void main()
 {
-	outColor = a_Color;
-	worldPos = a_Position;
+	worldPos	 = a_Position;
 	vertexNormal = a_Normal;
+	outColor	 = a_Color;
 
 	gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
 }
