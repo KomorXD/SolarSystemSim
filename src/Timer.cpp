@@ -6,7 +6,7 @@ Timer::Timer(const std::string& taskName)
 {
 	m_T1 = std::chrono::steady_clock::now();
 
-	LOG_INFO("Started {} task.", m_Name);
+	LOG_INFO("Started {}.", m_Name);
 }
 
 Timer::~Timer()
