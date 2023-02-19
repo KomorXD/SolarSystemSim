@@ -67,6 +67,10 @@ struct RendererData
 	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
 	std::shared_ptr<Shader>		  SphereShader;
 
+	std::shared_ptr<VertexArray>  LineVertexArray;
+	std::shared_ptr<VertexBuffer> LineVertexBuffer;
+	std::shared_ptr<Shader>		  LineShader;
+
 	uint32_t	QuadIndexCount = 0;
 	QuadVertex* QuadBufferBase = nullptr;
 	QuadVertex* QuadBufferPtr  = nullptr;
@@ -75,10 +79,16 @@ struct RendererData
 	SphereVertex* SphereBufferBase = nullptr;
 	SphereVertex* SphereBufferPtr  = nullptr;
 
+	uint32_t	LineVertexCount = 0;
+	LineVertex* LineBufferBase  = nullptr;
+	LineVertex* LineBufferPtr   = nullptr;
+
 	std::array<glm::vec4, 4> QuadVertices;
 
 	std::vector<glm::vec4> SphereVertices;
 	std::vector<glm::vec3> SphereNormals;
+
+	float LineWidth = 2.0f;
 };
 
 static RendererData s_Data{};
@@ -215,7 +225,7 @@ void Renderer::Init()
 
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(quadIndices.data(), quadIndices.size());
 
-		s_Data.QuadVertexArray->AddBuffer(*s_Data.QuadVertexBuffer, ibo, layout);
+		s_Data.QuadVertexArray->AddBuffers(s_Data.QuadVertexBuffer, ibo, layout);
 
 		s_Data.QuadBufferBase = new QuadVertex[s_Data.MaxVertices];
 		s_Data.QuadShader = std::make_shared<Shader>("res/shaders/Quad.vert", "res/shaders/Quad.frag");
@@ -241,7 +251,7 @@ void Renderer::Init()
 		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32, s_Data.MaxIndices);
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), sphereIndices.size());
 
-		s_Data.SphereVertexArray->AddBuffer(*s_Data.SphereVertexBuffer, ibo, layout);
+		s_Data.SphereVertexArray->AddBuffers(s_Data.SphereVertexBuffer, ibo, layout);
 
 		s_Data.SphereBufferBase = new SphereVertex[s_Data.MaxVertices];
 		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
@@ -251,12 +261,29 @@ void Renderer::Init()
 		s_Data.SphereVertices = std::move(data.Vertices);
 		s_Data.SphereNormals  = std::move(data.Normals);
 	}
+
+	{
+		SCOPE_PROFILE("Line data init");
+
+		s_Data.LineVertexArray = std::make_shared<VertexArray>();
+		s_Data.LineVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(LineVertex));
+
+		VertexBufferLayout layout;
+
+		layout.Push<float>(3);
+		layout.Push<float>(4);
+
+		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, layout);
+		s_Data.LineBufferBase = new LineVertex[s_Data.MaxVertices];
+		s_Data.LineShader = std::make_unique<Shader>("res/shaders/Line.vert", "res/shaders/Line.frag");
+	}
 }
 
 void Renderer::Shutdown()
 {
 	delete[] s_Data.QuadBufferBase;
 	delete[] s_Data.SphereBufferBase;
+	delete[] s_Data.LineBufferBase;
 }
 
 void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -296,6 +323,17 @@ void Renderer::Flush()
 		s_Data.SphereVertexBuffer->SetData(s_Data.SphereBufferBase, dataSize);
 
 		DrawIndexed(s_Data.SphereShader, s_Data.SphereVertexArray, s_Data.SphereIndexCount);
+	}
+
+	if (s_Data.LineVertexCount)
+	{
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.LineBufferPtr - (uint8_t*)s_Data.LineBufferBase);
+
+		s_Data.LineVertexBuffer->SetData(s_Data.LineBufferBase, dataSize);
+
+		GLCall(glDisable(GL_CULL_FACE));
+		DrawLines(s_Data.LineShader, s_Data.LineVertexArray, s_Data.LineVertexCount);
+		GLCall(glEnable(GL_CULL_FACE));
 	}
 }
 
@@ -350,6 +388,24 @@ void Renderer::DrawSphere(const glm::vec3& position, float radius, const glm::ve
 	s_Data.SphereIndexCount += s_Data.IndicesPerSphere;
 }
 
+void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
+{
+	if (s_Data.LineVertexCount + 2 >= s_Data.MaxVertices)
+	{
+		NextBatch();
+	}
+
+	s_Data.LineBufferPtr->Position = start;
+	s_Data.LineBufferPtr->Color = color;
+	++s_Data.LineBufferPtr;
+
+	s_Data.LineBufferPtr->Position = end;
+	s_Data.LineBufferPtr->Color = color;
+	++s_Data.LineBufferPtr;
+
+	s_Data.LineVertexCount += 2;
+}
+
 void Renderer::DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count)
 {
 	uint32_t indices = count ? count : vao->GetIndexBuffer()->GetCount();
@@ -360,6 +416,16 @@ void Renderer::DrawIndexed(const std::shared_ptr<Shader>& shader, const std::sha
 	vao->Bind();
 
 	GLCall(glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, nullptr));
+}
+
+void Renderer::DrawLines(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t vertexCount)
+{
+	shader->Bind();
+	shader->SetUniformMat4("u_ViewProjection", s_ViewProjection);
+
+	vao->Bind();
+
+	GLCall(glDrawArrays(GL_LINES, 0, vertexCount));
 }
 
 void Renderer::SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, const glm::mat4& transform)
@@ -382,6 +448,11 @@ void Renderer::ToggleWireframe()
 	GLCall(glPolygonMode(GL_FRONT_AND_BACK, mode[0]));
 }
 
+void Renderer::SetLineWidth(float width)
+{
+	GLCall(glLineWidth(width));
+}
+
 void Renderer::StartBatch()
 {
 	s_Data.QuadIndexCount = 0;
@@ -389,6 +460,9 @@ void Renderer::StartBatch()
 
 	s_Data.SphereIndexCount = 0;
 	s_Data.SphereBufferPtr = s_Data.SphereBufferBase;
+
+	s_Data.LineVertexCount = 0;
+	s_Data.LineBufferPtr = s_Data.LineBufferBase;
 }
 
 void Renderer::NextBatch()
