@@ -527,11 +527,11 @@ void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
 	GLCall(glDepthFunc(GL_LESS));
 }
 
-glm::vec4 Renderer::GetPixelAt(const glm::vec2& coords)
+glm::vec<4, uint8_t> Renderer::GetPixelAt(const glm::vec2& coords)
 {
-	glm::vec4 pixel{};
+	glm::vec<4, uint8_t> pixel{};
 
-	GLCall(glReadPixels(coords.x, coords.y, 1, 1, GL_RGBA, GL_FLOAT, &pixel[0]));
+	GLCall(glReadPixels(coords.x, coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
 
 	return pixel;
 }
