@@ -162,6 +162,9 @@ public:
 	void AttachTexture(uint32_t width, uint32_t height);
 	void AttachRenderBuffer(uint32_t width, uint32_t height);
 
+	void ResizeTexture(uint32_t width, uint32_t height);
+	void ResizeRenderBuffer(uint32_t width, uint32_t height);
+
 	void BindBuffer()					const;
 	void BindTexture(uint32_t slot = 0)	const;
 	void BindRenderBuffer()				const;

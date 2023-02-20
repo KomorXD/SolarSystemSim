@@ -503,6 +503,18 @@ void Framebuffer::AttachRenderBuffer(uint32_t width, uint32_t height)
 	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 }
 
+void Framebuffer::ResizeTexture(uint32_t width, uint32_t height)
+{
+	GLCall(glDeleteTextures(1, &m_TextureID));
+	AttachTexture(width, height);
+}
+
+void Framebuffer::ResizeRenderBuffer(uint32_t width, uint32_t height)
+{
+	GLCall(glDeleteRenderbuffers(1, &m_RenderbufferID));
+	AttachRenderBuffer(width, height);
+}
+
 void Framebuffer::BindBuffer() const
 {
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
