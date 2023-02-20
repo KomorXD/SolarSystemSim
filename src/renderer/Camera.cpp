@@ -22,7 +22,7 @@ void Camera::OnEvent(Event& ev)
 {
 	if (ev.Type == Event::WindowResized)
 	{
-		SetViewportSize({ (float)ev.Size.Width * 0.66f, (float)ev.Size.Height });
+		SetViewportSize({ (float)ev.Size.Width, (float)ev.Size.Height });
 	}
 }
 
@@ -131,14 +131,14 @@ void Camera::CheckForMouseMovement(float ts)
 	if (Input::IsKeyPressed(Key::LeftControl))
 	{
 		m_Yaw   += delta.x * ts * 0.1f;
-		m_Pitch += delta.y * ts * 0.1f;
+		m_Pitch -= delta.y * ts * 0.1f;
 
 		UpdateView();
 	}
 	else if (Input::IsMouseButtonPressed(MouseButton::Right))
 	{
-		m_Position += GetRightDirection() * -delta.x * ts * 0.3f;
-		m_Position += GetUpDirection() * delta.y * ts * 0.3f;
+		m_Position -= GetRightDirection() * delta.x * ts * 0.3f;
+		m_Position -= GetUpDirection()	  * delta.y * ts * 0.3f;
 
 		UpdateView();
 	}
