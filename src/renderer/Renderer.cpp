@@ -234,7 +234,7 @@ void Renderer::Init()
 			offset += 4;
 		}
 
-		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(quadIndices.data(), quadIndices.size());
+		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(quadIndices.data(), (uint32_t)quadIndices.size());
 
 		s_Data.QuadVertexArray->AddBuffers(s_Data.QuadVertexBuffer, ibo, layout);
 
@@ -525,6 +525,15 @@ void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
 	GLCall(glDepthFunc(GL_LEQUAL));
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 	GLCall(glDepthFunc(GL_LESS));
+}
+
+glm::vec4 Renderer::GetPixelAt(const glm::vec2& coords)
+{
+	glm::vec4 pixel{};
+
+	GLCall(glReadPixels(coords.x, coords.y, 1, 1, GL_RGBA, GL_FLOAT, &pixel[0]));
+
+	return pixel;
 }
 
 void Renderer::EnableDepth()
