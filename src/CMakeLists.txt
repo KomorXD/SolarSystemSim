@@ -14,12 +14,14 @@ file(GLOB PROJECT_HEADERS
 	"*.hpp" 
 	"scenes/*.hpp"
 	"renderer/*.hpp"
+	"objects/*.hpp"
 )
 
 file(GLOB PROJECT_SOURCES 
 	"*.cpp" 
 	"scenes/*.cpp"
 	"renderer/*.cpp"
+	"objects/*.cpp"
 )
 
 file(GLOB VENDORS_SOURCES 
