@@ -75,18 +75,39 @@ void DebugScene::OnRender()
 	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
 	Renderer::Clear();
 
+	// 1st render - draw object with no borders
 	Renderer::SceneBegin(m_Camera);
+	Renderer::EnableDepth();
+	Renderer::EndStencil();
+	Renderer::SetSphereLightning(true);
 
 	if (m_ShowGrid)
 	{
 		DrawGridPlane();
 	}
+	
+	Renderer::DrawQuad({ 2.0f, 0.0f, -12.0f }, glm::vec3(0.75f), { 1.0f, 1.0f, 0.0f, 1.0f });
+	Renderer::DrawQuad({ 2.0f, 0.0f, -9.0f  }, glm::vec3(0.75f), { 1.0f, 1.0f, 0.0f, 1.0f });
+	Renderer::DrawSkybox(m_SkyboxTex);
+	Renderer::SceneEnd();
 
+	// 2nd render - draw objects with borders, writing to the stencil buffer
+	Renderer::SceneBegin(m_Camera);
+	Renderer::BeginStencil();
 	Renderer::DrawSphere({ 2.0f, 0.0f, -10.0f }, 0.5f, m_SphereColor);
 	Renderer::DrawSphere({ 0.0f, -0.5f, -8.0f }, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
 	Renderer::DrawQuad({ -2.0f, 0.0f, -7.0f }, glm::vec3(0.75f), { 0.0f, 1.0f, 1.0f, 1.0f });
-	Renderer::DrawSkybox(m_SkyboxTex);
 	Renderer::SceneEnd();
+
+	// 3rd render - draw objects with borders using stencil buffer, outlining them
+	Renderer::SceneBegin(m_Camera);
+	Renderer::EndStencil();
+	Renderer::SetSphereLightning(false);
+	Renderer::DrawSphere({ 2.0f, 0.0f, -10.0f }, 0.55f,			 { 0.98f, 0.24f, 0.0f, 1.0f });
+	Renderer::DrawSphere({ 0.0f, -0.5f, -8.0f }, 1.05f,			 { 0.98f, 0.24f, 0.0f, 1.0f });
+	Renderer::DrawQuad({ -2.0f, 0.0f, -7.0f }, glm::vec3(0.80f), { 0.98f, 0.24f, 0.0f, 1.0f });
+	Renderer::SceneEnd();
+	Renderer::BeginStencil();
 
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();

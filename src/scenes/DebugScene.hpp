@@ -21,7 +21,7 @@ public:
 private:
 	void DrawGridPlane();
 
-	float m_FPS = 60.0f;
+	float m_FPS = 0.0f;
 	bool m_ShowGrid = true;
 
 	Camera m_Camera;
