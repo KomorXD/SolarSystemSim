@@ -33,6 +33,14 @@ public:
 	static void SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, const glm::mat4& transform = glm::mat4(1.0f));
 	static void DrawSkybox(const std::shared_ptr<Cubemap>& cubemap);
 
+	static void EnableDepth();
+	static void DisableDepth();
+
+	static void BeginStencil();
+	static void EndStencil();
+
+	static void SetSphereLightning(bool flag);
+
 	static void ToggleWireframe();
 	static void SetLineWidth(float width);
 

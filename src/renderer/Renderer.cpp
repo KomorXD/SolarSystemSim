@@ -199,6 +199,9 @@ void Renderer::Init()
 
 	GLCall(glEnable(GL_BLEND));
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
+	GLCall(glEnable(GL_STENCIL_TEST));
+	GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 	
 	GLCall(glEnable(GL_CULL_FACE));
 	GLCall(glEnable(GL_LINE_SMOOTH));
@@ -413,7 +416,7 @@ void Renderer::ClearColor(const glm::vec4& color)
 
 void Renderer::Clear()
 {
-	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
 
 void Renderer::DrawQuad(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color)
@@ -522,6 +525,34 @@ void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
 	GLCall(glDepthFunc(GL_LEQUAL));
 	GLCall(glDrawArrays(GL_TRIANGLES, 0, 36));
 	GLCall(glDepthFunc(GL_LESS));
+}
+
+void Renderer::EnableDepth()
+{
+	GLCall(glEnable(GL_DEPTH_TEST));
+}
+
+void Renderer::DisableDepth()
+{
+	GLCall(glDisable(GL_DEPTH_TEST));
+}
+
+void Renderer::BeginStencil()
+{
+	GLCall(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+	GLCall(glStencilMask(0xFF));
+}
+
+void Renderer::EndStencil()
+{
+	GLCall(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
+	GLCall(glStencilMask(0x00));
+}
+
+void Renderer::SetSphereLightning(bool flag)
+{
+	s_Data.SphereShader->Bind();
+	s_Data.SphereShader->SetUniform1i("u_Lightning", (int32_t)flag);
 }
 
 void Renderer::ToggleWireframe()
