@@ -111,7 +111,7 @@ void Application::Run()
 	{
 		prevTime = currTime;
 		currTime = glfwGetTime();
-		timestep = std::min(1.0 / 60.0, currTime - prevTime);
+		timestep = currTime - prevTime;
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
