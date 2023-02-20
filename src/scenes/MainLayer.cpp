@@ -12,7 +12,15 @@ MainLayer::MainLayer()
 
 void MainLayer::OnEvent(Event& ev)
 {
-	if (m_IsViewportFocused || ev.Type == Event::WindowResized)
+	if (ev.Type == Event::WindowResized)
+	{
+		ev.Size.Width = (uint32_t)(ev.Size.Width * 0.66f);
+		m_Scene->OnEvent(ev);
+
+		return;
+	}
+
+	if (m_IsViewportFocused)
 	{
 		m_Scene->OnEvent(ev);
 	}
