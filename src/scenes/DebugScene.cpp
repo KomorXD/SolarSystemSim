@@ -37,6 +37,14 @@ DebugScene::DebugScene()
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
 
+	for (float x = -5.0f; x <= 5.0f; x += 5.0f)
+	{
+		for (float z = -5.0f; z <= 5.0f; z += 5.0f)
+		{
+			m_Planets.emplace_back(glm::vec3(x, 0.0f, z - 5.0f));
+		}
+	}
+
 	LOG_INFO("DebugScene initialized.");
 }
 
@@ -76,38 +84,9 @@ void DebugScene::OnUpdate(float ts)
 	m_Camera.OnUpdate(ts);
 }
 
-struct Sphere
-{
-	glm::vec3 Origin;
-	glm::vec4 Color;
-	float Radius = 1.0f;
-
-	uint32_t EntityID = 0;
-};
-
-uint32_t s_IdTracker = 1;
-
-Sphere CreateSphere(const glm::vec3& center, const glm::vec4& color, float radius)
-{
-	Sphere sphere{};
-
-	sphere.Origin = center;
-	sphere.Color = color;
-	sphere.Radius = radius;
-	sphere.EntityID = s_IdTracker;
-
-	++s_IdTracker;
-
-	return sphere;
-}
-
 void DebugScene::OnRender()
 {
-	s_IdTracker = 1;
-
-	Sphere s1 = CreateSphere({  2.0f, 0.0f, -10.0f }, m_SphereColor, 0.5f);
-	Sphere s2 = CreateSphere({ -2.0f, 0.0f, -10.0f }, m_SphereColor, 1.0f);
-	Sphere* hovered = nullptr;
+	Planet* hovered = nullptr;
 
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
@@ -120,19 +99,25 @@ void DebugScene::OnRender()
 	Renderer::EnableDepth();
 	Renderer::EndStencil();
 	Renderer::SetSphereLightning(false);
-	Renderer::DrawSphere(s1.Origin, s1.Radius, glm::vec4(glm::vec3((float)s1.EntityID / (s_IdTracker)), 1.0f));
-	Renderer::DrawSphere(s2.Origin, s2.Radius, glm::vec4(glm::vec3((float)s2.EntityID / (s_IdTracker)), 1.0f));
+	
+	for (auto& planet : m_Planets)
+	{
+		Renderer::DrawSphere(planet.GetPosition(), planet.GetRadius(),
+			glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
+	}
+
 	Renderer::SceneEnd();
 
-	float pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
+	uint8_t pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
 
-	if (pixelColor == (float)s1.EntityID / s_IdTracker)
+	for (auto& planet : m_Planets)
 	{
-		hovered = &s1;
-	}
-	else if(pixelColor == (float)s2.EntityID / s_IdTracker)
-	{
-		hovered = &s2;
+		if (planet.GetEntityID() == pixelColor)
+		{
+			hovered = &planet;
+
+			break;
+		}
 	}
 
 	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
@@ -150,27 +135,32 @@ void DebugScene::OnRender()
 	}
 
 	Renderer::DrawSkybox(m_SkyboxTex);
+
+	for (auto& planet : m_Planets)
+	{
+		if (&planet == hovered) continue;
+
+		Renderer::DrawSphere(planet.GetPosition(), planet.GetRadius(), planet.GetColor());
+	}
+
 	Renderer::SceneEnd();
 
 	// 2nd render - draw objects with borders, writing to the stencil buffer
-	Renderer::SceneBegin(m_Camera);
-	Renderer::BeginStencil();
-	Renderer::DrawSphere(s1.Origin, s1.Radius, s1.Color);
-	Renderer::DrawSphere(s2.Origin, s2.Radius, s2.Color);
-	Renderer::SceneEnd();
-
-	// 3rd render - draw objects with borders using stencil buffer, outlining them
 	if (hovered)
 	{
 		Renderer::SceneBegin(m_Camera);
+		Renderer::BeginStencil();
+		Renderer::DrawSphere(hovered->GetPosition(), hovered->GetRadius(), hovered->GetColor());
+		Renderer::SceneEnd();
+
+		Renderer::SceneBegin(m_Camera);
 		Renderer::EndStencil();
 		Renderer::SetSphereLightning(false);
-
-		Renderer::DrawSphere(hovered->Origin, hovered->Radius * 1.05f, { 0.98f, 0.24f, 0.0f, 1.0f });
-
+		Renderer::DrawSphere(hovered->GetPosition(), hovered->GetRadius() * 1.05f, { 0.98f, 0.24f, 0.0f, 1.0f });
 		Renderer::SceneEnd();
-		Renderer::BeginStencil();
-	}	
+	}
+
+	Renderer::BeginStencil();
 
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();

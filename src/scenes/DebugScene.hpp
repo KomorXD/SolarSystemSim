@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 #include "../OpenGL.hpp"
 #include "../renderer/Camera.hpp"
+#include "../objects/Planet.hpp"
 
 #include <memory>
 
@@ -20,6 +21,8 @@ public:
 
 private:
 	void DrawGridPlane();
+
+	std::vector<Planet> m_Planets;
 
 	float m_TS = 0.0f;
 	bool m_ShowGrid = true;
