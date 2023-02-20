@@ -6,8 +6,17 @@ in vec3 vertexNormal;
 
 out vec4 fragColor;
 
+uniform int u_Lightning = 1;
+
 void main()
 {
+	if(u_Lightning == 0)
+	{
+		fragColor = outColor;
+
+		return;
+	}
+
 	vec3 lightPos = vec3(0.0, 3.0, 0.0);
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
