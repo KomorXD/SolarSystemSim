@@ -15,11 +15,12 @@ DebugScene::DebugScene()
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
 	m_FB = std::make_unique<Framebuffer>();
-	m_FB->AttachTexture(spec.Width, spec.Height);
-	m_FB->AttachRenderBuffer(spec.Width, spec.Height);
+	m_FB->AttachTexture(spec.Width * 0.66f, spec.Height);
+	m_FB->AttachRenderBuffer(spec.Width * 0.66f, spec.Height);
 	m_FB->UnbindBuffer();
 
 	Renderer::Init();
+	Renderer::OnWindowResize(spec.Width * 0.66f, spec.Height);
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.66f, (float)spec.Height });
@@ -52,6 +53,14 @@ void DebugScene::OnEvent(Event& ev)
 	{
 		Renderer::ToggleWireframe();
 	}
+	else if (ev.Type == Event::WindowResized)
+	{
+		m_FB->BindBuffer();
+		m_FB->ResizeTexture(ev.Size.Width, ev.Size.Height);
+		m_FB->ResizeRenderBuffer(ev.Size.Width, ev.Size.Height);
+
+		Renderer::OnWindowResize(ev.Size.Width, ev.Size.Height);
+	}
 
 	m_Camera.OnEvent(ev);
 }
@@ -67,10 +76,64 @@ void DebugScene::OnUpdate(float ts)
 	m_Camera.OnUpdate(ts);
 }
 
+struct Sphere
+{
+	glm::vec3 Origin;
+	glm::vec4 Color;
+	float Radius = 1.0f;
+
+	uint32_t EntityID = 0;
+};
+
+uint32_t s_IdTracker = 1;
+
+Sphere CreateSphere(const glm::vec3& center, const glm::vec4& color, float radius)
+{
+	Sphere sphere{};
+
+	sphere.Origin = center;
+	sphere.Color = color;
+	sphere.Radius = radius;
+	sphere.EntityID = s_IdTracker;
+
+	++s_IdTracker;
+
+	return sphere;
+}
+
 void DebugScene::OnRender()
 {
+	s_IdTracker = 1;
+
+	Sphere s1 = CreateSphere({  2.0f, 0.0f, -10.0f }, m_SphereColor, 0.5f);
+	Sphere s2 = CreateSphere({ -2.0f, 0.0f, -10.0f }, m_SphereColor, 1.0f);
+	Sphere* hovered = nullptr;
+
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
+
+	Renderer::ClearColor(glm::vec4(1.0f));
+	Renderer::Clear();
+
+	// 0rd render - color picking
+	Renderer::SceneBegin(m_Camera);
+	Renderer::EnableDepth();
+	Renderer::EndStencil();
+	Renderer::SetSphereLightning(false);
+	Renderer::DrawSphere(s1.Origin, s1.Radius, glm::vec4(glm::vec3((float)s1.EntityID / (s_IdTracker)), 1.0f));
+	Renderer::DrawSphere(s2.Origin, s2.Radius, glm::vec4(glm::vec3((float)s2.EntityID / (s_IdTracker)), 1.0f));
+	Renderer::SceneEnd();
+
+	float pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
+
+	if (pixelColor == (float)s1.EntityID / s_IdTracker)
+	{
+		hovered = &s1;
+	}
+	else if(pixelColor == (float)s2.EntityID / s_IdTracker)
+	{
+		hovered = &s2;
+	}
 
 	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
 	Renderer::Clear();
@@ -85,29 +148,29 @@ void DebugScene::OnRender()
 	{
 		DrawGridPlane();
 	}
-	
-	Renderer::DrawQuad({ 2.0f, 0.0f, -12.0f }, glm::vec3(0.75f), { 1.0f, 1.0f, 0.0f, 1.0f });
-	Renderer::DrawQuad({ 2.0f, 0.0f, -9.0f  }, glm::vec3(0.75f), { 1.0f, 1.0f, 0.0f, 1.0f });
+
 	Renderer::DrawSkybox(m_SkyboxTex);
 	Renderer::SceneEnd();
 
 	// 2nd render - draw objects with borders, writing to the stencil buffer
 	Renderer::SceneBegin(m_Camera);
 	Renderer::BeginStencil();
-	Renderer::DrawSphere({ 2.0f, 0.0f, -10.0f }, 0.5f, m_SphereColor);
-	Renderer::DrawSphere({ 0.0f, -0.5f, -8.0f }, 1.0f, { 1.0f, 1.0f, 0.0f, 1.0f });
-	Renderer::DrawQuad({ -2.0f, 0.0f, -7.0f }, glm::vec3(0.75f), { 0.0f, 1.0f, 1.0f, 1.0f });
+	Renderer::DrawSphere(s1.Origin, s1.Radius, s1.Color);
+	Renderer::DrawSphere(s2.Origin, s2.Radius, s2.Color);
 	Renderer::SceneEnd();
 
 	// 3rd render - draw objects with borders using stencil buffer, outlining them
-	Renderer::SceneBegin(m_Camera);
-	Renderer::EndStencil();
-	Renderer::SetSphereLightning(false);
-	Renderer::DrawSphere({ 2.0f, 0.0f, -10.0f }, 0.55f,			 { 0.98f, 0.24f, 0.0f, 1.0f });
-	Renderer::DrawSphere({ 0.0f, -0.5f, -8.0f }, 1.05f,			 { 0.98f, 0.24f, 0.0f, 1.0f });
-	Renderer::DrawQuad({ -2.0f, 0.0f, -7.0f }, glm::vec3(0.80f), { 0.98f, 0.24f, 0.0f, 1.0f });
-	Renderer::SceneEnd();
-	Renderer::BeginStencil();
+	if (hovered)
+	{
+		Renderer::SceneBegin(m_Camera);
+		Renderer::EndStencil();
+		Renderer::SetSphereLightning(false);
+
+		Renderer::DrawSphere(hovered->Origin, hovered->Radius * 1.05f, { 0.98f, 0.24f, 0.0f, 1.0f });
+
+		Renderer::SceneEnd();
+		Renderer::BeginStencil();
+	}	
 
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
@@ -122,6 +185,7 @@ void DebugScene::OnConfigRender()
 
 	ImGui::NewLine();
 	ImGui::Text("Timestep: %.2fms", m_TS);
+	ImGui::Text("FPS: %.2f", 1000.0f / m_TS);
 	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
 	ImGui::NewLine();
 	ImGui::Separator();
