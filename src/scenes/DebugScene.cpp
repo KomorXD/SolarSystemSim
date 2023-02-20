@@ -62,7 +62,7 @@ void DebugScene::OnInput()
 
 void DebugScene::OnUpdate(float ts)
 {
-	m_FPS = 1.0f / ts;
+	m_TS = ts * 1000.0f;
 
 	m_Camera.OnUpdate(ts);
 }
@@ -121,7 +121,7 @@ void DebugScene::OnConfigRender()
 	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
 	ImGui::NewLine();
-	ImGui::Text("FPS: %.2f", m_FPS);
+	ImGui::Text("Timestep: %.2fms", m_TS);
 	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
 	ImGui::NewLine();
 	ImGui::Separator();
