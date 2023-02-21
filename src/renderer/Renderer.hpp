@@ -25,8 +25,10 @@ public:
 	static void Clear();
 
 	static void DrawQuad(const glm::vec3& position, const glm::vec3& size, const glm::vec4& color);
-	static void DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color);
 	static void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color);
+
+	static void SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4& color = { 0.2f, 0.2f, 0.2f, 1.0f });
+	static void DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t instances);
 
 	static void DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count = 0);
 	static void DrawLines(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t vertexCount);

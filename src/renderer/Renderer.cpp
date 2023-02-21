@@ -32,13 +32,12 @@ struct SphereVertex
 {
 	glm::vec3 Position;
 	glm::vec3 Normal;
-	glm::vec4 Color;
 };
 
-struct SphereData
+struct SphereInstance
 {
-	std::vector<glm::vec4> Vertices;
-	std::vector<glm::vec3> Normals;
+	glm::mat4 Transform;
+	glm::vec4 Color;
 };
 
 struct QuadVertex
@@ -55,23 +54,22 @@ struct LineVertex
 
 struct RendererData
 {
-	static constexpr uint32_t MaxQuads		   = 20000;
-	static constexpr uint32_t MaxVertices	   = MaxQuads * 4;
-	static constexpr uint32_t MaxIndices	   = MaxQuads * 6;
-
-	static constexpr uint32_t IndicesPerSphere = 5952;
+	static constexpr uint32_t MaxQuads	  = 5000;
+	static constexpr uint32_t MaxVertices = MaxQuads * 4;
+	static constexpr uint32_t MaxIndices  = MaxQuads * 6;
 
 	std::shared_ptr<VertexArray>  QuadVertexArray;
 	std::shared_ptr<VertexBuffer> QuadVertexBuffer;
 	std::shared_ptr<Shader>		  QuadShader;
 
-	std::shared_ptr<VertexArray>  SphereVertexArray;
-	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
-	std::shared_ptr<Shader>		  SphereShader;
-
 	std::shared_ptr<VertexArray>  LineVertexArray;
 	std::shared_ptr<VertexBuffer> LineVertexBuffer;
 	std::shared_ptr<Shader>		  LineShader;
+
+	std::shared_ptr<VertexArray>  SphereVertexArray;
+	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
+	std::shared_ptr<VertexBuffer> SphereTransformsVertexBuffer;
+	std::shared_ptr<Shader>		  SphereShader;
 
 	std::shared_ptr<VertexArray>  SkyboxVertexArray;
 	std::shared_ptr<VertexBuffer> SkyboxVertexBuffer;
@@ -81,18 +79,16 @@ struct RendererData
 	QuadVertex* QuadBufferBase = nullptr;
 	QuadVertex* QuadBufferPtr  = nullptr;
 
-	uint32_t	  SphereIndexCount = 0;
-	SphereVertex* SphereBufferBase = nullptr;
-	SphereVertex* SphereBufferPtr  = nullptr;
-
 	uint32_t	LineVertexCount = 0;
 	LineVertex* LineBufferBase  = nullptr;
 	LineVertex* LineBufferPtr   = nullptr;
 
-	std::array<glm::vec4, 4> QuadVertices;
+	uint32_t		SpheresInstanceCount		= 0;
+	SphereInstance* SpheresTransformsBufferBase = nullptr;
+	SphereInstance* SpheresTransformsBufferPtr  = nullptr;
+	uint32_t		SpheresBufferOffset		    = 0;
 
-	std::vector<glm::vec4> SphereVertices;
-	std::vector<glm::vec3> SphereNormals;
+	std::array<glm::vec4, 4> QuadVertices;
 
 	float LineWidth = 2.0f;
 
@@ -101,12 +97,14 @@ struct RendererData
 
 static RendererData s_Data{};
 
-static SphereData GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
+static std::vector<SphereVertex> GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
 {
 	constexpr float PI = 3.14159265358979323846f;
 	constexpr float radius = 1.0f;
 
-	SphereData data{};
+	std::vector<SphereVertex> vertices;
+
+	vertices.reserve((stackCount + 1) * (sectorCount + 1));
 
 	float lengthInv = 1.0f / radius;
 	float sectorStep = 2.0f * PI / sectorCount;
@@ -130,54 +128,45 @@ static SphereData GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
 			float ny = y * lengthInv;
 			float nz = z * lengthInv;
 
-			data.Vertices.push_back(glm::vec4(x, y, z, 1.0f));
-			data.Normals.push_back(glm::vec3(nx, ny, nz));
+			SphereVertex v{};
+
+			v.Position = glm::vec3(x, y, z);
+			v.Normal   = glm::vec3(nx, ny, nz);
+
+			vertices.push_back(v);
 		}
 	}
 
-	return data;
+	return vertices;
 }
 
-static std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stackCount, int32_t maxIndices)
+static std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stackCount)
 {
-	int32_t offset = 0;
-	int32_t indicesAdded = 0;
-
 	std::vector<uint32_t> indices{};
 	int32_t k1{};
 	int32_t k2{};
 
-	indices.reserve(maxIndices);
-
-	bool print = true;
-
-	while (indicesAdded + s_Data.IndicesPerSphere < maxIndices)
+	for (int32_t i = 0; i < stackCount; ++i)
 	{
-		for (int32_t i = 0; i < stackCount; ++i)
+		k1 = i * (sectorCount + 1);
+		k2 = k1 + sectorCount + 1;
+
+		for (int32_t j = 0; j < sectorCount; ++j, ++k1, ++k2)
 		{
-			k1 = i * (sectorCount + 1) + offset;
-			k2 = k1 + sectorCount + 1;
-
-			for (int32_t j = 0; j < sectorCount; ++j, ++k1, ++k2)
+			if (i != 0)
 			{
-				if (i != 0)
-				{
-					indices.push_back(k1);
-					indices.push_back(k2);
-					indices.push_back(k1 + 1);
-				}
+				indices.push_back(k1);
+				indices.push_back(k2);
+				indices.push_back(k1 + 1);
+			}
 
-				if (i != (stackCount - 1))
-				{
-					indices.push_back(k1 + 1);
-					indices.push_back(k2);
-					indices.push_back(k2 + 1);
-				}
+			if (i != (stackCount - 1))
+			{
+				indices.push_back(k1 + 1);
+				indices.push_back(k2);
+				indices.push_back(k2 + 1);
 			}
 		}
-		
-		offset += 1089;
-		indicesAdded += s_Data.IndicesPerSphere;
 	}
 
 	return indices;
@@ -214,8 +203,8 @@ void Renderer::Init()
 
 		VertexBufferLayout layout;
 
-		layout.Push<float>(3);
-		layout.Push<float>(4);
+		layout.Push<float>(3); // Position
+		layout.Push<float>(4); // Color
 
 		std::vector<uint32_t> quadIndices(s_Data.MaxIndices);
 
@@ -248,32 +237,6 @@ void Renderer::Init()
 	}
 
 	{
-		SCOPE_PROFILE("Sphere data init");
-
-		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
-		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereVertex));
-
-		VertexBufferLayout layout;
-
-		layout.Push<float>(3);
-		layout.Push<float>(3);
-		layout.Push<float>(4);
-
-		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32, s_Data.MaxIndices);
-		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), sphereIndices.size());
-
-		s_Data.SphereVertexArray->AddBuffers(s_Data.SphereVertexBuffer, ibo, layout);
-
-		s_Data.SphereBufferBase = new SphereVertex[s_Data.MaxVertices];
-		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
-
-		SphereData data = GenerateUVSphereData(32, 32);
-
-		s_Data.SphereVertices = std::move(data.Vertices);
-		s_Data.SphereNormals  = std::move(data.Normals);
-	}
-
-	{
 		SCOPE_PROFILE("Line data init");
 
 		s_Data.LineVertexArray = std::make_shared<VertexArray>();
@@ -281,12 +244,48 @@ void Renderer::Init()
 
 		VertexBufferLayout layout;
 
-		layout.Push<float>(3);
-		layout.Push<float>(4);
+		layout.Push<float>(3); // Position
+		layout.Push<float>(4); // Color
 
 		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, layout);
 		s_Data.LineBufferBase = new LineVertex[s_Data.MaxVertices];
 		s_Data.LineShader = std::make_shared<Shader>("res/shaders/Line.vert", "res/shaders/Line.frag");
+	}
+
+	{
+		SCOPE_PROFILE("Sphere data init");
+
+		std::vector<SphereVertex> sphereVertices = GenerateUVSphereData(32, 32);
+
+		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
+		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereVertex));
+		s_Data.SphereVertexBuffer->SetData(sphereVertices.data(), (uint32_t)(sphereVertices.size() * sizeof(SphereVertex)));
+		s_Data.SpheresBufferOffset = (uint32_t)(sphereVertices.size() * sizeof(SphereVertex));
+
+		VertexBufferLayout layout;
+
+		layout.Push<float>(3); // Position
+		layout.Push<float>(3); // Normal
+		
+		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32);
+		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), (uint32_t)sphereIndices.size());
+
+		s_Data.SphereVertexArray->AddBuffers(s_Data.SphereVertexBuffer, ibo, layout);
+
+		layout.Clear();
+		layout.Push<float>(4); // Transform
+		layout.Push<float>(4); // Transform
+		layout.Push<float>(4); // Transform
+		layout.Push<float>(4); // Transform
+		layout.Push<float>(4); // Color
+
+		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::mat4));
+		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 2);
+
+		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
+		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
+		
+		s_Data.SphereVertexArray->Unbind();
 	}
 
 	{
@@ -342,7 +341,7 @@ void Renderer::Init()
 
 		VertexBufferLayout layout;
 
-		layout.Push<float>(3);
+		layout.Push<float>(3); // Position
 
 		s_Data.SkyboxVertexArray->AddVertexBuffer(s_Data.SkyboxVertexBuffer, layout);
 		s_Data.SkyboxShader = std::make_shared<Shader>("res/shaders/Skybox.vert", "res/shaders/Skybox.frag");
@@ -352,8 +351,8 @@ void Renderer::Init()
 void Renderer::Shutdown()
 {
 	delete[] s_Data.QuadBufferBase;
-	delete[] s_Data.SphereBufferBase;
 	delete[] s_Data.LineBufferBase;
+	delete[] s_Data.SpheresTransformsBufferBase;
 }
 
 void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -388,15 +387,6 @@ void Renderer::Flush()
 		GLCall(glEnable(GL_CULL_FACE));
 	}
 
-	if (s_Data.SphereIndexCount)
-	{
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.SphereBufferPtr - (uint8_t*)s_Data.SphereBufferBase);
-
-		s_Data.SphereVertexBuffer->SetData(s_Data.SphereBufferBase, dataSize);
-
-		DrawIndexed(s_Data.SphereShader, s_Data.SphereVertexArray, s_Data.SphereIndexCount);
-	}
-
 	if (s_Data.LineVertexCount)
 	{
 		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.LineBufferPtr - (uint8_t*)s_Data.LineBufferBase);
@@ -406,6 +396,15 @@ void Renderer::Flush()
 		GLCall(glDisable(GL_CULL_FACE));
 		DrawLines(s_Data.LineShader, s_Data.LineVertexArray, s_Data.LineVertexCount);
 		GLCall(glEnable(GL_CULL_FACE));
+	}
+
+	if (s_Data.SpheresInstanceCount)
+	{
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.SpheresTransformsBufferPtr - (uint8_t*)s_Data.SpheresTransformsBufferBase);
+
+		s_Data.SphereTransformsVertexBuffer->SetData(s_Data.SpheresTransformsBufferBase, dataSize);
+
+		DrawIndexedInstanced(s_Data.SphereShader, s_Data.SphereVertexArray, s_Data.SpheresInstanceCount);
 	}
 }
 
@@ -439,27 +438,6 @@ void Renderer::DrawQuad(const glm::vec3& position, const glm::vec3& size, const 
 	s_Data.QuadIndexCount += 6;
 }
 
-void Renderer::DrawSphere(const glm::vec3& position, float radius, const glm::vec4& color)
-{
-	if (s_Data.SphereIndexCount + s_Data.IndicesPerSphere >= s_Data.MaxIndices)
-	{
-		NextBatch();
-	}
-
-	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), glm::vec3(radius));
-
-	for (size_t i = 0; i < s_Data.SphereVertices.size(); ++i)
-	{
-		s_Data.SphereBufferPtr->Position = transform * s_Data.SphereVertices[i];
-		s_Data.SphereBufferPtr->Normal = s_Data.SphereNormals[i];
-		s_Data.SphereBufferPtr->Color = color;
-
-		++s_Data.SphereBufferPtr;
-	}
-
-	s_Data.SphereIndexCount += s_Data.IndicesPerSphere;
-}
-
 void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color)
 {
 	if (s_Data.LineVertexCount + 2 >= s_Data.MaxVertices)
@@ -476,6 +454,29 @@ void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm:
 	++s_Data.LineBufferPtr;
 
 	s_Data.LineVertexCount += 2;
+}
+
+void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4& color)
+{
+	if (s_Data.SpheresInstanceCount >= 10000)
+	{
+		NextBatch();
+	}
+
+	s_Data.SpheresTransformsBufferPtr->Transform = transform;
+	s_Data.SpheresTransformsBufferPtr->Color = color;
+	++s_Data.SpheresTransformsBufferPtr;
+	++s_Data.SpheresInstanceCount;
+}
+
+void Renderer::DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t instances)
+{
+	shader->Bind();
+	shader->SetUniformMat4("u_ViewProjection", s_ViewProjection);
+
+	vao->Bind();
+
+	GLCall(glDrawElementsInstanced(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, instances));
 }
 
 void Renderer::DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count)
@@ -531,7 +532,7 @@ glm::vec<4, uint8_t> Renderer::GetPixelAt(const glm::vec2& coords)
 {
 	glm::vec<4, uint8_t> pixel{};
 
-	GLCall(glReadPixels(coords.x, coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
+	GLCall(glReadPixels((GLint)coords.x, (GLint)coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
 
 	return pixel;
 }
@@ -583,11 +584,11 @@ void Renderer::StartBatch()
 	s_Data.QuadIndexCount = 0;
 	s_Data.QuadBufferPtr = s_Data.QuadBufferBase;
 
-	s_Data.SphereIndexCount = 0;
-	s_Data.SphereBufferPtr = s_Data.SphereBufferBase;
-
 	s_Data.LineVertexCount = 0;
 	s_Data.LineBufferPtr = s_Data.LineBufferBase;
+
+	s_Data.SpheresInstanceCount = 0;
+	s_Data.SpheresTransformsBufferPtr = s_Data.SpheresTransformsBufferBase;
 }
 
 void Renderer::NextBatch()
