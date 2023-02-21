@@ -1,6 +1,6 @@
 #include "Application.hpp"
 #include "Logger.hpp"
-#include "scenes/MainLayer.hpp"
+#include "layers/EditorLayer.hpp"
 #include "OpenGL.hpp"
 
 #include <glad/glad.h>
@@ -87,7 +87,7 @@ void Application::Run()
 		return;
 	}
 
-	m_CurrentLayer = std::make_unique<MainLayer>();
+	m_CurrentLayer = std::make_unique<EditorLayer>();
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

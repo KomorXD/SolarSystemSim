@@ -5,11 +5,11 @@
 
 #include <memory>
 
-class DebugScene : public Scene
+class EditorScene : public Scene
 {
 public:
-	DebugScene();
-	~DebugScene();
+	EditorScene();
+	~EditorScene();
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnInput()			override;

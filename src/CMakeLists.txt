@@ -13,6 +13,7 @@ include_directories(
 file(GLOB PROJECT_HEADERS 
 	"*.hpp" 
 	"scenes/*.hpp"
+	"layers/*.hpp"
 	"renderer/*.hpp"
 	"objects/*.hpp"
 )
@@ -20,6 +21,7 @@ file(GLOB PROJECT_HEADERS
 file(GLOB PROJECT_SOURCES 
 	"*.cpp" 
 	"scenes/*.cpp"
+	"layers/*.cpp"
 	"renderer/*.cpp"
 	"objects/*.cpp"
 )

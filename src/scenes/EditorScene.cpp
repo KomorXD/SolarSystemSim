@@ -1,4 +1,4 @@
-#include "DebugScene.hpp"
+#include "EditorScene.hpp"
 #include "../Logger.hpp"
 #include "../Timer.hpp"
 #include "../Event.hpp"
@@ -9,7 +9,7 @@
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
-DebugScene::DebugScene()
+EditorScene::EditorScene()
 {
 	FUNC_PROFILE();
 
@@ -55,17 +55,17 @@ DebugScene::DebugScene()
 		}
 	}
 
-	LOG_INFO("DebugScene initialized.");
+	LOG_INFO("EditorScene initialized.");
 }
 
-DebugScene::~DebugScene()
+EditorScene::~EditorScene()
 {
 	Renderer::Shutdown();
 
-	LOG_INFO("DebugScene destroyed.");
+	LOG_INFO("EditorScene destroyed.");
 }
 
-void DebugScene::OnEvent(Event& ev)
+void EditorScene::OnEvent(Event& ev)
 {
 	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::RightShift)
 	{
@@ -83,18 +83,18 @@ void DebugScene::OnEvent(Event& ev)
 	m_Camera.OnEvent(ev);
 }
 
-void DebugScene::OnInput()
+void EditorScene::OnInput()
 {
 }
 
-void DebugScene::OnUpdate(float ts)
+void EditorScene::OnUpdate(float ts)
 {
 	m_TS = ts * 1000.0f;
 
 	m_Camera.OnUpdate(ts);
 }
 
-void DebugScene::OnRender()
+void EditorScene::OnRender()
 {
 	Planet* hovered = nullptr;
 
@@ -177,7 +177,7 @@ void DebugScene::OnRender()
 	m_FB->BindTexture(1);
 }
 
-void DebugScene::OnConfigRender()
+void EditorScene::OnConfigRender()
 {
 	glm::vec3 cameraPos = m_Camera.GetPosition();
 
@@ -211,12 +211,12 @@ void DebugScene::OnConfigRender()
 	ImGui::End();
 }
 
-uint32_t DebugScene::GetFramebufferTextureID() const
+uint32_t EditorScene::GetFramebufferTextureID() const
 {
 	return m_FB->GetTextureID();
 }
 
-void DebugScene::DrawGridPlane()
+void EditorScene::DrawGridPlane()
 {
 	constexpr float distance = 30.0f;
 	constexpr glm::vec3 lineColor(0.77f);

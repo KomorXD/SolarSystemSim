@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Layer.hpp"
-#include "Scene.hpp"
+#include "../scenes/Scene.hpp"
 
 #include <memory>
 
-class MainLayer : public Layer
+class EditorLayer : public Layer
 {
 public:
-	MainLayer();
+	EditorLayer();
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnInput()			override;

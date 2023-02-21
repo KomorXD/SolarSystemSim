@@ -1,16 +1,16 @@
-#include "MainLayer.hpp"
-#include "DebugScene.hpp"
+#include "EditorLayer.hpp"
+#include "../scenes/EditorScene.hpp"
 #include "../Application.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
-MainLayer::MainLayer()
+EditorLayer::EditorLayer()
 {
-	m_Scene = std::make_unique<DebugScene>();
+	m_Scene = std::make_unique<EditorScene>();
 }
 
-void MainLayer::OnEvent(Event& ev)
+void EditorLayer::OnEvent(Event& ev)
 {
 	if (ev.Type == Event::WindowResized)
 	{
@@ -26,7 +26,7 @@ void MainLayer::OnEvent(Event& ev)
 	}
 }
 
-void MainLayer::OnInput()
+void EditorLayer::OnInput()
 {
 	if (m_IsViewportFocused)
 	{
@@ -34,7 +34,7 @@ void MainLayer::OnInput()
 	}
 }
 
-void MainLayer::OnUpdate(float ts)
+void EditorLayer::OnUpdate(float ts)
 {
 	if (m_IsViewportFocused)
 	{
@@ -42,7 +42,7 @@ void MainLayer::OnUpdate(float ts)
 	}
 }
 
-void MainLayer::OnImGuiRender()
+void EditorLayer::OnImGuiRender()
 {
 	WindowSpec windowSpec = Application::GetInstance()->GetWindowSpec();
 
