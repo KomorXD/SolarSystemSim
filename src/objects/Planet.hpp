@@ -12,6 +12,8 @@ public:
 	void SetPosition(const glm::vec3& position);
 	void SetColor(const glm::vec4& color);
 
+	void OnConfigRender();
+
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	inline glm::vec4 GetColor()	   const { return m_Color;    }
 	inline float GetRadius()	   const { return m_Radius;   }
