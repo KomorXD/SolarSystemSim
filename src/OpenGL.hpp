@@ -32,7 +32,7 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	void SetData(const void* data, uint32_t size);
+	void SetData(const void* data, uint32_t size, uint32_t offset = 0);
 
 private:
 	uint32_t m_ID = 0;
@@ -59,7 +59,6 @@ struct VertexBufferElement
 	uint32_t type = 0;
 	uint32_t count = 0;
 	uint8_t  normalized = 0;
-	bool	 Instanced = false;
 
 	static uint32_t GetSizeOfType(uint32_t type);
 };
@@ -76,22 +75,28 @@ public:
 	template<>
 	void Push<float>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE, instanced });
+		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
 		m_Stride += count * sizeof(GLfloat);
 	}
 
 	template<>
 	void Push<uint32_t>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE, instanced });
+		m_Elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
 		m_Stride += count * sizeof(GLuint);
 	}
 
 	template<>
 	void Push<uint8_t>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE, instanced });
+		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE });
 		m_Stride += count * sizeof(GLbyte);
+	}
+
+	void Clear()
+	{
+		m_Elements.clear();
+		m_Stride = 0;
 	}
 
 	inline const std::vector<VertexBufferElement>& GetElements() const { return m_Elements; }
@@ -108,8 +113,9 @@ public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout);
-	void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout);
+	void AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout, uint32_t attribOffset = 0);
+	void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout, uint32_t attribOffset = 0);
+	void AddInstancedVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout, uint32_t attribOffset = 0);
 
 	void Bind() const;
 	void Unbind() const;

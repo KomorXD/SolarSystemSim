@@ -48,10 +48,10 @@ void VertexBuffer::Unbind() const
 	GLCall(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-void VertexBuffer::SetData(const void* data, uint32_t size)
+void VertexBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
 {
 	Bind();
-	GLCall(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
+	GLCall(glBufferSubData(GL_ARRAY_BUFFER, (GLintptr)offset, size, data));
 }
 
 IndexBuffer::IndexBuffer(const uint32_t* data, uint32_t count)
@@ -108,7 +108,7 @@ VertexArray::~VertexArray()
 	}
 }
 
-void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout)
+void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::unique_ptr<IndexBuffer>& ibo, const VertexBufferLayout& layout, uint32_t attribOffset)
 {
 	Bind();
 	vbo->Bind();
@@ -117,17 +117,12 @@ void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::uniq
 	const auto& elements = layout.GetElements();
 	uint32_t offset = 0;
 
-	for (uint32_t i = 0; i < elements.size(); ++i)
+	for (uint32_t i = attribOffset; i < elements.size() + attribOffset; ++i)
 	{
-		const VertexBufferElement& element = elements[i];
+		const VertexBufferElement& element = elements[i - attribOffset];
 
 		GLCall(glEnableVertexAttribArray(i));
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
-
-		if (element.Instanced)
-		{
-			GLCall(glVertexAttribDivisor(i, 1));
-		}
 
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}
@@ -135,7 +130,7 @@ void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::uniq
 	m_IBO = std::move(ibo);
 }
 
-void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout)
+void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout, uint32_t attribOffset)
 {
 	Bind();
 	vbo->Bind();
@@ -143,12 +138,32 @@ void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, cons
 	const auto& elements = layout.GetElements();
 	uint32_t offset = 0;
 
-	for (uint32_t i = 0; i < elements.size(); ++i)
+	for (uint32_t i = attribOffset; i < elements.size() + attribOffset; ++i)
 	{
-		const VertexBufferElement& element = elements[i];
+		const VertexBufferElement& element = elements[i - attribOffset];
 
 		GLCall(glEnableVertexAttribArray(i));
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
+
+		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
+	}
+}
+
+void VertexArray::AddInstancedVertexBuffer(const std::shared_ptr<VertexBuffer>& vbo, const VertexBufferLayout& layout, uint32_t attribOffset)
+{
+	Bind();
+	vbo->Bind();
+
+	const auto& elements = layout.GetElements();
+	uint32_t offset = 0;
+
+	for (uint32_t i = attribOffset; i < elements.size() + attribOffset; ++i)
+	{
+		const VertexBufferElement& element = elements[i - attribOffset];
+
+		GLCall(glEnableVertexAttribArray(i));
+		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
+		GLCall(glVertexAttribDivisor(i, 1));
 
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}
@@ -573,7 +588,7 @@ Cubemap::Cubemap(const std::array<std::string, 6>& texFaces)
 
 		if (m_LocalBuffer)
 		{
-			GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+			GLCall(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + (uint32_t)i, 0, GL_RGBA8,
 				m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_LocalBuffer));
 			stbi_image_free(m_LocalBuffer);
 		}
