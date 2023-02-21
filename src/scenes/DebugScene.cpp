@@ -15,12 +15,12 @@ DebugScene::DebugScene()
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
 	m_FB = std::make_unique<Framebuffer>();
-	m_FB->AttachTexture(spec.Width * 0.66f, spec.Height);
-	m_FB->AttachRenderBuffer(spec.Width * 0.66f, spec.Height);
+	m_FB->AttachTexture((uint32_t)(spec.Width * 0.66f), spec.Height);
+	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.66f), spec.Height);
 	m_FB->UnbindBuffer();
 
 	Renderer::Init();
-	Renderer::OnWindowResize(spec.Width * 0.66f, spec.Height);
+	Renderer::OnWindowResize((uint32_t)(spec.Width * 0.66f), spec.Height);
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.66f, (float)spec.Height });
@@ -37,9 +37,11 @@ DebugScene::DebugScene()
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
 
-	for (float x = -5.0f; x <= 5.0f; x += 5.0f)
+	float xd = 30.0f;
+
+	for (float x = -xd; x <= xd; x += 5.0f)
 	{
-		for (float z = -5.0f; z <= 5.0f; z += 5.0f)
+		for (float z = -xd; z <= xd; z += 5.0f)
 		{
 			m_Planets.emplace_back(glm::vec3(x, 0.0f, z - 5.0f));
 		}
@@ -102,8 +104,7 @@ void DebugScene::OnRender()
 	
 	for (auto& planet : m_Planets)
 	{
-		Renderer::DrawSphere(planet.GetPosition(), planet.GetRadius(),
-			glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
+		Renderer::SubmitSphereInstanced(planet.GetTransform(), glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
 	}
 
 	Renderer::SceneEnd();
@@ -140,7 +141,7 @@ void DebugScene::OnRender()
 	{
 		if (&planet == hovered) continue;
 
-		Renderer::DrawSphere(planet.GetPosition(), planet.GetRadius(), planet.GetColor());
+		Renderer::SubmitSphereInstanced(planet.GetTransform(), planet.GetColor());
 	}
 
 	Renderer::SceneEnd();
@@ -150,13 +151,14 @@ void DebugScene::OnRender()
 	{
 		Renderer::SceneBegin(m_Camera);
 		Renderer::BeginStencil();
-		Renderer::DrawSphere(hovered->GetPosition(), hovered->GetRadius(), hovered->GetColor());
+		Renderer::SubmitSphereInstanced(hovered->GetTransform(), hovered->GetColor());
 		Renderer::SceneEnd();
 
 		Renderer::SceneBegin(m_Camera);
 		Renderer::EndStencil();
 		Renderer::SetSphereLightning(false);
-		Renderer::DrawSphere(hovered->GetPosition(), hovered->GetRadius() * 1.05f, { 0.98f, 0.24f, 0.0f, 1.0f });
+		Renderer::SubmitSphereInstanced(hovered->GetTransform() * glm::scale(glm::mat4(1.0f), 
+			glm::vec3(hovered->GetRadius() * 1.05f)), {0.98f, 0.24f, 0.0f, 1.0f});
 		Renderer::SceneEnd();
 	}
 
