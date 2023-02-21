@@ -67,17 +67,23 @@ EditorScene::~EditorScene()
 
 void EditorScene::OnEvent(Event& ev)
 {
-	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::RightShift)
-	{
-		Renderer::ToggleWireframe();
-	}
-	else if (ev.Type == Event::WindowResized)
+	if (ev.Type == Event::WindowResized)
 	{
 		m_FB->BindBuffer();
 		m_FB->ResizeTexture(ev.Size.Width, ev.Size.Height);
 		m_FB->ResizeRenderBuffer(ev.Size.Width, ev.Size.Height);
 
 		Renderer::OnWindowResize(ev.Size.Width, ev.Size.Height);
+		m_Camera.SetViewportSize({ (float)ev.Size.Width, (float)ev.Size.Height });
+
+		return;
+	}
+
+	if (ev.Type == Event::MouseButtonPressed && ev.MouseButton.Button == MouseButton::Left)
+	{
+		CheckForPlanetSelect();
+
+		return;
 	}
 
 	m_Camera.OnEvent(ev);
@@ -96,38 +102,8 @@ void EditorScene::OnUpdate(float ts)
 
 void EditorScene::OnRender()
 {
-	Planet* hovered = nullptr;
-
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
-
-	Renderer::ClearColor(glm::vec4(1.0f));
-	Renderer::Clear();
-
-	// 0rd render - color picking
-	Renderer::SceneBegin(m_Camera);
-	Renderer::EnableDepth();
-	Renderer::EndStencil();
-	Renderer::SetSphereLightning(false);
-	
-	for (auto& planet : m_Planets)
-	{
-		Renderer::SubmitSphereInstanced(planet.GetTransform(), glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
-	}
-
-	Renderer::SceneEnd();
-
-	uint8_t pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
-
-	for (auto& planet : m_Planets)
-	{
-		if (planet.GetEntityID() == pixelColor)
-		{
-			hovered = &planet;
-
-			break;
-		}
-	}
 
 	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
 	Renderer::Clear();
@@ -147,7 +123,7 @@ void EditorScene::OnRender()
 
 	for (auto& planet : m_Planets)
 	{
-		if (&planet == hovered) continue;
+		if (&planet == m_SelectedPlanet) continue;
 
 		Renderer::SubmitSphereInstanced(planet.GetTransform(), planet.GetColor());
 	}
@@ -155,18 +131,18 @@ void EditorScene::OnRender()
 	Renderer::SceneEnd();
 
 	// 2nd render - draw objects with borders, writing to the stencil buffer
-	if (hovered)
+	if (m_SelectedPlanet)
 	{
 		Renderer::SceneBegin(m_Camera);
 		Renderer::BeginStencil();
-		Renderer::SubmitSphereInstanced(hovered->GetTransform(), hovered->GetColor());
+		Renderer::SubmitSphereInstanced(m_SelectedPlanet->GetTransform(), m_SelectedPlanet->GetColor());
 		Renderer::SceneEnd();
 
 		Renderer::SceneBegin(m_Camera);
 		Renderer::EndStencil();
 		Renderer::SetSphereLightning(false);
-		Renderer::SubmitSphereInstanced(hovered->GetTransform() * glm::scale(glm::mat4(1.0f), 
-			glm::vec3(hovered->GetRadius() * 1.05f)), {0.98f, 0.24f, 0.0f, 1.0f});
+		Renderer::SubmitSphereInstanced(m_SelectedPlanet->GetTransform() * glm::scale(glm::mat4(1.0f),
+			glm::vec3(m_SelectedPlanet->GetRadius() + 0.05f)), {0.98f, 0.24f, 0.0f, 1.0f});
 		Renderer::SceneEnd();
 	}
 
@@ -191,12 +167,6 @@ void EditorScene::OnConfigRender()
 	ImGui::Separator();
 	ImGui::NewLine();
 
-	ImGui::Text("Sphere color picker");
-	ImGui::ColorEdit4("Color", glm::value_ptr(m_SphereColor));
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
-
 	ImGui::Checkbox("Show grid", &m_ShowGrid);
 	
 	if (ImGui::Button("Toggle wireframe"))
@@ -208,12 +178,55 @@ void EditorScene::OnConfigRender()
 	ImGui::Separator();
 	ImGui::NewLine();
 
+	if (m_SelectedPlanet)
+	{
+		m_SelectedPlanet->OnConfigRender();
+	}
+
 	ImGui::End();
 }
 
 uint32_t EditorScene::GetFramebufferTextureID() const
 {
 	return m_FB->GetTextureID();
+}
+
+void EditorScene::CheckForPlanetSelect()
+{
+	Planet* hoveredPlanet = nullptr;
+
+	Renderer::ClearColor(glm::vec4(1.0f));
+	Renderer::Clear();
+
+	// 0rd render - color picking
+	Renderer::SceneBegin(m_Camera);
+	Renderer::EnableDepth();
+	Renderer::EndStencil();
+	Renderer::SetSphereLightning(false);
+
+	for (auto& planet : m_Planets)
+	{
+		Renderer::SubmitSphereInstanced(planet.GetTransform(), glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
+	}
+
+	Renderer::SceneEnd();
+
+	uint8_t pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
+
+	for (auto& planet : m_Planets)
+	{
+		if (planet.GetEntityID() == pixelColor)
+		{
+			hoveredPlanet = &planet;
+
+			break;
+		}
+	}
+
+	if (Input::IsMouseButtonPressed(MouseButton::Left))
+	{
+		m_SelectedPlanet = hoveredPlanet ? hoveredPlanet : nullptr;
+	}
 }
 
 void EditorScene::DrawGridPlane()

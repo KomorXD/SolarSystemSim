@@ -20,17 +20,17 @@ public:
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 private:
+	void CheckForPlanetSelect();
 	void DrawGridPlane();
 
 	std::vector<Planet> m_Planets;
-
-	float m_TS = 0.0f;
-	bool m_ShowGrid = true;
+	Planet* m_SelectedPlanet = nullptr;
 
 	Camera m_Camera;
 
 	std::unique_ptr<Framebuffer> m_FB;
 	std::shared_ptr<Cubemap> m_SkyboxTex;
 
-	glm::vec4 m_SphereColor{ 1.0f, 0.0f, 0.0f, 1.0f };
+	float m_TS = 0.0f;
+	bool  m_ShowGrid = true;
 };
