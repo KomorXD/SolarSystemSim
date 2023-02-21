@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Planet
 {
@@ -15,6 +16,11 @@ public:
 	inline glm::vec4 GetColor()	   const { return m_Color;    }
 	inline float GetRadius()	   const { return m_Radius;   }
 	inline uint32_t GetEntityID()  const { return m_EntityID; }
+
+	inline glm::mat4 GetTransform() const
+	{
+		return glm::translate(glm::mat4(1.0f), m_Position) * glm::scale(glm::mat4(1.0f), glm::vec3(m_Radius));
+	}
 
 	inline static constexpr uint32_t MAX_PLANETS = 254;
 
