@@ -4,6 +4,7 @@
 #include "../Event.hpp"
 #include "../Application.hpp"
 #include "../renderer/Renderer.hpp"
+#include "../Random.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,6 +45,13 @@ DebugScene::DebugScene()
 		for (float z = -xd; z <= xd; z += 5.0f)
 		{
 			m_Planets.emplace_back(glm::vec3(x, 0.0f, z - 5.0f));
+			m_Planets.back().SetColor(
+				{
+					Random::FloatInRange(0.0f, 1.0f),
+					Random::FloatInRange(0.0f, 1.0f),
+					Random::FloatInRange(0.0f, 1.0f),
+					1.0f
+				});
 		}
 	}
 
