@@ -59,6 +59,7 @@ struct VertexBufferElement
 	uint32_t type = 0;
 	uint32_t count = 0;
 	uint8_t  normalized = 0;
+	bool	 Instanced = false;
 
 	static uint32_t GetSizeOfType(uint32_t type);
 };
@@ -67,29 +68,29 @@ class VertexBufferLayout
 {
 public:
 	template<typename T>
-	void Push(uint32_t count)
+	void Push(uint32_t count, bool instanced = false)
 	{
 		// static_assert(false);
 	}
 
 	template<>
-	void Push<float>(uint32_t count)
+	void Push<float>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
+		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE, instanced });
 		m_Stride += count * sizeof(GLfloat);
 	}
 
 	template<>
-	void Push<uint32_t>(uint32_t count)
+	void Push<uint32_t>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE });
+		m_Elements.push_back({ GL_UNSIGNED_INT, count, GL_FALSE, instanced });
 		m_Stride += count * sizeof(GLuint);
 	}
 
 	template<>
-	void Push<uint8_t>(uint32_t count)
+	void Push<uint8_t>(uint32_t count, bool instanced)
 	{
-		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE });
+		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE, instanced });
 		m_Stride += count * sizeof(GLbyte);
 	}
 

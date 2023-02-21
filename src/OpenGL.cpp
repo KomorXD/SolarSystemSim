@@ -124,6 +124,11 @@ void VertexArray::AddBuffers(const std::shared_ptr<VertexBuffer>& vbo, std::uniq
 		GLCall(glEnableVertexAttribArray(i));
 		GLCall(glVertexAttribPointer(i, element.count, element.type, element.normalized, layout.GetStride(), (const void*)offset));
 
+		if (element.Instanced)
+		{
+			GLCall(glVertexAttribDivisor(i, 1));
+		}
+
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}
 
