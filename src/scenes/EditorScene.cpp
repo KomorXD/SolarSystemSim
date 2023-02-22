@@ -25,6 +25,7 @@ EditorScene::EditorScene()
 	Renderer::OnWindowResize((uint32_t)(spec.Width * 0.66f), spec.Height);
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
+	m_Camera.MoveYaw(glm::radians(90.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.66f, (float)spec.Height });
 
 	std::array<std::string, 6> faces =
@@ -192,8 +193,6 @@ void EditorScene::OnConfigRender()
 	ImGui::Separator();
 	ImGui::NewLine();
 
-	ImGui::Checkbox("Show grid", &m_ShowGrid);
-	
 	if (ImGui::Button("New planet"))
 	{
 		m_SelectedPlanet = nullptr;
@@ -205,6 +204,41 @@ void EditorScene::OnConfigRender()
 	if (ImGui::Button("Toggle wireframe"))
 	{
 		Renderer::ToggleWireframe();
+	}
+
+	ImGui::SameLine();
+
+	ImGui::Checkbox("Show grid", &m_ShowGrid);
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::NewLine();
+
+	if (ImGui::Button("X view"))
+	{
+		float distance = glm::length(m_Camera.GetPosition());
+
+		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
+			glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f));
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Y view"))
+	{
+		float distance = glm::length(m_Camera.GetPosition());
+
+		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
+			glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f));
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Z view"))
+	{
+		float distance = glm::length(m_Camera.GetPosition());
+
+		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
+			glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f));
 	}
 
 	ImGui::NewLine();
