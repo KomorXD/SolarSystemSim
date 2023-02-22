@@ -35,7 +35,8 @@ public:
 	static void SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, const glm::mat4& transform = glm::mat4(1.0f));
 	static void DrawSkybox(const std::shared_ptr<Cubemap>& cubemap);
 
-	static glm::vec<4, uint8_t> GetPixelAt(const glm::vec2& coords);
+	static glm::uvec4 GetPixelAt(const glm::vec2& coords);
+	static glm::vec3 ScreenToWorldCoords(const glm::vec2& screenCoords, float depth);
 
 	static void EnableDepth();
 	static void DisableDepth();

@@ -528,13 +528,39 @@ void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
 	GLCall(glDepthFunc(GL_LESS));
 }
 
-glm::vec<4, uint8_t> Renderer::GetPixelAt(const glm::vec2& coords)
+glm::uvec4 Renderer::GetPixelAt(const glm::vec2& coords)
 {
 	glm::vec<4, uint8_t> pixel{};
 
 	GLCall(glReadPixels((GLint)coords.x, (GLint)coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
 
 	return pixel;
+}
+
+glm::vec3 Renderer::ScreenToWorldCoords(const glm::vec2& screenCoords, float depth)
+{
+	struct
+	{
+		int X;
+		int Y;
+		int Width;
+		int Height;
+	} viewport{};
+
+	GLCall(glGetIntegerv(GL_VIEWPORT, (int*)&viewport));
+
+	glm::mat4 viewProjInverse = glm::inverse(s_ViewProjection);
+	glm::vec4 mouseCoords(
+		(screenCoords.x - viewport.Width / 2.0f) / (viewport.Width / 2.0f),
+		(screenCoords.y - viewport.Height / 2.0f) / (viewport.Height / 2.0f),
+		depth,
+		1.0f
+	);
+	glm::vec4 worldCoords = viewProjInverse * mouseCoords;
+
+	worldCoords /= worldCoords.w;
+
+	return glm::vec3(worldCoords);
 }
 
 void Renderer::EnableDepth()
