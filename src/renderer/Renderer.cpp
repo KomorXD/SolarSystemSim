@@ -537,30 +537,22 @@ glm::uvec4 Renderer::GetPixelAt(const glm::vec2& coords)
 	return pixel;
 }
 
-float Renderer::GetDepthAt(const glm::vec2& screenCoords)
+Viewport Renderer::GetViewport()
 {
-	float depth{};
+	Viewport viewport{};
 
-	GLCall(glReadPixels((GLint)screenCoords.x, (GLint)screenCoords.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth));
+	GLCall(glGetIntegerv(GL_VIEWPORT, (int*)&viewport));
 
-	return depth;
+	return viewport;
 }
 
 glm::vec3 Renderer::ScreenToWorldCoords(const glm::vec2& screenCoords, float depth)
 {
-	struct
-	{
-		int X;
-		int Y;
-		int Width;
-		int Height;
-	} viewport{};
-
-	GLCall(glGetIntegerv(GL_VIEWPORT, (int*)&viewport));
+	Viewport viewport = GetViewport();
 
 	glm::mat4 viewProjInverse = glm::inverse(s_ViewProjection);
 	glm::vec4 mouseCoords(
-		(screenCoords.x - viewport.Width / 2.0f) / (viewport.Width / 2.0f),
+		(screenCoords.x - viewport.Width / 2.0f)  / (viewport.Width  / 2.0f),
 		(screenCoords.y - viewport.Height / 2.0f) / (viewport.Height / 2.0f),
 		depth,
 		1.0f
@@ -570,6 +562,13 @@ glm::vec3 Renderer::ScreenToWorldCoords(const glm::vec2& screenCoords, float dep
 	worldCoords /= worldCoords.w;
 
 	return glm::vec3(worldCoords);
+}
+
+glm::vec3 Renderer::WorldToScreenCoords(const glm::vec3& worldCoords)
+{
+	glm::vec4 screenCoords = s_ViewProjection * glm::translate(glm::mat4(1.0f), worldCoords) * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	return glm::vec3(screenCoords) / screenCoords.w;
 }
 
 void Renderer::EnableDepth()

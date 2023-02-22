@@ -9,6 +9,14 @@ class Shader;
 class Cubemap;
 class VertexArray;
 
+struct Viewport
+{
+	int32_t StartX = 0;
+	int32_t StartY = 0;
+	int32_t Width  = 0;
+	int32_t Height = 0;
+};
+
 class Renderer
 {
 public:
@@ -36,8 +44,10 @@ public:
 	static void DrawSkybox(const std::shared_ptr<Cubemap>& cubemap);
 
 	static glm::uvec4 GetPixelAt(const glm::vec2& coords);
-	static float GetDepthAt(const glm::vec2& screenCoords);
+	static Viewport GetViewport();
+
 	static glm::vec3 ScreenToWorldCoords(const glm::vec2& screenCoords, float depth);
+	static glm::vec3 WorldToScreenCoords(const glm::vec3& worldCoords);
 
 	static void EnableDepth();
 	static void DisableDepth();
