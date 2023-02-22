@@ -13,6 +13,10 @@ public:
 	void OnEvent(Event& ev);
 	void OnUpdate(float ts);
 
+	void Move(const glm::vec3& offset);
+	void MovePitch(float offset);
+	void MoveYaw(float offset);
+
 	void SetViewportSize(const glm::vec2& viewportSize);
 	void SetPosition(const glm::vec3& position);
 

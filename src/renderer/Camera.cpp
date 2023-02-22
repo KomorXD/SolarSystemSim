@@ -32,6 +32,25 @@ void Camera::OnUpdate(float ts)
 	CheckForMoveInput(ts);
 }
 
+void Camera::Move(const glm::vec3& offset)
+{
+	m_Position += offset;
+	UpdateView();
+}
+
+void Camera::MovePitch(float offset)
+{
+	m_Pitch += offset;
+	m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
+	UpdateView();
+}
+
+void Camera::MoveYaw(float offset)
+{
+	m_Yaw += offset;
+	UpdateView();
+}
+
 void Camera::SetViewportSize(const glm::vec2& viewportSize)
 {
 	m_ViewportSize = viewportSize;
@@ -132,6 +151,8 @@ void Camera::CheckForMouseMovement(float ts)
 	{
 		m_Yaw   += delta.x * ts * 0.1f;
 		m_Pitch -= delta.y * ts * 0.1f;
+
+		m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
 
 		UpdateView();
 	}
