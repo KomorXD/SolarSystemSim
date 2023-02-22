@@ -5,6 +5,7 @@
 #include "../Application.hpp"
 #include "../renderer/Renderer.hpp"
 #include "../Random.hpp"
+#include "states/EditorSceneStates.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -79,6 +80,20 @@ void EditorScene::OnEvent(Event& ev)
 		return;
 	}
 
+	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::Escape && m_ActiveState)
+	{
+		m_ActiveState.reset();
+
+		return;
+	}
+
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnEvent(ev);
+
+		return;
+	}
+
 	if (ev.Type == Event::MouseButtonPressed && ev.MouseButton.Button == MouseButton::Left)
 	{
 		CheckForPlanetSelect();
@@ -96,8 +111,12 @@ void EditorScene::OnInput()
 void EditorScene::OnUpdate(float ts)
 {
 	m_TS = ts * 1000.0f;
-
 	m_Camera.OnUpdate(ts);
+
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnUpdate(ts);
+	}
 }
 
 void EditorScene::OnRender()
@@ -146,6 +165,11 @@ void EditorScene::OnRender()
 		Renderer::SceneEnd();
 	}
 
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnRender(m_Camera);
+	}
+
 	Renderer::BeginStencil();
 
 	m_FB->UnbindRenderBuffer();
@@ -169,6 +193,14 @@ void EditorScene::OnConfigRender()
 
 	ImGui::Checkbox("Show grid", &m_ShowGrid);
 	
+	if (ImGui::Button("New planet"))
+	{
+		m_SelectedPlanet = nullptr;
+		m_ActiveState = std::make_unique<NewSphereState>(*this);
+	}
+
+	ImGui::SameLine();
+
 	if (ImGui::Button("Toggle wireframe"))
 	{
 		Renderer::ToggleWireframe();
@@ -177,6 +209,11 @@ void EditorScene::OnConfigRender()
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
+
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnConfigRender();
+	}
 
 	if (m_SelectedPlanet)
 	{
@@ -189,6 +226,16 @@ void EditorScene::OnConfigRender()
 uint32_t EditorScene::GetFramebufferTextureID() const
 {
 	return m_FB->GetTextureID();
+}
+
+void EditorScene::PushNewPlanet(Planet& planet)
+{
+	m_Planets.push_back(planet);
+
+	if (m_ActiveState)
+	{
+		m_ActiveState.reset();
+	}
 }
 
 void EditorScene::CheckForPlanetSelect()

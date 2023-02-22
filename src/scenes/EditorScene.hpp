@@ -2,6 +2,7 @@
 #include "../OpenGL.hpp"
 #include "../renderer/Camera.hpp"
 #include "../objects/Planet.hpp"
+#include "states/SceneState.hpp"
 
 #include <memory>
 
@@ -19,9 +20,13 @@ public:
 
 	virtual uint32_t GetFramebufferTextureID() const override;
 
+	void PushNewPlanet(Planet& planet);
+
 private:
 	void CheckForPlanetSelect();
 	void DrawGridPlane();
+
+	std::unique_ptr<SceneState> m_ActiveState;
 
 	std::vector<Planet> m_Planets;
 	Planet* m_SelectedPlanet = nullptr;
