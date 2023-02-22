@@ -17,7 +17,7 @@ public:
 
 private:
 	Planet m_NewPlanet;
-	float m_Depth = 1.0f;
+	float m_Depth = 0.98f;
 
 	EditorScene& m_ParentScene;
 };
@@ -34,6 +34,7 @@ public:
 
 private:
 	Planet* m_MovedPlanet;
+	glm::vec2 m_Offset;
 	float m_Depth = 1.0f;
 
 	EditorScene& m_ParentScene;

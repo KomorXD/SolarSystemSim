@@ -3,6 +3,7 @@
 #include "../../renderer/Renderer.hpp"
 #include "../../Input.hpp"
 #include "../../Event.hpp"
+#include "../../Logger.hpp"
 
 NewSphereState::NewSphereState(EditorScene& scene)
 	: m_NewPlanet(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth))
@@ -59,7 +60,15 @@ void NewSphereState::OnConfigRender()
 MoveSphereState::MoveSphereState(EditorScene& scene, Planet* movedPlanet)
 	: m_MovedPlanet(movedPlanet), m_ParentScene(scene)
 {
-	m_Depth = Renderer::GetDepthAt(Input::GetMousePosition());
+	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(movedPlanet->GetPosition());
+	glm::vec3 mouseScreenPos = glm::vec3(Input::GetMousePosition(), planetScreenPos.z);
+	Viewport viewport = Renderer::GetViewport();
+
+	planetScreenPos.x = ((planetScreenPos.x + 1.0f) / 2.0f) * viewport.Width;
+	planetScreenPos.y = ((planetScreenPos.y + 1.0f) / 2.0f) * viewport.Height;
+
+	m_Depth = planetScreenPos.z;
+	m_Offset = planetScreenPos - mouseScreenPos;
 }
 
 void MoveSphereState::OnEvent(Event& ev)
@@ -94,7 +103,7 @@ void MoveSphereState::OnUpdate(float ts)
 {
 	if (m_MovedPlanet)
 	{
-		m_MovedPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
+		m_MovedPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition() + m_Offset, m_Depth));
 	}
 }
 
