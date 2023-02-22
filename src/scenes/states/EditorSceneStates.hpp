@@ -9,15 +9,15 @@ class NewSphereState : public SceneState
 {
 public:
 	NewSphereState(EditorScene& scene);
-	~NewSphereState();
 
-	virtual void OnEvent(Event& ev) override;
-	virtual void OnUpdate(float ts) override;
-	virtual void OnRender()			override;
+	virtual void OnEvent(Event& ev)		  override;
+	virtual void OnUpdate(float ts)		  override;
+	virtual void OnRender(Camera& camera) override;
+	virtual void OnConfigRender()		  override;
 
 private:
 	Planet m_NewPlanet;
-	float m_Depth = 0.9f;
+	float m_Depth = 1.0f;
 
 	EditorScene& m_ParentScene;
 };
