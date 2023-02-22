@@ -80,8 +80,9 @@ void EditorScene::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::Escape && m_ActiveState)
+	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::Escape)
 	{
+		m_SelectedPlanet = nullptr;
 		m_ActiveState.reset();
 
 		return;
@@ -228,14 +229,14 @@ uint32_t EditorScene::GetFramebufferTextureID() const
 	return m_FB->GetTextureID();
 }
 
+void EditorScene::CancelState()
+{
+	m_ActiveState.reset();
+}
+
 void EditorScene::PushNewPlanet(Planet& planet)
 {
 	m_Planets.push_back(planet);
-
-	if (m_ActiveState)
-	{
-		m_ActiveState.reset();
-	}
 }
 
 void EditorScene::CheckForPlanetSelect()
@@ -273,6 +274,12 @@ void EditorScene::CheckForPlanetSelect()
 	if (Input::IsMouseButtonPressed(MouseButton::Left))
 	{
 		m_SelectedPlanet = hoveredPlanet ? hoveredPlanet : nullptr;
+	}
+
+	if (m_SelectedPlanet)
+	{
+		m_ActiveState.reset();
+		m_ActiveState = std::make_unique<MoveSphereState>(*this, m_SelectedPlanet);
 	}
 }
 

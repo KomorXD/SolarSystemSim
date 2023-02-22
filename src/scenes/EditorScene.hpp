@@ -20,6 +20,7 @@ public:
 
 	virtual uint32_t GetFramebufferTextureID() const override;
 
+	void CancelState();
 	void PushNewPlanet(Planet& planet);
 
 private:
