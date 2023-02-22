@@ -51,7 +51,7 @@ void EditorLayer::OnImGuiRender()
 	ImGui::SetNextWindowPos({ 0.0f, 0.0f });
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.66f, windowSpec.Height * 1.0f });
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
-	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
 	m_IsViewportFocused = ImGui::IsWindowHovered();
 	ImGui::Image((ImTextureID)m_Scene->GetFramebufferTextureID(), ImGui::GetContentRegionAvail(), { 0.0f, 1.0f }, { 1.0f, 0.0f });
