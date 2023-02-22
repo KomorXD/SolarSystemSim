@@ -114,3 +114,37 @@ void MoveSphereState::OnRender(Camera& camera)
 void MoveSphereState::OnConfigRender()
 {
 }
+
+InterpolateViewState::InterpolateViewState(EditorScene& scene, Camera& camera, const glm::vec3& targetPos, float targetPitch, float targetYaw)
+	: m_TargetPos(targetPos), m_TargetPitch(targetPitch), m_TargetYaw(targetYaw), m_ParentScene(scene), m_SceneCamera(camera)
+{
+	m_DeltaMove  = targetPos - camera.GetPosition();
+	m_DeltaPitch = targetPitch - camera.GetPitch();
+	m_DeltaYaw   = targetYaw - camera.GetYaw();
+}
+
+void InterpolateViewState::OnEvent(Event& ev)
+{
+}
+
+void InterpolateViewState::OnUpdate(float ts)
+{
+	if (glm::distance(m_SceneCamera.GetPosition(), m_TargetPos) < 0.001f)
+	{
+		m_ParentScene.CancelState();
+
+		return;
+	}
+
+	m_SceneCamera.Move(m_DeltaMove * 0.05f);
+	m_SceneCamera.MovePitch(m_DeltaPitch * 0.05f);
+	m_SceneCamera.MoveYaw(m_DeltaYaw * 0.05f);
+}
+
+void InterpolateViewState::OnRender(Camera& camera)
+{
+}
+
+void InterpolateViewState::OnConfigRender()
+{
+}
