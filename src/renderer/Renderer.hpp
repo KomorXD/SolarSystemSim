@@ -36,6 +36,7 @@ public:
 	static void DrawSkybox(const std::shared_ptr<Cubemap>& cubemap);
 
 	static glm::uvec4 GetPixelAt(const glm::vec2& coords);
+	static float GetDepthAt(const glm::vec2& screenCoords);
 	static glm::vec3 ScreenToWorldCoords(const glm::vec2& screenCoords, float depth);
 
 	static void EnableDepth();

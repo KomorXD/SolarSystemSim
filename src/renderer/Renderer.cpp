@@ -537,6 +537,15 @@ glm::uvec4 Renderer::GetPixelAt(const glm::vec2& coords)
 	return pixel;
 }
 
+float Renderer::GetDepthAt(const glm::vec2& screenCoords)
+{
+	float depth{};
+
+	GLCall(glReadPixels((GLint)screenCoords.x, (GLint)screenCoords.y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depth));
+
+	return depth;
+}
+
 glm::vec3 Renderer::ScreenToWorldCoords(const glm::vec2& screenCoords, float depth)
 {
 	struct
