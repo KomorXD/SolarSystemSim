@@ -20,7 +20,7 @@ void EditorLayer::OnEvent(Event& ev)
 		return;
 	}
 
-	if (m_IsViewportFocused)
+	if (m_IsViewportFocused || true)
 	{
 		m_Scene->OnEvent(ev);
 	}
@@ -36,7 +36,7 @@ void EditorLayer::OnInput()
 
 void EditorLayer::OnUpdate(float ts)
 {
-	if (m_IsViewportFocused)
+	if (m_IsViewportFocused || true)
 	{
 		m_Scene->OnUpdate(ts);
 	}
