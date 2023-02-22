@@ -21,3 +21,20 @@ private:
 
 	EditorScene& m_ParentScene;
 };
+
+class MoveSphereState : public SceneState
+{
+public:
+	MoveSphereState(EditorScene& scene, Planet* movedPlanet);
+
+	virtual void OnEvent(Event& ev)		  override;
+	virtual void OnUpdate(float ts)		  override;
+	virtual void OnRender(Camera& camera) override;
+	virtual void OnConfigRender()		  override;
+
+private:
+	Planet* m_MovedPlanet;
+	float m_Depth = 1.0f;
+
+	EditorScene& m_ParentScene;
+};
