@@ -3,8 +3,10 @@
 #include "../scenes/states/EditorSceneStates.hpp"
 #include "../Application.hpp"
 #include "../Logger.hpp"
+#include "../math/Math.hpp"
 
 #include <imgui/imgui.h>
+#include <imgui/ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
 EditorLayer::EditorLayer()
@@ -37,6 +39,18 @@ void EditorLayer::OnEvent(Event& ev)
 
 	if (m_IsViewportFocused)
 	{
+		if (ev.Type == Event::KeyPressed)
+		{
+			switch (ev.Key.Code)
+			{
+			case Key::Q:	m_GizmoMode = -1;				   return;
+			case Key::W:	m_GizmoMode = ImGuizmo::TRANSLATE; return;
+			case Key::E:	m_GizmoMode = ImGuizmo::ROTATE;    return;
+			case Key::R:	m_GizmoMode = ImGuizmo::SCALE;	   return;
+			default: break;
+			}
+		}
+
 		m_Scene->OnEvent(ev);
 	}
 }
@@ -77,8 +91,58 @@ void EditorLayer::RenderViewport()
 	m_IsViewportFocused = ImGui::IsWindowHovered();
 	ImGui::Image((ImTextureID)m_Scene->GetFramebufferTextureID(), ImGui::GetContentRegionAvail(), { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
+	RenderImGuizmo();
+
 	ImGui::End();
 	ImGui::PopStyleVar();
+}
+
+void EditorLayer::RenderImGuizmo()
+{
+	if (!(*m_SceneData.SelectedPlanet) || m_GizmoMode == -1)
+	{
+		return;
+	}
+
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+
+	ImGuizmo::SetOrthographic(false);
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(0.0f, 0.0f, spec.Width * 0.8f, spec.Height * 1.0f);
+
+	const glm::mat4& cameraProj = m_SceneData.EditorCamera->GetProjection();
+	glm::mat4 cameraView = m_SceneData.EditorCamera->GetViewMatrix();
+	glm::mat4 planetTransform = (*m_SceneData.SelectedPlanet)->GetTransform();
+
+	bool doSnap = Input::IsKeyPressed(Key::LeftControl);
+	float snapStep = m_GizmoMode == ImGuizmo::ROTATE ? 45.0f : 0.5f;
+	float snapArr[3]{ snapStep, snapStep, snapStep };
+	
+	ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj),
+		ImGuizmo::OPERATION(m_GizmoMode), ImGuizmo::WORLD, glm::value_ptr(planetTransform),
+		nullptr, doSnap ? snapArr : nullptr);
+	
+	if (ImGuizmo::IsUsing())
+	{
+		glm::vec3 translation{};
+		glm::vec3 rotation{};
+		glm::vec3 scale{};
+
+#if 0
+		// BUG: for some reason rotation goes haywire
+		// It seems to be true that ImGuizmo's impl is not stable
+		ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(planetTransform), 
+			glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+#endif
+
+		Math::TransformDecompose(planetTransform, translation, rotation, scale);
+
+		glm::vec3 deltaRotation = rotation - (*m_SceneData.SelectedPlanet)->GetRotation();
+
+		(*m_SceneData.SelectedPlanet)->SetPosition(translation);
+		(*m_SceneData.SelectedPlanet)->SetRotation((*m_SceneData.SelectedPlanet)->GetRotation() + deltaRotation);
+		(*m_SceneData.SelectedPlanet)->SetScale(scale);
+	}
 }
 
 void EditorLayer::RenderControlPanel()

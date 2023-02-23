@@ -17,11 +17,14 @@ public:
 
 private:
 	void RenderViewport();
+	void RenderImGuizmo();
 	void RenderControlPanel();
 	void RenderEntityData();
 
 	std::unique_ptr<Scene> m_Scene;
 	SceneData m_SceneData;
+
+	int32_t m_GizmoMode = -1;
 
 	bool m_IsViewportFocused = true;
 };
