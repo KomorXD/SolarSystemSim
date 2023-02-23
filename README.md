@@ -21,3 +21,5 @@ What I plan for it to feature:
 - [glm](https://github.com/g-truc/glm)
 - [spdlog](https://github.com/gabime/spdlog)
 - [Dear ImGui](https://github.com/ocornut/imgui)
+- [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)
+- [stb_image](https://github.com/nothings/stb)
