@@ -10,6 +10,7 @@ class Planet;
 class Camera;
 class SceneState;
 
+// TODO: Do it different way, like double pointer eeeeeewwwwwwwwwwwwww
 struct SceneData
 {
 	std::vector<Planet>* Planets = nullptr;
