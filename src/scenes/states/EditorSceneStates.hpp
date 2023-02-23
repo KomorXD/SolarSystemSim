@@ -5,10 +5,10 @@
 
 class EditorScene;
 
-class NewSphereState : public SceneState
+class NewPlanetState : public SceneState
 {
 public:
-	NewSphereState(EditorScene& scene);
+	NewPlanetState(EditorScene& scene, Planet& newPlanet);
 
 	virtual void OnEvent(Event& ev)		  override;
 	virtual void OnUpdate(float ts)		  override;
@@ -16,16 +16,16 @@ public:
 	virtual void OnConfigRender()		  override;
 
 private:
-	Planet m_NewPlanet;
-	float m_Depth = 0.98f;
+	Planet& m_NewPlanet;
+	float m_Depth = 0.97f;
 
 	EditorScene& m_ParentScene;
 };
 
-class MoveSphereState : public SceneState
+class MovePlanetState : public SceneState
 {
 public:
-	MoveSphereState(EditorScene& scene, Planet* movedPlanet);
+	MovePlanetState(EditorScene& scene, Planet& movedPlanet);
 
 	virtual void OnEvent(Event& ev)		  override;
 	virtual void OnUpdate(float ts)		  override;
@@ -33,7 +33,7 @@ public:
 	virtual void OnConfigRender()		  override;
 
 private:
-	Planet* m_MovedPlanet = nullptr;
+	Planet& m_MovedPlanet;
 	glm::vec2 m_Offset;
 	float m_Depth = 1.0f;
 

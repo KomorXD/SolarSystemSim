@@ -195,8 +195,8 @@ void EditorScene::OnConfigRender()
 
 	if (ImGui::Button("New planet"))
 	{
-		m_SelectedPlanet = nullptr;
-		m_ActiveState = std::make_unique<NewSphereState>(*this);
+		m_SelectedPlanet = &m_Planets.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_ActiveState = std::make_unique<NewPlanetState>(*this, *m_SelectedPlanet);
 	}
 
 	ImGui::SameLine();
@@ -313,7 +313,7 @@ void EditorScene::CheckForPlanetSelect()
 	if (m_SelectedPlanet)
 	{
 		m_ActiveState.reset();
-		m_ActiveState = std::make_unique<MoveSphereState>(*this, m_SelectedPlanet);
+		m_ActiveState = std::make_unique<MovePlanetState>(*this, *m_SelectedPlanet);
 	}
 }
 
