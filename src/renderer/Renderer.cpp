@@ -28,12 +28,6 @@ glm::mat4 Renderer::s_ViewProjection = glm::mat4(1.0f);
 glm::mat4 Renderer::s_Projection = glm::mat4(1.0f);
 glm::mat4 Renderer::s_View = glm::mat4(1.0f);
 
-struct SphereVertex
-{
-	glm::vec3 Position;
-	glm::vec3 Normal;
-};
-
 struct SphereInstance
 {
 	glm::mat4 Transform;
@@ -86,7 +80,6 @@ struct RendererData
 	uint32_t		SpheresInstanceCount		= 0;
 	SphereInstance* SpheresTransformsBufferBase = nullptr;
 	SphereInstance* SpheresTransformsBufferPtr  = nullptr;
-	uint32_t		SpheresBufferOffset		    = 0;
 
 	std::array<glm::vec4, 4> QuadVertices;
 
@@ -97,12 +90,12 @@ struct RendererData
 
 static RendererData s_Data{};
 
-static std::vector<SphereVertex> GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
+static std::vector<glm::vec3> GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
 {
 	constexpr float PI = 3.14159265358979323846f;
 	constexpr float radius = 1.0f;
 
-	std::vector<SphereVertex> vertices;
+	std::vector<glm::vec3> vertices;
 
 	vertices.reserve((stackCount + 1) * (sectorCount + 1));
 
@@ -124,16 +117,7 @@ static std::vector<SphereVertex> GenerateUVSphereData(int32_t sectorCount, int32
 			float x = xy * std::cosf(sectorAngle);
 			float y = xy * std::sinf(sectorAngle);
 
-			float nx = x * lengthInv;
-			float ny = y * lengthInv;
-			float nz = z * lengthInv;
-
-			SphereVertex v{};
-
-			v.Position = glm::vec3(x, y, z);
-			v.Normal   = glm::vec3(nx, ny, nz);
-
-			vertices.push_back(v);
+			vertices.emplace_back(x, y, z);
 		}
 	}
 
@@ -255,17 +239,15 @@ void Renderer::Init()
 	{
 		SCOPE_PROFILE("Sphere data init");
 
-		std::vector<SphereVertex> sphereVertices = GenerateUVSphereData(32, 32);
+		std::vector<glm::vec3> sphereVertices = GenerateUVSphereData(32, 32);
 
 		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
-		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereVertex));
-		s_Data.SphereVertexBuffer->SetData(sphereVertices.data(), (uint32_t)(sphereVertices.size() * sizeof(SphereVertex)));
-		s_Data.SpheresBufferOffset = (uint32_t)(sphereVertices.size() * sizeof(SphereVertex));
+		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::vec3));
+		s_Data.SphereVertexBuffer->SetData(sphereVertices.data(), (uint32_t)(sphereVertices.size() * sizeof(glm::vec3)));
 
 		VertexBufferLayout layout;
 
 		layout.Push<float>(3); // Position
-		layout.Push<float>(3); // Normal
 		
 		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32);
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), (uint32_t)sphereIndices.size());
@@ -279,8 +261,8 @@ void Renderer::Init()
 		layout.Push<float>(4); // Transform
 		layout.Push<float>(4); // Color
 
-		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::mat4));
-		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 2);
+		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * (sizeof(glm::mat4) + sizeof(glm::vec4)));
+		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 1);
 
 		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
 		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
