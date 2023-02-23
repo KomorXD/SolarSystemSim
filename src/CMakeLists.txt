@@ -17,6 +17,7 @@ file(GLOB PROJECT_HEADERS
 	"layers/*.hpp"
 	"renderer/*.hpp"
 	"objects/*.hpp"
+	"math/*.hpp"
 )
 
 file(GLOB PROJECT_SOURCES 
@@ -26,13 +27,13 @@ file(GLOB PROJECT_SOURCES
 	"layers/*.cpp"
 	"renderer/*.cpp"
 	"objects/*.cpp"
+	"math/*.cpp"
 )
 
 file(GLOB VENDORS_SOURCES 
 	"../dependencies/glad/src/glad.c"
 	"vendors/imgui/*.cpp"
 	"vendors/stb_image/*.cpp"
-	"vendors/ImGuizmo/*.cpp"
 )
 
 file(GLOB PROJECT_CONFIGS
