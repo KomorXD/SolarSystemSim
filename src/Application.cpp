@@ -10,6 +10,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include <imgui/ImGuizmo.h>
+
 Application::Application(const WindowSpec& spec)
 	: m_WindowSpec(spec)
 {
@@ -117,6 +119,7 @@ void Application::Run()
 		ImGui_ImplGlfw_NewFrame();
 
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 		ImGui::PushFont(font);
 
 		Event ev{};
