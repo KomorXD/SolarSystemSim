@@ -22,7 +22,6 @@ EditorScene::EditorScene()
 	m_FB->UnbindBuffer();
 
 	Renderer::Init();
-	Renderer::OnWindowResize((uint32_t)(spec.Width * 0.66f), spec.Height);
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 	m_Camera.MoveYaw(glm::radians(90.0f));
@@ -40,7 +39,7 @@ EditorScene::EditorScene()
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
 
-	float xd = 30.0f;
+	float xd = 5.0f;
 
 	for (float x = -xd; x <= xd; x += 5.0f)
 	{
@@ -75,7 +74,7 @@ void EditorScene::OnEvent(Event& ev)
 		m_FB->ResizeTexture(ev.Size.Width, ev.Size.Height);
 		m_FB->ResizeRenderBuffer(ev.Size.Width, ev.Size.Height);
 
-		Renderer::OnWindowResize(ev.Size.Width, ev.Size.Height);
+		Renderer::OnWindowResize({ 0, 0, (int32_t)ev.Size.Width, (int32_t)ev.Size.Height });
 		m_Camera.SetViewportSize({ (float)ev.Size.Width, (float)ev.Size.Height });
 
 		return;
@@ -179,83 +178,21 @@ void EditorScene::OnRender()
 	m_FB->BindTexture(1);
 }
 
-void EditorScene::OnConfigRender()
+void EditorScene::SetState(std::unique_ptr<SceneState>&& state)
 {
-	glm::vec3 cameraPos = m_Camera.GetPosition();
+	m_ActiveState = std::move(state);
+}
 
-	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+SceneData EditorScene::GetSceneData()
+{
+	SceneData data{};
 
-	ImGui::NewLine();
-	ImGui::Text("Timestep: %.2fms", m_TS);
-	ImGui::Text("FPS: %.2f", 1000.0f / m_TS);
-	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
+	data.Planets = &m_Planets;
+	data.SelectedPlanet = &m_SelectedPlanet;
+	data.EditorCamera = &m_Camera;
+	data.ShowGrid = &m_ShowGrid;
 
-	if (ImGui::Button("New planet"))
-	{
-		m_SelectedPlanet = &m_Planets.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		m_ActiveState = std::make_unique<NewPlanetState>(*this, *m_SelectedPlanet);
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Toggle wireframe"))
-	{
-		Renderer::ToggleWireframe();
-	}
-
-	ImGui::SameLine();
-
-	ImGui::Checkbox("Show grid", &m_ShowGrid);
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
-
-	if (ImGui::Button("X view"))
-	{
-		float distance = glm::length(m_Camera.GetPosition());
-
-		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
-			glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f));
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Y view"))
-	{
-		float distance = glm::length(m_Camera.GetPosition());
-
-		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
-			glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f));
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Z view"))
-	{
-		float distance = glm::length(m_Camera.GetPosition());
-
-		m_ActiveState = std::make_unique<InterpolateViewState>(*this, m_Camera, 
-			glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f));
-	}
-
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
-
-	if (m_ActiveState)
-	{
-		m_ActiveState->OnConfigRender();
-	}
-
-	if (m_SelectedPlanet)
-	{
-		m_SelectedPlanet->OnConfigRender();
-	}
-
-	ImGui::End();
+	return data;
 }
 
 uint32_t EditorScene::GetFramebufferTextureID() const
@@ -266,11 +203,6 @@ uint32_t EditorScene::GetFramebufferTextureID() const
 void EditorScene::CancelState()
 {
 	m_ActiveState.reset();
-}
-
-void EditorScene::PushNewPlanet(Planet& planet)
-{
-	m_Planets.push_back(planet);
 }
 
 void EditorScene::CheckForPlanetSelect()
@@ -293,6 +225,7 @@ void EditorScene::CheckForPlanetSelect()
 
 	Renderer::SceneEnd();
 
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 	uint8_t pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
 
 	for (auto& planet : m_Planets)
@@ -313,7 +246,7 @@ void EditorScene::CheckForPlanetSelect()
 	if (m_SelectedPlanet)
 	{
 		m_ActiveState.reset();
-		m_ActiveState = std::make_unique<MovePlanetState>(*this, *m_SelectedPlanet);
+		m_ActiveState = std::make_unique<MovePlanetState>(this, m_SelectedPlanet);
 	}
 }
 

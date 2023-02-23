@@ -23,7 +23,7 @@ public:
 	static void Init();
 	static void Shutdown();
 
-	static void OnWindowResize(uint32_t width, uint32_t height);
+	static void OnWindowResize(const Viewport& newViewport);
 
 	static void SceneBegin(Camera& camera);
 	static void SceneEnd();

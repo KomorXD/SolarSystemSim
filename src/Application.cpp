@@ -97,7 +97,7 @@ void Application::Run()
 
 	io.Fonts->AddFontDefault();
 
-	ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/tahoma.ttf", 24.0f);
+	ImFont* font = io.Fonts->AddFontFromFileTTF("res/fonts/tahoma.ttf", 20.0f);
 	IM_ASSERT(font != nullptr);
 
 	ImGui_ImplGlfw_InitForOpenGL(m_Window, true);

@@ -3,9 +3,10 @@
 #include "../../renderer/Renderer.hpp"
 #include "../../Input.hpp"
 #include "../../Event.hpp"
+#include "../../Application.hpp"
 #include "../../Logger.hpp"
 
-NewPlanetState::NewPlanetState(EditorScene& scene, Planet& newPlanet)
+NewPlanetState::NewPlanetState(EditorScene* scene, Planet* newPlanet)
 	: m_NewPlanet(newPlanet)
 	, m_ParentScene(scene)
 {
@@ -15,7 +16,7 @@ void NewPlanetState::OnEvent(Event& ev)
 {
 	if (ev.Type == Event::MouseButtonPressed && ev.MouseButton.Button == MouseButton::Left)
 	{
-		m_ParentScene.CancelState();
+		m_ParentScene->CancelState();
 
 		return;
 	}
@@ -40,26 +41,28 @@ void NewPlanetState::OnEvent(Event& ev)
 
 void NewPlanetState::OnUpdate(float ts)
 {
-	m_NewPlanet.SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+
+	m_NewPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
 }
 
 void NewPlanetState::OnRender(Camera& camera)
 {
 	Renderer::SceneBegin(camera);
 	Renderer::SetSphereLightning(true);
-	Renderer::SubmitSphereInstanced(m_NewPlanet.GetTransform(), m_NewPlanet.GetColor());
+	Renderer::SubmitSphereInstanced(m_NewPlanet->GetTransform(), m_NewPlanet->GetColor());
 	Renderer::SceneEnd();
 }
 
 void NewPlanetState::OnConfigRender()
 {
-	m_NewPlanet.OnConfigRender();
+	m_NewPlanet->OnConfigRender();
 }
 
-MovePlanetState::MovePlanetState(EditorScene& scene, Planet& movedPlanet)
+MovePlanetState::MovePlanetState(EditorScene* scene, Planet* movedPlanet)
 	: m_MovedPlanet(movedPlanet), m_ParentScene(scene)
 {
-	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(movedPlanet.GetPosition());
+	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(movedPlanet->GetPosition());
 	glm::vec3 mouseScreenPos = glm::vec3(Input::GetMousePosition(), planetScreenPos.z);
 	Viewport viewport = Renderer::GetViewport();
 
@@ -74,7 +77,7 @@ void MovePlanetState::OnEvent(Event& ev)
 {
 	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Left)
 	{
-		m_ParentScene.CancelState();
+		m_ParentScene->CancelState();
 
 		return;
 	}
@@ -99,7 +102,7 @@ void MovePlanetState::OnEvent(Event& ev)
 
 void MovePlanetState::OnUpdate(float ts)
 {
-	m_MovedPlanet.SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition() + m_Offset, m_Depth));
+	m_MovedPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition() + m_Offset, m_Depth));
 }
 
 void MovePlanetState::OnRender(Camera& camera)
@@ -110,12 +113,12 @@ void MovePlanetState::OnConfigRender()
 {
 }
 
-InterpolateViewState::InterpolateViewState(EditorScene& scene, Camera& camera, const glm::vec3& targetPos, float targetPitch, float targetYaw)
+InterpolateViewState::InterpolateViewState(EditorScene* scene, Camera* camera, const glm::vec3& targetPos, float targetPitch, float targetYaw)
 	: m_TargetPos(targetPos), m_TargetPitch(targetPitch), m_TargetYaw(targetYaw), m_ParentScene(scene), m_SceneCamera(camera)
 {
-	m_DeltaMove  = targetPos - camera.GetPosition();
-	m_DeltaPitch = targetPitch - camera.GetPitch();
-	m_DeltaYaw   = targetYaw - camera.GetYaw();
+	m_DeltaMove  = targetPos - camera->GetPosition();
+	m_DeltaPitch = targetPitch - camera->GetPitch();
+	m_DeltaYaw   = targetYaw - camera->GetYaw();
 }
 
 void InterpolateViewState::OnEvent(Event& ev)
@@ -124,16 +127,16 @@ void InterpolateViewState::OnEvent(Event& ev)
 
 void InterpolateViewState::OnUpdate(float ts)
 {
-	if (glm::distance(m_SceneCamera.GetPosition(), m_TargetPos) < 0.001f)
+	if (glm::distance(m_SceneCamera->GetPosition(), m_TargetPos) < 0.001f)
 	{
-		m_ParentScene.CancelState();
+		m_ParentScene->CancelState();
 
 		return;
 	}
 
-	m_SceneCamera.Move(m_DeltaMove * 0.05f);
-	m_SceneCamera.MovePitch(m_DeltaPitch * 0.05f);
-	m_SceneCamera.MoveYaw(m_DeltaYaw * 0.05f);
+	m_SceneCamera->Move(m_DeltaMove * 0.05f);
+	m_SceneCamera->MovePitch(m_DeltaPitch * 0.05f);
+	m_SceneCamera->MoveYaw(m_DeltaYaw * 0.05f);
 }
 
 void InterpolateViewState::OnRender(Camera& camera)

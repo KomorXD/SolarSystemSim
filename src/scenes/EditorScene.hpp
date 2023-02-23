@@ -16,12 +16,13 @@ public:
 	virtual void OnInput()			override;
 	virtual void OnUpdate(float ts)	override;
 	virtual void OnRender()			override;
-	virtual void OnConfigRender()	override;
 
+	virtual void SetState(std::unique_ptr<SceneState>&& state) override;
+
+	virtual SceneData GetSceneData() override;
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 	void CancelState();
-	void PushNewPlanet(Planet& planet);
 
 private:
 	void CheckForPlanetSelect();

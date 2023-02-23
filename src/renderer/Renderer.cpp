@@ -355,9 +355,11 @@ void Renderer::Shutdown()
 	delete[] s_Data.SpheresTransformsBufferBase;
 }
 
-void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+void Renderer::OnWindowResize(const Viewport& newViewport)
 {
-	GLCall(glViewport(0, 0, width, height));
+	auto& [x, y, width, height] = newViewport;
+
+	GLCall(glViewport(x, y, width, height));
 }
 
 void Renderer::SceneBegin(Camera& camera)

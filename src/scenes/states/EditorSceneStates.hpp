@@ -8,7 +8,7 @@ class EditorScene;
 class NewPlanetState : public SceneState
 {
 public:
-	NewPlanetState(EditorScene& scene, Planet& newPlanet);
+	NewPlanetState(EditorScene* scene, Planet* newPlanet);
 
 	virtual void OnEvent(Event& ev)		  override;
 	virtual void OnUpdate(float ts)		  override;
@@ -16,16 +16,16 @@ public:
 	virtual void OnConfigRender()		  override;
 
 private:
-	Planet& m_NewPlanet;
+	Planet* m_NewPlanet = nullptr;
 	float m_Depth = 0.97f;
 
-	EditorScene& m_ParentScene;
+	EditorScene* m_ParentScene = nullptr;
 };
 
 class MovePlanetState : public SceneState
 {
 public:
-	MovePlanetState(EditorScene& scene, Planet& movedPlanet);
+	MovePlanetState(EditorScene* scene, Planet* movedPlanet);
 
 	virtual void OnEvent(Event& ev)		  override;
 	virtual void OnUpdate(float ts)		  override;
@@ -33,17 +33,17 @@ public:
 	virtual void OnConfigRender()		  override;
 
 private:
-	Planet& m_MovedPlanet;
-	glm::vec2 m_Offset;
+	Planet* m_MovedPlanet = nullptr;
+	glm::vec2 m_Offset{};
 	float m_Depth = 1.0f;
 
-	EditorScene& m_ParentScene;
+	EditorScene* m_ParentScene = nullptr;
 };
 
 class InterpolateViewState : public SceneState
 {
 public:
-	InterpolateViewState(EditorScene& scene, Camera& camera, const glm::vec3& targetPos, float targetPitch, float targetYaw);
+	InterpolateViewState(EditorScene* scene, Camera* camera, const glm::vec3& targetPos, float targetPitch, float targetYaw);
 
 	virtual void OnEvent(Event& ev)		  override;
 	virtual void OnUpdate(float ts)		  override;
@@ -60,6 +60,6 @@ private:
 	float m_TargetYaw  = 0.0f;
 	float m_DeltaYaw   = 0.0f;
 
-	EditorScene& m_ParentScene;
-	Camera& m_SceneCamera;
+	Camera* m_SceneCamera = nullptr;
+	EditorScene* m_ParentScene = nullptr;
 };

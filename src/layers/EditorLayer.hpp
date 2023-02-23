@@ -16,7 +16,12 @@ public:
 	virtual void OnImGuiRender()	override;
 
 private:
+	void RenderViewport();
+	void RenderControlPanel();
+	void RenderEntityData();
+
 	std::unique_ptr<Scene> m_Scene;
+	SceneData m_SceneData;
 
 	bool m_IsViewportFocused = true;
 };
