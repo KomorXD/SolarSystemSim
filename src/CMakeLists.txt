@@ -32,6 +32,7 @@ file(GLOB VENDORS_SOURCES
 	"../dependencies/glad/src/glad.c"
 	"vendors/imgui/*.cpp"
 	"vendors/stb_image/*.cpp"
+	"vendors/ImGuizmo/*.cpp"
 )
 
 file(GLOB PROJECT_CONFIGS
