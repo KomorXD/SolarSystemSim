@@ -147,7 +147,7 @@ void Camera::CheckForMouseMovement(float ts)
 		return;
 	}
 
-	if (Input::IsKeyPressed(Key::LeftControl))
+	if (Input::IsKeyPressed(Key::LeftAlt))
 	{
 		m_Yaw   += delta.x * ts * 0.1f;
 		m_Pitch -= delta.y * ts * 0.1f;
