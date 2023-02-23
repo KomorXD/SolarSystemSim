@@ -166,11 +166,6 @@ void EditorScene::OnRender()
 		Renderer::SceneEnd();
 	}
 
-	if (m_ActiveState)
-	{
-		m_ActiveState->OnRender(m_Camera);
-	}
-
 	Renderer::BeginStencil();
 
 	m_FB->UnbindRenderBuffer();
@@ -241,12 +236,6 @@ void EditorScene::CheckForPlanetSelect()
 	if (Input::IsMouseButtonPressed(MouseButton::Left))
 	{
 		m_SelectedPlanet = hoveredPlanet ? hoveredPlanet : nullptr;
-	}
-
-	if (m_SelectedPlanet)
-	{
-		m_ActiveState.reset();
-		m_ActiveState = std::make_unique<MovePlanetState>(this, m_SelectedPlanet);
 	}
 }
 
