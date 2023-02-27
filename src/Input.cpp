@@ -28,3 +28,17 @@ glm::vec2 Input::GetMousePosition()
 
 	return { (float)xPos, (float)app->GetWindowSpec().Height - (float)yPos };
 }
+
+void Input::HideCursor()
+{
+	Application* app = Application::GetInstance();
+
+	glfwSetInputMode(app->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void Input::ShowCursor()
+{
+	Application* app = Application::GetInstance();
+
+	glfwSetInputMode(app->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}

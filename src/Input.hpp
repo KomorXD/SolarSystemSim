@@ -162,4 +162,7 @@ public:
 
 	static bool IsMouseButtonPressed(MouseButton button);
 	static glm::vec2 GetMousePosition();
+
+	static void HideCursor();
+	static void ShowCursor();
 };
