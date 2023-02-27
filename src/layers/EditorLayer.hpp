@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Layer.hpp"
-#include "../scenes/Scene.hpp"
+#include "../scenes/EditorScene.hpp"
 
 #include <memory>
 
@@ -21,8 +21,7 @@ private:
 	void RenderControlPanel();
 	void RenderEntityData();
 
-	std::unique_ptr<Scene> m_Scene;
-	SceneData m_SceneData;
+	std::unique_ptr<EditorScene> m_Scene;
 
 	int32_t m_GizmoMode = -1;
 

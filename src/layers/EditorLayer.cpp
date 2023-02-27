@@ -1,5 +1,4 @@
 #include "EditorLayer.hpp"
-#include "../scenes/EditorScene.hpp"
 #include "../scenes/states/EditorSceneStates.hpp"
 #include "../Application.hpp"
 #include "../Logger.hpp"
@@ -21,8 +20,6 @@ EditorLayer::EditorLayer()
 	dummyEv.Size.Height = spec.Height;
 	
 	m_Scene->OnEvent(dummyEv);
-
-	m_SceneData = m_Scene->GetSceneData();
 }
 
 void EditorLayer::OnEvent(Event& ev)
@@ -99,10 +96,13 @@ void EditorLayer::RenderViewport()
 
 void EditorLayer::RenderImGuizmo()
 {
-	if (!(*m_SceneData.SelectedPlanet) || m_GizmoMode == -1)
+	if (!m_Scene->m_SelectedPlanet || m_GizmoMode == -1)
 	{
 		return;
 	}
+
+	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
+	Camera& editorCamera = m_Scene->m_Camera;
 
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
@@ -110,9 +110,9 @@ void EditorLayer::RenderImGuizmo()
 	ImGuizmo::SetDrawlist();
 	ImGuizmo::SetRect(0.0f, 0.0f, spec.Width * 0.8f, spec.Height * 1.0f);
 
-	const glm::mat4& cameraProj = m_SceneData.EditorCamera->GetProjection();
-	glm::mat4 cameraView = m_SceneData.EditorCamera->GetViewMatrix();
-	glm::mat4 planetTransform = (*m_SceneData.SelectedPlanet)->GetTransform();
+	const glm::mat4& cameraProj = editorCamera.GetProjection();
+	glm::mat4 cameraView = editorCamera.GetViewMatrix();
+	glm::mat4 planetTransform = selectedPlanet->GetTransform();
 
 	bool doSnap = Input::IsKeyPressed(Key::LeftControl);
 	float snapStep = m_GizmoMode == ImGuizmo::ROTATE ? 45.0f : 0.5f;
@@ -130,11 +130,11 @@ void EditorLayer::RenderImGuizmo()
 
 		Math::TransformDecompose(planetTransform, translation, rotation, scale);
 
-		glm::vec3 deltaRotation = rotation - (*m_SceneData.SelectedPlanet)->GetRotation();
+		glm::vec3 deltaRotation = rotation - selectedPlanet->GetRotation();
 
-		(*m_SceneData.SelectedPlanet)->SetPosition(translation);
-		(*m_SceneData.SelectedPlanet)->SetRotation((*m_SceneData.SelectedPlanet)->GetRotation() + deltaRotation);
-		(*m_SceneData.SelectedPlanet)->SetScale(scale);
+		selectedPlanet->SetPosition(translation);
+		selectedPlanet->SetRotation(selectedPlanet->GetRotation() + deltaRotation);
+		selectedPlanet->SetScale(scale);
 	}
 }
 
@@ -145,7 +145,7 @@ void EditorLayer::RenderControlPanel()
 	ImGui::SetNextWindowPos({ windowSpec.Width * 0.8f, 0.0f });
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.2f, windowSpec.Height * 1.0f });
 
-	glm::vec3 cameraPos = m_SceneData.EditorCamera->GetPosition();
+	glm::vec3 cameraPos = m_Scene->m_Camera.GetPosition();
 	
 	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 	
@@ -157,20 +157,20 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("New planet"))
 	{
-		*m_SceneData.SelectedPlanet = &m_SceneData.Planets->emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		m_Scene->SetState(std::make_unique<NewPlanetState>((EditorScene*)m_Scene.get(), *m_SceneData.SelectedPlanet));
+		m_Scene->m_SelectedPlanet = &m_Scene->m_Planets.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
 	}
 	
-	ImGui::Checkbox("Show grid", m_SceneData.ShowGrid);
+	ImGui::Checkbox("Show grid", &m_Scene->m_ShowGrid);
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
 	
 	if (ImGui::Button("X view"))
 	{
-		float distance = glm::length(m_SceneData.EditorCamera->GetPosition());
+		float distance = glm::length(m_Scene->m_Camera.GetPosition());
 	
-		m_Scene->SetState(std::make_unique<InterpolateViewState>((EditorScene*)m_Scene.get(), m_SceneData.EditorCamera,
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
 	}
 	
@@ -178,9 +178,9 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Y view"))
 	{
-		float distance = glm::length(m_SceneData.EditorCamera->GetPosition());
+		float distance = glm::length(m_Scene->m_Camera.GetPosition());
 
-		m_Scene->SetState(std::make_unique<InterpolateViewState>((EditorScene*)m_Scene.get(), m_SceneData.EditorCamera,
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
 	}
 	
@@ -188,9 +188,9 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Z view"))
 	{
-		float distance = glm::length(m_SceneData.EditorCamera->GetPosition());
+		float distance = glm::length(m_Scene->m_Camera.GetPosition());
 
-		m_Scene->SetState(std::make_unique<InterpolateViewState>((EditorScene*)m_Scene.get(), m_SceneData.EditorCamera,
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
 	}
 	
@@ -205,8 +205,8 @@ void EditorLayer::RenderControlPanel()
 
 void EditorLayer::RenderEntityData()
 {
-	if (*m_SceneData.SelectedPlanet)
+	if (m_Scene->m_SelectedPlanet)
 	{
-		(*m_SceneData.SelectedPlanet)->OnConfigRender();
+		m_Scene->m_SelectedPlanet->OnConfigRender();
 	}
 }
