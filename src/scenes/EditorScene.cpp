@@ -233,9 +233,9 @@ void EditorScene::CheckForPlanetSelect()
 		}
 	}
 
-	if (Input::IsMouseButtonPressed(MouseButton::Left))
+	if (Input::IsMouseButtonPressed(MouseButton::Left) && hoveredPlanet)
 	{
-		m_SelectedPlanet = hoveredPlanet ? hoveredPlanet : nullptr;
+		m_SelectedPlanet = hoveredPlanet;
 	}
 }
 
