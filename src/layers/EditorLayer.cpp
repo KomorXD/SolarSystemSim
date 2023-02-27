@@ -3,6 +3,7 @@
 #include "../Application.hpp"
 #include "../Logger.hpp"
 #include "../math/Math.hpp"
+#include "../renderer/Renderer.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/ImGuizmo.h>
@@ -148,6 +149,11 @@ void EditorLayer::RenderControlPanel()
 	glm::vec3 cameraPos = m_Scene->m_Camera.GetPosition();
 	
 	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+	if (ImGui::Button("Reload shaders"))
+	{
+		Renderer::ReloadShaders();
+	}
 	
 	ImGui::NewLine();
 	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
@@ -162,6 +168,9 @@ void EditorLayer::RenderControlPanel()
 	}
 	
 	ImGui::Checkbox("Show grid", &m_Scene->m_RenderGrid);
+	ImGui::NewLine();
+	
+	ImGui::Checkbox("Show skybox", &m_Scene->m_RenderSkybox);
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
