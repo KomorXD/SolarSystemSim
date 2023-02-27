@@ -23,13 +23,22 @@ void Camera::OnEvent(Event& ev)
 	if (ev.Type == Event::WindowResized)
 	{
 		SetViewportSize({ (float)ev.Size.Width, (float)ev.Size.Height });
+
+		return;
+	}
+
+	if (ev.Type == Event::MouseWheelScrolled)
+	{
+		m_Position += GetForwardDirection() * ev.MouseWheel.OffsetY;
+
+		UpdateView();
 	}
 }
 
 void Camera::OnUpdate(float ts)
 {
 	CheckForMouseMovement(ts);
-	CheckForMoveInput(ts);
+	// CheckForMoveInput(ts);
 }
 
 void Camera::Move(const glm::vec3& offset)
@@ -142,25 +151,38 @@ void Camera::CheckForMouseMovement(float ts)
 
 	m_InitialMousePos = mousePos;
 
-	if (glm::length(delta) == 0.0f)
+	float deltaLen = glm::length(delta);
+
+	if (deltaLen == 0.0f || deltaLen > 100.0f)
 	{
 		return;
 	}
 
 	if (Input::IsKeyPressed(Key::LeftAlt))
 	{
+		Input::HideCursor();
+
 		m_Yaw   += delta.x * ts * 0.1f;
 		m_Pitch -= delta.y * ts * 0.1f;
 
 		m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
 
 		UpdateView();
+
+		return;
 	}
-	else if (Input::IsMouseButtonPressed(MouseButton::Right))
+
+	if (Input::IsMouseButtonPressed(MouseButton::Middle))
 	{
-		m_Position -= GetRightDirection() * delta.x * ts * 0.3f;
-		m_Position -= GetUpDirection()	  * delta.y * ts * 0.3f;
+		Input::HideCursor();
+
+		m_Position -= GetRightDirection() * delta.x * ts * 0.8f;
+		m_Position -= GetUpDirection()	  * delta.y * ts * 0.8f;
 
 		UpdateView();
+
+		return;
 	}
+
+	Input::ShowCursor();
 }
