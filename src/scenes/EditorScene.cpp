@@ -125,7 +125,7 @@ void EditorScene::OnRender()
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
 
-	Renderer::ClearColor(glm::vec4(0.33f, 0.33f, 0.33f, 1.0f));
+	Renderer::ClearColor(glm::vec4(glm::vec3(0.55f), 1.0f));
 	Renderer::Clear();
 
 	// 1st render - draw object with no borders
@@ -134,12 +134,15 @@ void EditorScene::OnRender()
 	Renderer::EndStencil();
 	Renderer::SetSphereLightning(true);
 
-	if (m_ShowGrid)
+	if (m_RenderGrid)
 	{
 		DrawGridPlane();
 	}
 
-	Renderer::DrawSkybox(m_SkyboxTex);
+	if (m_RenderSkybox)
+	{
+		Renderer::DrawSkybox(m_SkyboxTex);
+	}
 
 	for (auto& planet : m_Planets)
 	{
@@ -162,7 +165,7 @@ void EditorScene::OnRender()
 		Renderer::EndStencil();
 		Renderer::SetSphereLightning(false);
 		Renderer::SubmitSphereInstanced(m_SelectedPlanet->GetTransform() * glm::scale(glm::mat4(1.0f),
-			glm::vec3(m_SelectedPlanet->GetRadius() + 0.05f)), {0.98f, 0.24f, 0.0f, 1.0f});
+			glm::vec3(m_SelectedPlanet->GetRadius() + 0.05f)), { 0.98f, 0.24f, 0.0f, 1.0f });
 		Renderer::SceneEnd();
 	}
 
@@ -185,7 +188,7 @@ SceneData EditorScene::GetSceneData()
 	data.Planets = &m_Planets;
 	data.SelectedPlanet = &m_SelectedPlanet;
 	data.EditorCamera = &m_Camera;
-	data.ShowGrid = &m_ShowGrid;
+	data.ShowGrid = &m_RenderGrid;
 
 	return data;
 }
@@ -242,17 +245,19 @@ void EditorScene::CheckForPlanetSelect()
 void EditorScene::DrawGridPlane()
 {
 	constexpr float distance = 30.0f;
-	constexpr glm::vec3 lineColor(0.77f);
+	constexpr glm::vec4 lineColor(glm::vec3(0.22f), 1.0f);
 
 	Renderer::SetLineWidth(1.0f);
 
-	for (float x = -distance; x <= distance; x += 1.0f)
+	for (float x = -distance; x <= distance; x += 2.0f)
 	{
-		Renderer::DrawLine({ x, 0.0f, -distance }, { x, 0.0f, distance }, glm::vec4(lineColor, 1.0f - (std::abs(x) / (distance))));
+		Renderer::DrawLine({ x, 0.0f, -distance }, { x, 0.0f, distance },
+			x == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
 	}
 
-	for (float z = -distance; z <= distance; z += 1.0f)
+	for (float z = -distance; z <= distance; z += 2.0f)
 	{
-		Renderer::DrawLine({ -distance, 0.0f, z }, { distance, 0.0f, z }, glm::vec4(lineColor, 1.0f - (std::abs(z) / (distance))));
+		Renderer::DrawLine({ -distance, 0.0f, z }, { distance, 0.0f, z }, 
+			z == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
 	}
 }

@@ -39,7 +39,8 @@ private:
 	std::shared_ptr<Cubemap> m_SkyboxTex;
 
 	float m_TS = 0.0f;
-	bool  m_ShowGrid = true;
+	bool  m_RenderGrid = true;
+	bool  m_RenderSkybox = false;
 
 	friend class EditorLayer;
 };

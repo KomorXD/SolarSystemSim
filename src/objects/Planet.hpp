@@ -41,7 +41,7 @@ private:
 	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Scale	 = { 1.0f, 1.0f, 1.0f };
-	glm::vec4 m_Color	 = { 0.2f, 0.2f, 0.2f, 1.0f };
+	glm::vec4 m_Color	 = { 0.44f, 0.44f, 0.44f, 1.0f };
 
 	float m_Radius = 1.0f;
 

@@ -161,7 +161,7 @@ void EditorLayer::RenderControlPanel()
 		m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
 	}
 	
-	ImGui::Checkbox("Show grid", &m_Scene->m_ShowGrid);
+	ImGui::Checkbox("Show grid", &m_Scene->m_RenderGrid);
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
