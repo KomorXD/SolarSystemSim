@@ -21,21 +21,11 @@ void NewPlanetState::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::KeyPressed || ev.Type == Event::KeyHeld)
+	if (ev.Type == Event::MouseWheelScrolled)
 	{
-		if (ev.Key.Code == Key::KPAdd)
-		{
-			m_Depth += 0.001f;
+		m_Depth += 0.001f * ev.MouseWheel.OffsetY;
 
-			return;
-		}
-
-		if (ev.Key.Code == Key::KPSubtract)
-		{
-			m_Depth -= 0.001f;
-
-			return;
-		}
+		return;
 	}
 }
 
