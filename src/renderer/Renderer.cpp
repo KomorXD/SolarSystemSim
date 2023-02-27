@@ -337,6 +337,16 @@ void Renderer::Shutdown()
 	delete[] s_Data.SpheresTransformsBufferBase;
 }
 
+void Renderer::ReloadShaders()
+{
+	FUNC_PROFILE();
+
+	s_Data.QuadShader->ReloadShader();
+	s_Data.LineShader->ReloadShader();
+	s_Data.SphereShader->ReloadShader();
+	s_Data.SkyboxShader->ReloadShader();
+}
+
 void Renderer::OnWindowResize(const Viewport& newViewport)
 {
 	auto& [x, y, width, height] = newViewport;

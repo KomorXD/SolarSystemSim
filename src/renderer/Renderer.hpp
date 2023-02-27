@@ -23,6 +23,8 @@ public:
 	static void Init();
 	static void Shutdown();
 
+	static void ReloadShaders();
+
 	static void OnWindowResize(const Viewport& newViewport);
 
 	static void SceneBegin(Camera& camera);
