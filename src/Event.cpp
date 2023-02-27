@@ -7,7 +7,7 @@ bool EventQueue::PollEvents(Event& ev)
 		return false;
 	}
 
-	ev = m_Events.back();
+	ev = m_Events.front();
 	m_Events.pop();
 
 	return true;
