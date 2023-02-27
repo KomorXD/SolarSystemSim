@@ -40,4 +40,6 @@ private:
 
 	float m_TS = 0.0f;
 	bool  m_ShowGrid = true;
+
+	friend class EditorLayer;
 };
