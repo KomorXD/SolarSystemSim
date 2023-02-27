@@ -128,13 +128,6 @@ void EditorLayer::RenderImGuizmo()
 		glm::vec3 rotation{};
 		glm::vec3 scale{};
 
-#if 0
-		// BUG: for some reason rotation goes haywire
-		// It seems to be true that ImGuizmo's impl is not stable
-		ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(planetTransform), 
-			glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
-#endif
-
 		Math::TransformDecompose(planetTransform, translation, rotation, scale);
 
 		glm::vec3 deltaRotation = rotation - (*m_SceneData.SelectedPlanet)->GetRotation();
