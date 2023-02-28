@@ -172,11 +172,10 @@ void Renderer::Init()
 
 	GLCall(glEnable(GL_BLEND));
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-
-	GLCall(glEnable(GL_STENCIL_TEST));
-	GLCall(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
 	
 	GLCall(glEnable(GL_CULL_FACE));
+	GLCall(glCullFace(GL_BACK));
+	
 	GLCall(glEnable(GL_LINE_SMOOTH));
 
 	{
@@ -522,15 +521,6 @@ void Renderer::DrawSkybox(const std::shared_ptr<Cubemap>& cubemap)
 	GLCall(glDepthFunc(GL_LESS));
 }
 
-glm::uvec4 Renderer::GetPixelAt(const glm::vec2& coords)
-{
-	glm::vec<4, uint8_t> pixel{};
-
-	GLCall(glReadPixels((GLint)coords.x, (GLint)coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
-
-	return pixel;
-}
-
 Viewport Renderer::GetViewport()
 {
 	Viewport viewport{};
@@ -575,16 +565,14 @@ void Renderer::DisableDepth()
 	GLCall(glDisable(GL_DEPTH_TEST));
 }
 
-void Renderer::BeginStencil()
+void Renderer::SetFrontCull()
 {
-	GLCall(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-	GLCall(glStencilMask(0xFF));
+	GLCall(glCullFace(GL_FRONT));
 }
 
-void Renderer::EndStencil()
+void Renderer::SetBackCull()
 {
-	GLCall(glStencilFunc(GL_NOTEQUAL, 1, 0xFF));
-	GLCall(glStencilMask(0x00));
+	GLCall(glCullFace(GL_BACK));
 }
 
 void Renderer::SetSphereLightning(bool flag)
