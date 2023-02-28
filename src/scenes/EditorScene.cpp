@@ -125,13 +125,12 @@ void EditorScene::OnRender()
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
 
+	// Draw non selectable stuff
 	Renderer::ClearColor(glm::vec4(glm::vec3(0.55f), 1.0f));
 	Renderer::Clear();
-
-	// 1st render - draw object with no borders
+	
 	Renderer::SceneBegin(m_Camera);
 	Renderer::EnableDepth();
-	Renderer::EndStencil();
 	Renderer::SetSphereLightning(true);
 
 	if (m_RenderGrid)
@@ -144,53 +143,41 @@ void EditorScene::OnRender()
 		Renderer::DrawSkybox(m_SkyboxTex);
 	}
 
+	Renderer::SceneEnd();
+
+	// Draw spheres' outlines
+	Renderer::SceneBegin(m_Camera);
+	Renderer::SetSphereLightning(false);
+	Renderer::SetFrontCull();
+
 	for (auto& planet : m_Planets)
 	{
-		if (&planet == m_SelectedPlanet) continue;
+		glm::vec3 color = &planet == m_SelectedPlanet ? glm::vec3(0.98f, 0.24f, 0.0f) : glm::vec3(0.0f);
 
+		Renderer::SubmitSphereInstanced(planet.GetTransform() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, 1.0f));
+	}
+
+	Renderer::SceneEnd();
+	
+	// Draw shaded spheres
+	Renderer::SceneBegin(m_Camera);
+	Renderer::SetBackCull();
+	Renderer::SetSphereLightning(true);
+
+	for (auto& planet : m_Planets)
+	{
 		Renderer::SubmitSphereInstanced(planet.GetTransform(), planet.GetColor());
 	}
 
 	Renderer::SceneEnd();
 
-	// 2nd render - draw objects with borders, writing to the stencil buffer
-	if (m_SelectedPlanet)
-	{
-		Renderer::SceneBegin(m_Camera);
-		Renderer::BeginStencil();
-		Renderer::SubmitSphereInstanced(m_SelectedPlanet->GetTransform(), m_SelectedPlanet->GetColor());
-		Renderer::SceneEnd();
-
-		Renderer::SceneBegin(m_Camera);
-		Renderer::EndStencil();
-		Renderer::SetSphereLightning(false);
-		Renderer::SubmitSphereInstanced(m_SelectedPlanet->GetTransform() * glm::scale(glm::mat4(1.0f),
-			glm::vec3(m_SelectedPlanet->GetRadius() + 0.05f)), { 0.98f, 0.24f, 0.0f, 1.0f });
-		Renderer::SceneEnd();
-	}
-
-	Renderer::BeginStencil();
-
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
-	m_FB->BindTexture(1);
 }
 
 void EditorScene::SetState(std::unique_ptr<SceneState>&& state)
 {
 	m_ActiveState = std::move(state);
-}
-
-SceneData EditorScene::GetSceneData()
-{
-	SceneData data{};
-
-	data.Planets = &m_Planets;
-	data.SelectedPlanet = &m_SelectedPlanet;
-	data.EditorCamera = &m_Camera;
-	data.ShowGrid = &m_RenderGrid;
-
-	return data;
 }
 
 uint32_t EditorScene::GetFramebufferTextureID() const
@@ -205,15 +192,16 @@ void EditorScene::CancelState()
 
 void EditorScene::CheckForPlanetSelect()
 {
+	m_FB->BindBuffer();
+	m_FB->BindRenderBuffer();
+
 	Planet* hoveredPlanet = nullptr;
 
 	Renderer::ClearColor(glm::vec4(1.0f));
 	Renderer::Clear();
-
-	// 0rd render - color picking
+	
 	Renderer::SceneBegin(m_Camera);
 	Renderer::EnableDepth();
-	Renderer::EndStencil();
 	Renderer::SetSphereLightning(false);
 
 	for (auto& planet : m_Planets)
@@ -224,7 +212,7 @@ void EditorScene::CheckForPlanetSelect()
 	Renderer::SceneEnd();
 
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
-	uint8_t pixelColor = Renderer::GetPixelAt(Input::GetMousePosition()).r;
+	uint8_t pixelColor = m_FB->GetPixelAt(Input::GetMousePosition()).r;
 
 	for (auto& planet : m_Planets)
 	{
@@ -240,6 +228,9 @@ void EditorScene::CheckForPlanetSelect()
 	{
 		m_SelectedPlanet = hoveredPlanet;
 	}
+	
+	m_FB->UnbindRenderBuffer();
+	m_FB->UnbindBuffer();
 }
 
 void EditorScene::DrawGridPlane()

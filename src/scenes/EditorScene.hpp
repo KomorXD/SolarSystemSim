@@ -18,8 +18,7 @@ public:
 	virtual void OnRender()			override;
 
 	virtual void SetState(std::unique_ptr<SceneState>&& state) override;
-
-	virtual SceneData GetSceneData() override;
+	
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 	void CancelState();
