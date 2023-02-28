@@ -172,6 +172,8 @@ public:
 	void ResizeTexture(uint32_t width, uint32_t height);
 	void ResizeRenderBuffer(uint32_t width, uint32_t height);
 
+	glm::uvec4 GetPixelAt(const glm::vec2& coords);
+
 	void BindBuffer()					const;
 	void BindTexture(uint32_t slot = 0)	const;
 	void BindRenderBuffer()				const;

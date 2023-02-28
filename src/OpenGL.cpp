@@ -535,6 +535,19 @@ void Framebuffer::ResizeRenderBuffer(uint32_t width, uint32_t height)
 	AttachRenderBuffer(width, height);
 }
 
+glm::uvec4 Framebuffer::GetPixelAt(const glm::vec2& coords)
+{
+	glm::vec<4, uint8_t> pixel{};
+
+	BindBuffer();
+	BindTexture();
+	BindRenderBuffer();
+
+	GLCall(glReadPixels((GLint)coords.x, (GLint)coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
+
+	return pixel;
+}
+
 void Framebuffer::BindBuffer() const
 {
 	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
