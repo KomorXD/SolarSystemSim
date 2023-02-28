@@ -5,21 +5,7 @@
 #include <memory>
 
 struct Event;
-
-class Planet;
-class Camera;
 class SceneState;
-
-// TODO: Do it different way, like double pointer eeeeeewwwwwwwwwwwwww
-struct SceneData
-{
-	std::vector<Planet>* Planets = nullptr;
-	Planet** SelectedPlanet = nullptr;
-	
-	Camera* EditorCamera = nullptr;
-	
-	bool* ShowGrid = nullptr;
-};
 
 class Scene
 {
@@ -31,6 +17,5 @@ public:
 
 	virtual void SetState(std::unique_ptr<SceneState>&& state) = 0;
 
-	virtual SceneData GetSceneData() = 0;
 	virtual uint32_t GetFramebufferTextureID() const = 0;
 };
