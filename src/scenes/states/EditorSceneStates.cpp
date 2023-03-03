@@ -36,8 +36,12 @@ void NewPlanetState::OnUpdate(float ts)
 	m_NewPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
 }
 
+void NewPlanetState::OnRender()
+{
+}
+
 InterpolateViewState::InterpolateViewState(EditorScene* scene, Camera* camera, const glm::vec3& targetPos, float targetPitch, float targetYaw)
-	: m_TargetPos(targetPos), m_TargetPitch(targetPitch), m_TargetYaw(targetYaw), m_ParentScene(scene), m_SceneCamera(camera)
+	: m_TargetPos(targetPos), m_TargetPitch(targetPitch), m_TargetYaw(targetYaw), m_ParentScene(scene), m_EditorCamera(camera)
 {
 	m_DeltaMove  = targetPos - camera->GetPosition();
 	m_DeltaPitch = targetPitch - camera->GetPitch();
@@ -50,14 +54,52 @@ void InterpolateViewState::OnEvent(Event& ev)
 
 void InterpolateViewState::OnUpdate(float ts)
 {
-	if (glm::distance(m_SceneCamera->GetPosition(), m_TargetPos) < 0.001f)
+	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.001f)
 	{
 		m_ParentScene->CancelState();
 
 		return;
 	}
 
-	m_SceneCamera->Move(m_DeltaMove * 0.05f);
-	m_SceneCamera->MovePitch(m_DeltaPitch * 0.05f);
-	m_SceneCamera->MoveYaw(m_DeltaYaw * 0.05f);
+	m_EditorCamera->Move(m_DeltaMove * 0.05f);
+	m_EditorCamera->MovePitch(m_DeltaPitch * 0.05f);
+	m_EditorCamera->MoveYaw(m_DeltaYaw * 0.05f);
+}
+
+void InterpolateViewState::OnRender()
+{
+}
+
+SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet)
+	: m_TargetPlanet(targetPlanet), m_EditorCamera(camera), m_ParentScene(scene)
+{
+}
+
+void SettingVelocityState::OnEvent(Event& ev)
+{
+	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Right)
+	{
+		m_ParentScene->CancelState();
+
+		return;
+	}
+}
+
+void SettingVelocityState::OnUpdate(float ts)
+{
+	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(m_TargetPlanet->GetPosition());
+	glm::vec2 mouseScreenPos = Input::GetMousePosition();
+	glm::vec3 mouseWorldPos = Renderer::ScreenToWorldCoords(mouseScreenPos, planetScreenPos.z);
+
+	m_Velocity = m_TargetPlanet->GetPosition() - mouseWorldPos;
+	m_TargetPlanet->SetVelocity(m_Velocity);
+}
+
+void SettingVelocityState::OnRender()
+{
+	Renderer::SceneBegin(*m_EditorCamera);
+	Renderer::SetLineWidth(5.0f);
+	Renderer::DisableDepth();
+	Renderer::DrawLine(m_TargetPlanet->GetPosition(), m_TargetPlanet->GetPosition() - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
+	Renderer::SceneEnd();
 }

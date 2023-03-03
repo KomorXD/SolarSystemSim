@@ -12,6 +12,7 @@ public:
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
+	virtual void OnRender()			override;
 
 private:
 	Planet* m_NewPlanet = nullptr;
@@ -27,6 +28,7 @@ public:
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
+	virtual void OnRender()			override;
 
 private:
 	glm::vec3 m_TargetPos = { 0.0f, 0.0f, 0.0f };
@@ -35,9 +37,27 @@ private:
 	float m_TargetPitch = 0.0f;
 	float m_DeltaPitch  = 0.0f;
 
-	float m_TargetYaw  = 0.0f;
-	float m_DeltaYaw   = 0.0f;
+	float m_TargetYaw = 0.0f;
+	float m_DeltaYaw  = 0.0f;
 
-	Camera* m_SceneCamera = nullptr;
+	Camera* m_EditorCamera = nullptr;
+	EditorScene* m_ParentScene = nullptr;
+};
+
+class SettingVelocityState : public SceneState
+{
+public:
+	SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet);
+
+	virtual void OnEvent(Event& ev) override;
+	virtual void OnUpdate(float ts) override;
+	virtual void OnRender()			override;
+
+private:
+	glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
+
+	Planet* m_TargetPlanet = nullptr;
+
+	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;
 };

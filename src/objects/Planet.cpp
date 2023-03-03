@@ -44,13 +44,25 @@ void Planet::SetColor(const glm::vec4& color)
 	m_Color = color;
 }
 
+void Planet::SetVelocity(const glm::vec3& velocity)
+{
+	m_Velocity = velocity;
+}
+
+void Planet::SetAcceleration(const glm::vec3& acceleration)
+{
+	m_Acceleration = acceleration;
+}
+
 void Planet::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
 	ImGui::Text("Planet #%d", m_EntityID);
 	ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat3("Scale",	  glm::value_ptr(m_Scale),    0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
+	ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+	ImGui::DragFloat3("Acceleration", glm::value_ptr(m_Acceleration), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::EndChild();
 }

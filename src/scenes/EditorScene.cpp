@@ -97,7 +97,14 @@ void EditorScene::OnEvent(Event& ev)
 
 	if (ev.Type == Event::MouseButtonPressed && ev.MouseButton.Button == MouseButton::Left)
 	{
-		CheckForPlanetSelect();
+		if (ev.MouseButton.Button == MouseButton::Left)
+		{
+			CheckForPlanetSelect();
+		}
+		else if (ev.MouseButton.Button == MouseButton::Right && m_SelectedPlanet)
+		{
+			m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
+		}
 
 		return;
 	}
@@ -170,6 +177,11 @@ void EditorScene::OnRender()
 	}
 
 	Renderer::SceneEnd();
+
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnRender();
+	}
 
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
