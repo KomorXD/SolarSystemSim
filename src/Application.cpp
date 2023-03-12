@@ -76,8 +76,9 @@ Application::~Application()
 	if (m_Window)
 	{
 		glfwDestroyWindow(m_Window);
-		glfwTerminate();
 	}
+	
+	glfwTerminate();
 }
 
 void Application::Run()
@@ -141,6 +142,11 @@ void Application::Run()
 		glfwPollEvents();
 		glfwSwapBuffers(m_Window);
 	}
+}
+
+void Application::CloseApplication()
+{
+	glfwSetWindowShouldClose(m_Window, (int)true);
 }
 
 void Application::SetWindowCallbacks()

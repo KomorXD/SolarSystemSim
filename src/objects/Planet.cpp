@@ -5,56 +5,61 @@
 
 static uint32_t s_IdCounter = 1;
 
-Planet::Planet(const glm::vec3& position)
+PlanetaryObject::PlanetaryObject(const glm::vec3& position)
 	: m_Position(position)
 {
 	m_EntityID = s_IdCounter;
 	++s_IdCounter;
 }
 
-void Planet::Move(const glm::vec3& offset)
+void PlanetaryObject::Move(const glm::vec3& offset)
 {
 	m_Position += offset;
 }
 
-void Planet::SetPosition(const glm::vec3& position)
+void PlanetaryObject::SetPosition(const glm::vec3& position)
 {
 	m_Position = position;
 }
 
-void Planet::SetScale(const glm::vec3& scale)
+void PlanetaryObject::SetScale(const glm::vec3& scale)
 {
 	m_Scale = scale;
 	m_Radius = glm::max(glm::max(scale.x, scale.y), scale.z);
 }
 
-void Planet::SetRadius(float radius)
+void PlanetaryObject::SetRadius(float radius)
 {
 	m_Radius = radius;
 	m_Scale = glm::vec3(radius);
 }
 
-void Planet::SetRotation(const glm::vec3& rotation)
+void PlanetaryObject::SetRotation(const glm::vec3& rotation)
 {
 	m_Rotation = rotation;
 }
 
-void Planet::SetColor(const glm::vec4& color)
+void PlanetaryObject::SetColor(const glm::vec4& color)
 {
 	m_Color = color;
 }
 
-void Planet::SetVelocity(const glm::vec3& velocity)
+void PlanetaryObject::SetMass(float mass)
+{
+	m_Mass = mass;
+}
+
+void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
 {
 	m_Velocity = velocity;
 }
 
-void Planet::SetAcceleration(const glm::vec3& acceleration)
+void PlanetaryObject::SetAcceleration(const glm::vec3& acceleration)
 {
 	m_Acceleration = acceleration;
 }
 
-void Planet::OnConfigRender()
+void PlanetaryObject::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
 	ImGui::Text("Planet #%d", m_EntityID);
@@ -64,5 +69,6 @@ void Planet::OnConfigRender()
 	ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 	ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Acceleration", glm::value_ptr(m_Acceleration), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+	ImGui::DragFloat("Mass", &m_Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::EndChild();
 }

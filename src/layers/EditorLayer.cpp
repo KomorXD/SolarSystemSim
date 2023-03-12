@@ -102,7 +102,7 @@ void EditorLayer::RenderImGuizmo()
 		return;
 	}
 
-	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
+	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
 	Camera& editorCamera = m_Scene->m_Camera;
 
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();

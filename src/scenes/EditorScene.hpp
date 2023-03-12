@@ -29,8 +29,8 @@ private:
 
 	std::unique_ptr<SceneState> m_ActiveState;
 
-	std::vector<Planet> m_Planets;
-	Planet* m_SelectedPlanet = nullptr;
+	std::vector<PlanetaryObject> m_Planets;
+	PlanetaryObject* m_SelectedPlanet = nullptr;
 
 	Camera m_Camera;
 

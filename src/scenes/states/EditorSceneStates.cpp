@@ -6,7 +6,7 @@
 #include "../../Application.hpp"
 #include "../../Logger.hpp"
 
-NewPlanetState::NewPlanetState(EditorScene* scene, Planet* newPlanet)
+NewPlanetState::NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet)
 	: m_NewPlanet(newPlanet)
 	, m_ParentScene(scene)
 {
@@ -70,7 +70,7 @@ void InterpolateViewState::OnRender()
 {
 }
 
-SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet)
+SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet)
 	: m_TargetPlanet(targetPlanet), m_EditorCamera(camera), m_ParentScene(scene)
 {
 }

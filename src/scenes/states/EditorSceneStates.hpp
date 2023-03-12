@@ -8,14 +8,14 @@ class EditorScene;
 class NewPlanetState : public SceneState
 {
 public:
-	NewPlanetState(EditorScene* scene, Planet* newPlanet);
+	NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
 	virtual void OnRender()			override;
 
 private:
-	Planet* m_NewPlanet = nullptr;
+	PlanetaryObject* m_NewPlanet = nullptr;
 	float m_Depth = 0.97f;
 
 	EditorScene* m_ParentScene = nullptr;
@@ -47,7 +47,7 @@ private:
 class SettingVelocityState : public SceneState
 {
 public:
-	SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet);
+	SettingVelocityState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
@@ -56,7 +56,7 @@ public:
 private:
 	glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
 
-	Planet* m_TargetPlanet = nullptr;
+	PlanetaryObject* m_TargetPlanet = nullptr;
 
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;

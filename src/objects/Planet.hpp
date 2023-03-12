@@ -6,11 +6,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
-// TODO: think about rewriting it as a struct (its only data with getters/setters really)
-class Planet
+class PlanetaryObject
 {
 public:
-	Planet(const glm::vec3& position);
+	PlanetaryObject(const glm::vec3& position);
 
 	void Move(const glm::vec3& offset);
 	
@@ -19,6 +18,7 @@ public:
 	void SetRadius(float radius);
 	void SetRotation(const glm::vec3& rotation);
 	void SetColor(const glm::vec4& color);
+	void SetMass(float mass);
 
 	void SetVelocity(const glm::vec3& velocity);
 	void SetAcceleration(const glm::vec3& acceleration);
@@ -30,6 +30,7 @@ public:
 	inline glm::vec3 GetScale()	   const { return m_Scale;	  }
 	inline glm::vec4 GetColor()	   const { return m_Color;    }
 	inline float GetRadius()	   const { return m_Radius;   }
+	inline float GetMass()		   const { return m_Mass;	  }
 	inline uint32_t GetEntityID()  const { return m_EntityID; }
 
 	inline glm::mat4 GetTransform() const
@@ -51,6 +52,7 @@ private:
 	glm::vec3 m_Acceleration = { 0.0f, 0.0f, 0.0f };
 
 	float m_Radius = 1.0f;
+	float m_Mass   = 1.0f;
 
 	uint32_t m_EntityID = 0;
 };

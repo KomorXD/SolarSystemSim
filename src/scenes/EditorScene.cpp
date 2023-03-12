@@ -95,7 +95,7 @@ void EditorScene::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::MouseButtonPressed && ev.MouseButton.Button == MouseButton::Left)
+	if (ev.Type == Event::MouseButtonPressed)
 	{
 		if (ev.MouseButton.Button == MouseButton::Left)
 		{
@@ -207,7 +207,7 @@ void EditorScene::CheckForPlanetSelect()
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
 
-	Planet* hoveredPlanet = nullptr;
+	PlanetaryObject* hoveredPlanet = nullptr;
 
 	Renderer::ClearColor(glm::vec4(1.0f));
 	Renderer::Clear();

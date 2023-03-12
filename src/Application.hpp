@@ -22,6 +22,7 @@ public:
 	~Application();
 
 	void Run();
+	void CloseApplication();
 
 	inline GLFWwindow* GetWindow()	  const { return m_Window; }
 	inline WindowSpec GetWindowSpec() const { return m_WindowSpec; }
