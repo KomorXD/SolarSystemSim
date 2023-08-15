@@ -4,6 +4,12 @@
 
 struct Event;
 
+enum class CameraControlType
+{
+	EditorControl,
+	WorldControl
+};
+
 class Camera
 {
 public:
@@ -19,6 +25,7 @@ public:
 
 	void SetViewportSize(const glm::vec2& viewportSize);
 	void SetPosition(const glm::vec3& position);
+	void SetCameraControlType(CameraControlType controlType);
 
 	glm::vec3 GetUpDirection()		const;
 	glm::vec3 GetRightDirection()	const;
@@ -38,6 +45,8 @@ private:
 
 	void CheckForMoveInput(float ts);
 	void CheckForMouseMovement(float ts);
+
+	CameraControlType m_ControlType = CameraControlType::EditorControl;
 
 	float m_FOV			= 45.0f;
 	float m_AspectRatio = 16.0f / 9.0f;

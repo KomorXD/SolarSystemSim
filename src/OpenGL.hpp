@@ -9,7 +9,15 @@
 #include <memory>
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-#define ASSERT(x) if(!(x)) __debugbreak()
+
+#ifndef SSS_PROD
+	#ifdef TARGET_WINDOWS
+	#define ASSERT(x) if(!(x)) __debugbreak()
+	#else
+	#include <signal.h>
+	#define ASSERT(x) if(!(x)) raise(SIGTRAP)
+	#endif
+#endif
 
 #ifdef CONF_DEBUG
 #define GLCall(f) GLClearErrors();\

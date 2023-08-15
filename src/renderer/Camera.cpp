@@ -38,7 +38,11 @@ void Camera::OnEvent(Event& ev)
 void Camera::OnUpdate(float ts)
 {
 	CheckForMouseMovement(ts);
-	// CheckForMoveInput(ts);
+
+	if (m_ControlType == CameraControlType::WorldControl)
+	{
+		CheckForMoveInput(ts);
+	}
 }
 
 void Camera::Move(const glm::vec3& offset)
@@ -70,6 +74,11 @@ void Camera::SetPosition(const glm::vec3& position)
 {
 	m_Position = position;
 	UpdateView();
+}
+
+void Camera::SetCameraControlType(CameraControlType controlType)
+{
+	m_ControlType = controlType;
 }
 
 glm::vec3 Camera::GetUpDirection() const

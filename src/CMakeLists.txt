@@ -56,6 +56,12 @@ elseif(SSS_PROD)
 	add_definitions(-DCONF_PROD=1)
 endif()
 
+if(TARGET_WINDOWS)
+	add_definitions(-DTARGET_WINDOWS=1)
+elseif(TARGET_LINUX)
+	add_definitions(-DTARGET_LINUX=1)
+endif()
+
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${VENDORS_SOURCES})
 
 target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES} ${GLAD_LIBRARIES})

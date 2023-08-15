@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Layer.hpp"
-#include "../scenes/Scene.hpp"
+#include "../scenes/EditorScene.hpp"
 
 class SimulationLayer : public Layer
 {
 public:
-	SimulationLayer();
+	SimulationLayer(std::unique_ptr<EditorScene>& scene);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnInput()			override;

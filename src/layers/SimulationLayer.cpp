@@ -3,7 +3,7 @@
 
 #include <imgui/imgui.h>
 
-SimulationLayer::SimulationLayer()
+SimulationLayer::SimulationLayer(std::unique_ptr<EditorScene>& scene)
 {
 	// m_ActiveScene = std::make_unique<dupa>(?);
 }

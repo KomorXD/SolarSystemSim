@@ -150,6 +150,13 @@ void EditorLayer::RenderControlPanel()
 	
 	ImGui::Begin("Control panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
+	if (ImGui::Button("Start simulation"))
+	{
+		// start sim
+	}
+
+	ImGui::SameLine();
+
 	if (ImGui::Button("Reload shaders"))
 	{
 		Renderer::ReloadShaders();
