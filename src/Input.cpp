@@ -1,7 +1,7 @@
 #include "Input.hpp"
 #include "Application.hpp"
 
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
 bool Input::IsKeyPressed(Key key)

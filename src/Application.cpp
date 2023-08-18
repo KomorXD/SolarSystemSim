@@ -4,7 +4,7 @@
 #include "OpenGL.hpp"
 
 #include <glad/glad.h>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include <imgui/imgui_impl_glfw.h>
