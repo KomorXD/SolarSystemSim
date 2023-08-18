@@ -20,6 +20,10 @@ file(GLOB_RECURSE PROJECT_CONFIGS CONFIGURE_DEPENDS
     "../.gitignore"
     "../.gitmodules"
 )
+file(COPY res
+	DESTINATION
+		"${CMAKE_SOURCE_DIR}/out/bin/${BUILD_ARCHITECTURE}-${CMAKE_BUILD_TYPE}-${CMAKE_SYSTEM_NAME}/"
+)
 
 target_sources(${PROJECT_NAME}
     PRIVATE
