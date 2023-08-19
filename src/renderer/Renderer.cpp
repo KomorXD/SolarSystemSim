@@ -178,6 +178,8 @@ void Renderer::Init()
 	
 	GLCall(glEnable(GL_LINE_SMOOTH));
 
+	GLCall(glEnable(GL_MULTISAMPLE));
+
 	{
 		SCOPE_PROFILE("Quad data init");
 

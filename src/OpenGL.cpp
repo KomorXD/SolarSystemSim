@@ -586,6 +586,126 @@ bool Framebuffer::IsComplete() const
 	return complete;
 }
 
+MultisampledFramebuffer::MultisampledFramebuffer(int32_t samples)
+	: m_Samples(samples)
+{
+	GLCall(glGenFramebuffers(1, &m_ID));
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
+}
+
+MultisampledFramebuffer::~MultisampledFramebuffer()
+{
+	if (m_ID != 0)
+	{
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		GLCall(glDeleteFramebuffers(1, &m_ID));
+	}
+
+	if (m_TextureID != 0)
+	{
+		GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+		GLCall(glDeleteTextures(1, &m_TextureID));
+	}
+
+	if (m_RenderbufferID != 0)
+	{
+		GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+		GLCall(glDeleteRenderbuffers(1, &m_RenderbufferID));
+	}
+}
+
+void MultisampledFramebuffer::AttachTexture(uint32_t width, uint32_t height)
+{
+	GLCall(glGenTextures(1, &m_TextureID));
+	GLCall(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_TextureID));
+
+	GLCall(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Samples, GL_RGB, width, height, GL_TRUE));
+	GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_TextureID, 0));
+
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void MultisampledFramebuffer::AttachRenderBuffer(uint32_t width, uint32_t height)
+{
+	GLCall(glGenRenderbuffers(1, &m_RenderbufferID));
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID));
+				 
+	GLCall(glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_Samples, GL_DEPTH24_STENCIL8, width, height));
+	GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_RenderbufferID));
+				 
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+}
+
+void MultisampledFramebuffer::ResizeTexture(uint32_t width, uint32_t height)
+{
+	GLCall(glDeleteTextures(1, &m_TextureID));
+	AttachTexture(width, height);
+}
+
+void MultisampledFramebuffer::ResizeRenderBuffer(uint32_t width, uint32_t height)
+{
+	GLCall(glDeleteRenderbuffers(1, &m_RenderbufferID));
+	AttachRenderBuffer(width, height);
+}
+
+void MultisampledFramebuffer::BlitBuffers(uint32_t width, uint32_t height, uint32_t targetFramebufferID)
+{
+	GLCall(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_ID));
+	GLCall(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, targetFramebufferID));
+	GLCall(glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST));
+}
+
+glm::uvec4 MultisampledFramebuffer::GetPixelAt(const glm::vec2& coords)
+{
+	glm::vec<4, uint8_t> pixel{};
+
+	BindBuffer();
+	BindTexture();
+	BindRenderBuffer();
+
+	GLCall(glReadPixels((GLint)coords.x, (GLint)coords.y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, &pixel[0]));
+
+	return pixel;
+}
+
+void MultisampledFramebuffer::BindBuffer() const
+{
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, m_ID));
+}
+
+void MultisampledFramebuffer::BindTexture(uint32_t slot) const
+{
+	GLCall(glActiveTexture(GL_TEXTURE0 + slot));
+	GLCall(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_TextureID));
+}
+
+void MultisampledFramebuffer::BindRenderBuffer() const
+{
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, m_RenderbufferID));
+}
+
+void MultisampledFramebuffer::UnbindBuffer() const
+{
+	GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+}
+
+void MultisampledFramebuffer::UnbindTexture() const
+{
+	GLCall(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0));
+}
+
+void MultisampledFramebuffer::UnbindRenderBuffer() const
+{
+	GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+}
+
+bool MultisampledFramebuffer::IsComplete() const
+{
+	GLCall(bool complete = glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+	return complete;
+}
+
 Cubemap::Cubemap(const std::array<std::string, 6>& texFaces)
 {
 	FUNC_PROFILE();

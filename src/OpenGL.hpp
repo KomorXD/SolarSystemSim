@@ -190,11 +190,47 @@ public:
 	void UnbindTexture()				const;
 	void UnbindRenderBuffer()			const;
 
+	inline uint32_t GetFramebufferID() const { return m_ID; }
 	inline uint32_t GetTextureID() const { return m_TextureID; }
 
 	bool IsComplete() const;
 
 private:
+	uint32_t m_ID = 0;
+	uint32_t m_TextureID = 0;
+	uint32_t m_RenderbufferID = 0;
+};
+
+class MultisampledFramebuffer
+{
+public:
+	MultisampledFramebuffer(int32_t samples = 4);
+	~MultisampledFramebuffer();
+
+	void AttachTexture(uint32_t width, uint32_t height);
+	void AttachRenderBuffer(uint32_t width, uint32_t height);
+
+	void ResizeTexture(uint32_t width, uint32_t height);
+	void ResizeRenderBuffer(uint32_t width, uint32_t height);
+
+	void BlitBuffers(uint32_t width, uint32_t height, uint32_t targetFramebufferID);
+
+	glm::uvec4 GetPixelAt(const glm::vec2& coords);
+
+	void BindBuffer()					const;
+	void BindTexture(uint32_t slot = 0)	const;
+	void BindRenderBuffer()				const;
+	void UnbindBuffer()					const;
+	void UnbindTexture()				const;
+	void UnbindRenderBuffer()			const;
+
+	inline uint32_t GetTextureID() const { return m_TextureID; }
+
+	bool IsComplete() const;
+	
+private:
+	int32_t m_Samples = 4;
+
 	uint32_t m_ID = 0;
 	uint32_t m_TextureID = 0;
 	uint32_t m_RenderbufferID = 0;

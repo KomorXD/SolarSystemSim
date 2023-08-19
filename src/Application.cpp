@@ -32,6 +32,7 @@ Application::Application(const WindowSpec& spec)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 
 	m_Window = glfwCreateWindow(m_WindowSpec.Width, m_WindowSpec.Height,
 		m_WindowSpec.Title.c_str(), nullptr, nullptr);
