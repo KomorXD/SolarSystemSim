@@ -25,6 +25,20 @@ file(COPY res
 		"${CMAKE_SOURCE_DIR}/out/bin/${BUILD_ARCHITECTURE}-${CMAKE_BUILD_TYPE}-${CMAKE_SYSTEM_NAME}/"
 )
 
+if(SSS_DEBUG)
+	add_definitions(-DCONF_DEBUG=1)
+elseif(SSS_RELEASE)
+	add_definitions(-DCONF_RELEASE=1)
+elseif(SSS_PROD)
+	add_definitions(-DCONF_PROD=1)
+endif()
+
+if(TARGET_WINDOWS)
+	add_definitions(-DTARGET_WINDOWS=1)
+elseif(TARGET_LINUX)
+	add_definitions(-DTARGET_LINUX=1)
+endif()
+
 target_sources(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCES}
@@ -47,13 +61,6 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         ${GLFW_LIBRARIES}
         ${GLAD_LIBRARIES}
-)
-
-target_compile_definitions(${PROJECT_NAME}
-    PRIVATE
-        $<$<CONFIG:Debug>:CONF_DEBUG=1>
-        $<$<CONFIG:Release>:CONF_RELEASE=1>
-        $<$<CONFIG:Prod>:CONF_PROD=1>
 )
 
 set_target_properties(${PROJECT_NAME}
