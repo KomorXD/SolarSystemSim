@@ -103,3 +103,32 @@ void SettingVelocityState::OnRender()
 	Renderer::DrawLine(m_TargetPlanet->GetPosition(), m_TargetPlanet->GetPosition() - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 	Renderer::SceneEnd();
 }
+
+PanderingState::PanderingState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet)
+	: m_ParentScene(scene), m_EditorCamera(camera)
+{
+	glm::vec3 normalizedCameraForward = glm::normalize(camera->GetForwardDirection());
+
+	m_TargetPos = targetPlanet->GetPosition() - normalizedCameraForward * 6.0f * targetPlanet->GetRadius();
+	m_DeltaMove = m_TargetPos - camera->GetPosition();
+}
+
+void PanderingState::OnEvent(Event& ev)
+{
+}
+
+void PanderingState::OnUpdate(float ts)
+{
+	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.001f)
+	{
+		m_ParentScene->CancelState();
+
+		return;
+	}
+
+	m_EditorCamera->Move(m_DeltaMove * 0.05f);
+}
+
+void PanderingState::OnRender()
+{
+}

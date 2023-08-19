@@ -61,3 +61,20 @@ private:
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;
 };
+
+class PanderingState : public SceneState
+{
+public:
+	PanderingState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet);
+
+	virtual void OnEvent(Event& ev) override;
+	virtual void OnUpdate(float ts) override;
+	virtual void OnRender()			override;
+
+private:
+	glm::vec3 m_TargetPos = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_DeltaMove = { 0.0f, 0.0f, 0.0f };
+
+	Camera* m_EditorCamera = nullptr;
+	EditorScene* m_ParentScene = nullptr;
+};
