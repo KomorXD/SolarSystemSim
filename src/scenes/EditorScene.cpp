@@ -80,10 +80,24 @@ void EditorScene::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::Escape)
+	if (ev.Type == Event::KeyPressed)
 	{
-		m_SelectedPlanet = nullptr;
-		m_ActiveState.reset();
+		switch (ev.Key.Code)
+		{
+		case Key::Escape:
+			m_SelectedPlanet = nullptr;
+			m_ActiveState.reset();
+
+			break;
+
+		case Key::F:
+			if (m_SelectedPlanet)
+			{
+				m_ActiveState = std::make_unique<PanderingState>(this, &m_Camera, m_SelectedPlanet);
+			}
+
+			break;
+		}
 
 		return;
 	}
@@ -236,10 +250,7 @@ void EditorScene::CheckForPlanetSelect()
 		}
 	}
 
-	if (Input::IsMouseButtonPressed(MouseButton::Left) && hoveredPlanet)
-	{
-		m_SelectedPlanet = hoveredPlanet;
-	}
+	m_SelectedPlanet = hoveredPlanet;
 	
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
