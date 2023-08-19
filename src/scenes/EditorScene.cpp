@@ -189,6 +189,11 @@ void EditorScene::OnRender()
 
 	for (auto& planet : m_Planets)
 	{
+		if (glm::distance(planet.GetPosition(), m_Camera.GetPosition()) <= planet.GetRadius() * 1.06f)
+		{
+			continue;
+		}
+
 		glm::vec3 color = &planet == m_SelectedPlanet ? glm::vec3(0.98f, 0.24f, 0.0f) : glm::vec3(0.0f);
 
 		Renderer::SubmitSphereInstanced(planet.GetTransform() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, 1.0f));
