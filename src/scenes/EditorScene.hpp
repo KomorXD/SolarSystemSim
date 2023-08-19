@@ -35,6 +35,8 @@ private:
 	Camera m_Camera;
 
 	std::unique_ptr<Framebuffer> m_FB;
+	std::unique_ptr<MultisampledFramebuffer> m_MFB;
+	
 	std::shared_ptr<Cubemap> m_SkyboxTex;
 
 	float m_TS = 0.0f;

@@ -21,6 +21,11 @@ EditorScene::EditorScene()
 	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.66f), spec.Height);
 	m_FB->UnbindBuffer();
 
+	m_MFB = std::make_unique<MultisampledFramebuffer>(16);
+	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.66f), spec.Height);
+	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.66f), spec.Height);
+	m_MFB->UnbindBuffer();
+
 	Renderer::Init();
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
@@ -73,6 +78,12 @@ void EditorScene::OnEvent(Event& ev)
 		m_FB->BindBuffer();
 		m_FB->ResizeTexture(ev.Size.Width, ev.Size.Height);
 		m_FB->ResizeRenderBuffer(ev.Size.Width, ev.Size.Height);
+		m_FB->UnbindBuffer();
+
+		m_MFB->BindBuffer();
+		m_MFB->ResizeTexture(ev.Size.Width, ev.Size.Height);
+		m_MFB->ResizeRenderBuffer(ev.Size.Width, ev.Size.Height);
+		m_MFB->UnbindBuffer();
 
 		Renderer::OnWindowResize({ 0, 0, (int32_t)ev.Size.Width, (int32_t)ev.Size.Height });
 		m_Camera.SetViewportSize({ (float)ev.Size.Width, (float)ev.Size.Height });
@@ -95,6 +106,11 @@ void EditorScene::OnEvent(Event& ev)
 			{
 				m_ActiveState = std::make_unique<PanderingState>(this, &m_Camera, m_SelectedPlanet);
 			}
+
+			break;
+
+		case Key::P:
+			Renderer::ToggleWireframe();
 
 			break;
 		}
@@ -143,8 +159,8 @@ void EditorScene::OnUpdate(float ts)
 
 void EditorScene::OnRender()
 {
-	m_FB->BindBuffer();
-	m_FB->BindRenderBuffer();
+	m_MFB->BindBuffer();
+	m_MFB->BindRenderBuffer();
 
 	// Draw non selectable stuff
 	Renderer::ClearColor(glm::vec4(glm::vec3(0.55f), 1.0f));
@@ -197,8 +213,11 @@ void EditorScene::OnRender()
 		m_ActiveState->OnRender();
 	}
 
-	m_FB->UnbindRenderBuffer();
-	m_FB->UnbindBuffer();
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+
+	m_MFB->BlitBuffers((uint32_t)(spec.Width), spec.Height, m_FB->GetFramebufferID());
+	m_MFB->UnbindRenderBuffer();
+	m_MFB->UnbindBuffer();
 }
 
 void EditorScene::SetState(std::unique_ptr<SceneState>&& state)
