@@ -11,7 +11,8 @@
 				"CMAKE_C_COMPILER": "cl.exe",
 				"CMAKE_CXX_COMPILER": "cl.exe",
 				"TARGET_WINDOWS": true,
-				"TARGET_LINUX": false
+				"TARGET_LINUX": false,
+				"BUILD_ARCHITECTURE": "x86-64"
 			},
 			"condition": {
 				"type": "equals",
@@ -29,7 +30,9 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
-				"SSS_DEBUG": true
+				"SSS_DEBUG": true,
+				"SSS_RELEASE": false,
+				"SSS_PROD": false
 			}
 		},
 		{
@@ -42,8 +45,9 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
+				"SSS_DEBUG": false,
 				"SSS_RELEASE": true,
-				"SSS_DEBUG": false
+				"SSS_PROD": false
 			}
 		},
 		{
@@ -56,6 +60,8 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
+				"SSS_DEBUG": false,
+				"SSS_RELEASE": false,
 				"SSS_PROD": true
 			}
 		},
@@ -69,7 +75,8 @@
 				"CMAKE_C_COMPILER": "gcc",
 				"CMAKE_CXX_COMPILER": "g++",
 				"TARGET_LINUX": true,
-				"TARGET_WINDOWS": false
+				"TARGET_WINDOWS": false,
+				"BUILD_ARCHITECTURE": "x86-64"
 			},
 			"condition": {
 				"type": "equals",
@@ -87,7 +94,9 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
-				"SSS_DEBUG": true
+				"SSS_DEBUG": true,
+				"SSS_RELEASE": false,
+				"SSS_PROD": false
 			}
 		},
 		{
@@ -100,8 +109,9 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
+				"SSS_DEBUG": false,
 				"SSS_RELEASE": true,
-				"SSS_DEBUG": false
+				"SSS_PROD": false
 			}
 		},
 		{
@@ -114,6 +124,8 @@
 			},
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
+				"SSS_DEBUG": false,
+				"SSS_RELEASE": false,
 				"SSS_PROD": true
 			}
 		}
