@@ -123,6 +123,8 @@ void EditorLayer::RenderImGuizmo()
 		ImGuizmo::OPERATION(m_GizmoMode), ImGuizmo::WORLD, glm::value_ptr(planetTransform),
 		nullptr, doSnap ? snapArr : nullptr);
 	
+	m_Scene->m_LockFocusOnPlanet = ImGuizmo::IsOver();
+
 	if (ImGuizmo::IsUsing())
 	{
 		glm::vec3 translation{};

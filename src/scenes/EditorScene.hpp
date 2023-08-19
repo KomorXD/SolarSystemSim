@@ -42,6 +42,7 @@ private:
 	float m_TS = 0.0f;
 	bool  m_RenderGrid = true;
 	bool  m_RenderSkybox = false;
+	bool  m_LockFocusOnPlanet = false;
 
 	friend class EditorLayer;
 };

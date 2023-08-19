@@ -17,20 +17,20 @@ EditorScene::EditorScene()
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
 	m_FB = std::make_unique<Framebuffer>();
-	m_FB->AttachTexture((uint32_t)(spec.Width * 0.66f), spec.Height);
-	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.66f), spec.Height);
+	m_FB->AttachTexture((uint32_t)(spec.Width * 0.8f), spec.Height);
+	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.8f), spec.Height);
 	m_FB->UnbindBuffer();
 
 	m_MFB = std::make_unique<MultisampledFramebuffer>(16);
-	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.66f), spec.Height);
-	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.66f), spec.Height);
+	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.8f), spec.Height);
+	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.8f), spec.Height);
 	m_MFB->UnbindBuffer();
 
 	Renderer::Init();
 
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 	m_Camera.MoveYaw(glm::radians(90.0f));
-	m_Camera.SetViewportSize({ (float)spec.Width * 0.66f, (float)spec.Height });
+	m_Camera.SetViewportSize({ (float)spec.Width * 0.8f, (float)spec.Height });
 
 	std::array<std::string, 6> faces =
 	{
@@ -269,7 +269,10 @@ void EditorScene::CheckForPlanetSelect()
 		}
 	}
 
-	m_SelectedPlanet = hoveredPlanet;
+	if (!m_LockFocusOnPlanet)
+	{
+		m_SelectedPlanet = hoveredPlanet;
+	}
 	
 	m_FB->UnbindRenderBuffer();
 	m_FB->UnbindBuffer();
