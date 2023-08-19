@@ -7,10 +7,11 @@
 #include <string>
 #include <optional>
 #include <memory>
+#include <vector>
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 
-#ifndef SSS_PROD
+#ifndef CONF_PROD
 	#ifdef TARGET_WINDOWS
 	#define ASSERT(x) if(!(x)) __debugbreak()
 	#else
