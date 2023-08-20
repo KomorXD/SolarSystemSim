@@ -15,6 +15,7 @@ void main()
 	if(dist > 150.0)
 	{
 		fadeFactor = 1.0 - (200.0 - dist) / 50.0;
+		fadeFactor *= 1.0 / (abs(u_CameraPos.y) / 10.0);
 	}
 
 	fragColor = vec4(color.xyz, 1.0 - fadeFactor);
