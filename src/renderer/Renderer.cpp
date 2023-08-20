@@ -451,6 +451,12 @@ void Renderer::DrawLine(const glm::vec3& start, const glm::vec3& end, const glm:
 	s_Data.LineVertexCount += 2;
 }
 
+void Renderer::LoadLineUniform3f(const std::string& name, const glm::vec3& val)
+{
+	s_Data.LineShader->Bind();
+	s_Data.LineShader->SetUniform3f(name, val);
+}
+
 void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4& color)
 {
 	if (s_Data.SpheresInstanceCount >= 10000)

@@ -148,6 +148,7 @@ public:
 
 	void SetUniform1i(const std::string& name, int32_t val);
 	void SetUniform1f(const std::string& name, float val);
+	void SetUniform3f(const std::string& name, const glm::vec3& vec);
 	void SetUniform4f(const std::string& name, const glm::vec4& vec);
 	void SetUniformMat4(const std::string& name, const glm::mat4& vec);
 

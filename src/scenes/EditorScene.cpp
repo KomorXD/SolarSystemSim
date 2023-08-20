@@ -285,20 +285,25 @@ void EditorScene::CheckForPlanetSelect()
 
 void EditorScene::DrawGridPlane()
 {
-	constexpr float distance = 30.0f;
+	constexpr float distance = 400.0f;
 	constexpr glm::vec4 lineColor(glm::vec3(0.22f), 1.0f);
+	
+	glm::vec3 cameraPos = m_Camera.GetPosition();
+	int32_t xOffset = cameraPos.x / 4;
+	int32_t zOffset = cameraPos.z / 4;
 
 	Renderer::SetLineWidth(1.0f);
+	Renderer::LoadLineUniform3f("u_CameraPos", cameraPos);
 
-	for (float x = -distance; x <= distance; x += 2.0f)
+	for (float x = -distance + xOffset * 4.0f; x <= distance + xOffset * 4.0f; x += 4.0f)
 	{
-		Renderer::DrawLine({ x, 0.0f, -distance }, { x, 0.0f, distance },
+		Renderer::DrawLine({ x, 0.0f, -distance + zOffset * 4.0f }, { x, 0.0f, distance + zOffset * 4.0f },
 			x == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
 	}
 
-	for (float z = -distance; z <= distance; z += 2.0f)
+	for (float z = -distance + zOffset * 4.0f; z <= distance + zOffset * 4.0f; z += 4.0f)
 	{
-		Renderer::DrawLine({ -distance, 0.0f, z }, { distance, 0.0f, z }, 
+		Renderer::DrawLine({ -distance + xOffset * 4.0f, 0.0f, z }, { distance + xOffset * 4.0f, 0.0f, z },
 			z == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
 	}
 }
