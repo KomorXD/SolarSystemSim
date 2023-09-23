@@ -2,6 +2,7 @@
 #include "Logger.hpp"
 #include "layers/EditorLayer.hpp"
 #include "OpenGL.hpp"
+#include "TriggerClock.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -55,7 +56,7 @@ Application::Application(const WindowSpec& spec)
 	LOG_INFO("Window created");
 
 	glfwMakeContextCurrent(m_Window);
-	glfwSwapInterval(1);
+	glfwSwapInterval(0);
 
 	glfwSetWindowUserPointer(m_Window, this);
 	SetWindowCallbacks();
@@ -111,6 +112,10 @@ void Application::Run()
 	double currTime = 0.0f;
 	double timestep = 1.0f / 60.0f;
 
+	TriggerClock tickClock([this]() { m_CurrentLayer->OnTick(); });
+	tickClock.SetInterval(1.0f / 60.0f);
+	tickClock.Start();
+
 	while (!glfwWindowShouldClose(m_Window))
 	{
 		prevTime = currTime;
@@ -133,7 +138,10 @@ void Application::Run()
 
 		m_CurrentLayer->OnInput();
 		m_CurrentLayer->OnUpdate((float)timestep);
+		// m_CurrentLayer->OnTick();
 		m_CurrentLayer->OnImGuiRender();
+
+		TriggerClock::UpdateClocks();
 
 		ImGui::PopFont();
 		ImGui::Render();
