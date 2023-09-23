@@ -150,12 +150,20 @@ void EditorScene::OnUpdate(float ts)
 	{
 		return;
 	}
+}
+
+void EditorScene::OnTick()
+{
+	if (!m_Simulate)
+	{
+		return;
+	}
 
 	SimPhysics::ProgressAllOneStep(m_Planets);
 
 	for (auto& planet : m_Planets)
 	{
-		planet.OnUpdate(ts * TS_MULTIPLIER);
+		planet.OnUpdate(Application::TPS_STEP);
 	}
 }
 

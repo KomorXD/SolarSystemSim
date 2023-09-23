@@ -24,6 +24,10 @@ void SimulationLayer::OnUpdate(float ts)
 {
 }
 
+void SimulationLayer::OnTick()
+{
+}
+
 void SimulationLayer::OnImGuiRender()
 {
 	ImGui::Begin("tedsdtds");

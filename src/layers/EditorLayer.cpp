@@ -69,6 +69,11 @@ void EditorLayer::OnUpdate(float ts)
 	}
 }
 
+void EditorLayer::OnTick()
+{
+	m_Scene->OnTick();
+}
+
 void EditorLayer::OnImGuiRender()
 {
 	RenderViewport();
