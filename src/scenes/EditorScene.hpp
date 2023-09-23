@@ -21,6 +21,8 @@ public:
 	
 	virtual uint32_t GetFramebufferTextureID() const override;
 
+	inline std::vector<PlanetaryObject>& GetPlanetsRef() { return m_Planets; }
+
 	void CancelState();
 
 private:
@@ -43,6 +45,9 @@ private:
 	bool  m_RenderGrid = true;
 	bool  m_RenderSkybox = false;
 	bool  m_LockFocusOnPlanet = false;
+	bool  m_Simulate = false;
+	
+	static inline float TS_MULTIPLIER = 1.0f;
 
 	friend class EditorLayer;
 };

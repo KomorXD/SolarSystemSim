@@ -3,6 +3,8 @@
 #include "SceneState.hpp"
 #include "../../objects/Planet.hpp"
 
+#include <vector>
+
 class EditorScene;
 
 class NewPlanetState : public SceneState
@@ -39,7 +41,7 @@ private:
 
 	float m_TargetYaw = 0.0f;
 	float m_DeltaYaw  = 0.0f;
-
+	
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;
 };
@@ -55,6 +57,7 @@ public:
 
 private:
 	glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
+	std::vector<glm::vec3> m_ApproximatedPath;
 
 	PlanetaryObject* m_TargetPlanet = nullptr;
 

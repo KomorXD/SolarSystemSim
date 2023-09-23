@@ -181,6 +181,13 @@ void EditorLayer::RenderControlPanel()
 	
 	ImGui::Checkbox("Show skybox", &m_Scene->m_RenderSkybox);
 	ImGui::NewLine();
+
+	ImGui::Checkbox("Simulate", &m_Scene->m_Simulate);
+	ImGui::NewLine();
+
+	ImGui::DragFloat("TS Scalar", &EditorScene::TS_MULTIPLIER);
+	ImGui::NewLine();
+
 	ImGui::Separator();
 	ImGui::NewLine();
 	

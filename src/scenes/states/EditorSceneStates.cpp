@@ -5,6 +5,7 @@
 #include "../../Event.hpp"
 #include "../../Application.hpp"
 #include "../../Logger.hpp"
+#include "../Simulator.hpp"
 
 NewPlanetState::NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet)
 	: m_NewPlanet(newPlanet)
@@ -83,6 +84,11 @@ void SettingVelocityState::OnEvent(Event& ev)
 
 		return;
 	}
+
+	if (ev.Type == Event::MouseMoved)
+	{
+		m_ApproximatedPath = SimPhysics::ApproximateNextNPoints(m_ParentScene->GetPlanetsRef(), m_TargetPlanet, 1024);
+	}
 }
 
 void SettingVelocityState::OnUpdate(float ts)
@@ -101,6 +107,12 @@ void SettingVelocityState::OnRender()
 	Renderer::SetLineWidth(5.0f);
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetPosition(), m_TargetPlanet->GetPosition() - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
+
+	for (uint32_t i = 1; i < m_ApproximatedPath.size(); i++)
+	{
+		Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
+	}
+
 	Renderer::SceneEnd();
 }
 

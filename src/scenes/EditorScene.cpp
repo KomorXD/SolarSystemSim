@@ -6,6 +6,7 @@
 #include "../renderer/Renderer.hpp"
 #include "../Random.hpp"
 #include "states/EditorSceneStates.hpp"
+#include "../Simulator.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,22 +45,12 @@ EditorScene::EditorScene()
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
 
-	float xd = 5.0f;
+	m_Planets.emplace_back(glm::vec3(0.0f));
+	m_Planets[0].SetMass(1000000.0f);
+	m_Planets[0].SetRadius(10.0f);
 
-	for (float x = -xd; x <= xd; x += 5.0f)
-	{
-		for (float z = -xd; z <= xd; z += 5.0f)
-		{
-			m_Planets.emplace_back(glm::vec3(x, 0.0f, z - 5.0f));
-			m_Planets.back().SetColor(
-				{
-					Random::FloatInRange(0.0f, 1.0f),
-					Random::FloatInRange(0.0f, 1.0f),
-					Random::FloatInRange(0.0f, 1.0f),
-					1.0f
-				});
-		}
-	}
+	m_Planets.emplace_back(glm::vec3(30.0f, 0.0f, 0.0f));
+	m_Planets[1].SetMass(10000.0f);
 
 	LOG_INFO("EditorScene initialized.");
 }
@@ -148,12 +139,23 @@ void EditorScene::OnInput()
 
 void EditorScene::OnUpdate(float ts)
 {
-	m_TS = ts * 1000.0f;
 	m_Camera.OnUpdate(ts);
 
 	if (m_ActiveState)
 	{
 		m_ActiveState->OnUpdate(ts);
+	}
+
+	if (!m_Simulate)
+	{
+		return;
+	}
+
+	SimPhysics::ProgressAllOneStep(m_Planets);
+
+	for (auto& planet : m_Planets)
+	{
+		planet.OnUpdate(ts * TS_MULTIPLIER);
 	}
 }
 

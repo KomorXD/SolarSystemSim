@@ -11,6 +11,8 @@ class PlanetaryObject
 public:
 	PlanetaryObject(const glm::vec3& position);
 
+	void OnUpdate(float ts);
+
 	void Move(const glm::vec3& offset);
 	
 	void SetPosition(const glm::vec3& position);
@@ -22,6 +24,9 @@ public:
 
 	void SetVelocity(const glm::vec3& velocity);
 	void SetAcceleration(const glm::vec3& acceleration);
+
+	void AddVelocity(const glm::vec3& addVelocity);
+	void AddAcceleration(const glm::vec3& addAcceleration);
 
 	void OnConfigRender();
 

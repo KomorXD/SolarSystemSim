@@ -12,6 +12,13 @@ PlanetaryObject::PlanetaryObject(const glm::vec3& position)
 	++s_IdCounter;
 }
 
+void PlanetaryObject::OnUpdate(float ts)
+{
+	m_Velocity += m_Acceleration * ts;
+	m_Position += m_Velocity * ts;
+	m_Acceleration = glm::vec3(0.0f);
+}
+
 void PlanetaryObject::Move(const glm::vec3& offset)
 {
 	m_Position += offset;
@@ -57,6 +64,16 @@ void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
 void PlanetaryObject::SetAcceleration(const glm::vec3& acceleration)
 {
 	m_Acceleration = acceleration;
+}
+
+void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
+{
+	m_Velocity += addVelocity;
+}
+
+void PlanetaryObject::AddAcceleration(const glm::vec3& addAcceleration)
+{
+	m_Acceleration += addAcceleration;
 }
 
 void PlanetaryObject::OnConfigRender()
