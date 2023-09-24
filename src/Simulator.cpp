@@ -27,27 +27,37 @@ void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
 std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryObject>& planets, PlanetaryObject* target, uint32_t N)
 {
 	std::vector<glm::vec3> points;
-	std::vector<PlanetaryObject> initialCopy = planets;
+	std::vector<PlanetaryObject> planetsCopy = planets;
+	
+	size_t copiedPlanetIdx{};
+	for (size_t i = 0; i < planets.size(); i++)
+	{
+		if (&planets[i] == target)
+		{
+			copiedPlanetIdx = i;
+			break;
+		}
+	}
+
+	PlanetaryObject* targetCopy = &planetsCopy[copiedPlanetIdx];
 	
 	points.reserve(N);
-	points.emplace_back(target->GetPosition());
+	points.emplace_back(targetCopy->GetPosition());
 
 	for (uint32_t i = 0; i < N * 10; i++)
 	{
-		ProgressAllOneStep(planets);
+		ProgressAllOneStep(planetsCopy);
 
-		for (auto& planet : planets)
+		for (auto& planet : planetsCopy)
 		{
 			planet.OnUpdate(1.0f / 60.0f);
 		}
 
 		if (i % 10)
 		{
-			points.emplace_back(target->GetPosition());
+			points.emplace_back(targetCopy->GetPosition());
 		}
 	}
-
-	planets = initialCopy;
 
 	return points;
 }
