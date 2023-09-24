@@ -23,10 +23,7 @@ public:
 	void SetMass(float mass);
 
 	void SetVelocity(const glm::vec3& velocity);
-	void SetAcceleration(const glm::vec3& acceleration);
-
 	void AddVelocity(const glm::vec3& addVelocity);
-	void AddAcceleration(const glm::vec3& addAcceleration);
 
 	void OnConfigRender();
 
@@ -54,7 +51,6 @@ private:
 	glm::vec4 m_Color	 = { 0.44f, 0.44f, 0.44f, 1.0f };
 
 	glm::vec3 m_Velocity	 = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_Acceleration = { 0.0f, 0.0f, 0.0f };
 
 	float m_Radius = 1.0f;
 	float m_Mass   = 1.0f;

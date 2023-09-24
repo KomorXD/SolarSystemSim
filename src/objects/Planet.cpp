@@ -14,9 +14,7 @@ PlanetaryObject::PlanetaryObject(const glm::vec3& position)
 
 void PlanetaryObject::OnUpdate(float ts)
 {
-	m_Velocity += m_Acceleration * ts;
 	m_Position += m_Velocity * ts;
-	m_Acceleration = glm::vec3(0.0f);
 }
 
 void PlanetaryObject::Move(const glm::vec3& offset)
@@ -61,19 +59,9 @@ void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
 	m_Velocity = velocity;
 }
 
-void PlanetaryObject::SetAcceleration(const glm::vec3& acceleration)
-{
-	m_Acceleration = acceleration;
-}
-
 void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
 {
 	m_Velocity += addVelocity;
-}
-
-void PlanetaryObject::AddAcceleration(const glm::vec3& addAcceleration)
-{
-	m_Acceleration += addAcceleration;
 }
 
 void PlanetaryObject::OnConfigRender()
@@ -85,7 +73,6 @@ void PlanetaryObject::OnConfigRender()
 	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
 	ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat3("Acceleration", glm::value_ptr(m_Acceleration), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat("Mass", &m_Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::EndChild();
 }
