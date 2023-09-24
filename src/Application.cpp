@@ -13,6 +13,9 @@
 
 #include <imgui/ImGuizmo.h>
 
+#include <mutex>
+#include <thread>
+
 Application::Application(const WindowSpec& spec)
 	: m_WindowSpec(spec)
 {
@@ -112,8 +115,12 @@ void Application::Run()
 	double currTime = 0.0f;
 	double timestep = 1.0f / 60.0f;
 	uint32_t tpsFired = 0;
+	std::mutex layerMtx;
 
-	TriggerClock tickClock([&]() { m_CurrentLayer->OnTick(); tpsFired++; });
+	TriggerClock tickClock([&]() { 
+		std::lock_guard<std::mutex> lg(layerMtx);
+		m_CurrentLayer->OnTick(); tpsFired++;
+	});
 	tickClock.SetInterval(TPS_STEP * 1000);
 	tickClock.Start();
 
@@ -124,6 +131,8 @@ void Application::Run()
 	TriggerClock tpsClock([&]() { LOG_INFO("OnTick fired {} times last second", tpsFired); tpsFired = 0; });
 	tpsClock.SetInterval(1000);
 	tpsClock.Start();
+
+	std::thread clockThread(&Application::UpdateClocksWorker, this);
 
 	while (!glfwWindowShouldClose(m_Window))
 	{
@@ -139,17 +148,19 @@ void Application::Run()
 		ImGui::PushFont(font);
 
 		Event ev{};
-		
-		while(m_EventQueue.PollEvents(ev))
+
 		{
-			m_CurrentLayer->OnEvent(ev);
+			std::lock_guard<std::mutex> lg(layerMtx);
+			while (m_EventQueue.PollEvents(ev))
+			{
+				m_CurrentLayer->OnEvent(ev);
+			}
+
+			m_CurrentLayer->OnInput();
+			m_CurrentLayer->OnUpdate((float)timestep);
+
+			m_CurrentLayer->OnImGuiRender();
 		}
-
-		m_CurrentLayer->OnInput();
-		m_CurrentLayer->OnUpdate((float)timestep);
-		m_CurrentLayer->OnImGuiRender();
-
-		TriggerClock::UpdateClocks();
 
 		ImGui::PopFont();
 		ImGui::Render();
@@ -159,6 +170,8 @@ void Application::Run()
 		glfwPollEvents();
 		glfwSwapBuffers(m_Window);
 	}
+
+	clockThread.detach();
 }
 
 void Application::CloseApplication()
@@ -253,4 +266,12 @@ void Application::SetWindowCallbacks()
 
 			app->m_EventQueue.SubmitEvent(ev);
 		});
+}
+
+void Application::UpdateClocksWorker()
+{
+	while (true)
+	{
+		TriggerClock::UpdateClocks();
+	}
 }
