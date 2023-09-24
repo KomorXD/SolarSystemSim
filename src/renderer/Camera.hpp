@@ -25,6 +25,8 @@ public:
 
 	void SetViewportSize(const glm::vec2& viewportSize);
 	void SetPosition(const glm::vec3& position);
+	void SetPitch(float pitch);
+	void SetYaw(float yaw);
 	void SetCameraControlType(CameraControlType controlType);
 
 	glm::vec3 GetUpDirection()		const;

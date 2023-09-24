@@ -76,6 +76,16 @@ void Camera::SetPosition(const glm::vec3& position)
 	UpdateView();
 }
 
+void Camera::SetPitch(float pitch)
+{
+	m_Pitch = pitch;
+}
+
+void Camera::SetYaw(float yaw)
+{
+	m_Yaw = yaw;
+}
+
 void Camera::SetCameraControlType(CameraControlType controlType)
 {
 	m_ControlType = controlType;
@@ -162,17 +172,17 @@ void Camera::CheckForMouseMovement(float ts)
 
 	float deltaLen = glm::length(delta);
 
-	if (deltaLen == 0.0f || deltaLen > 100.0f)
+	/*if (deltaLen == 0.0f || deltaLen > 100.0f)
 	{
 		return;
-	}
+	}*/
 
 	if (Input::IsKeyPressed(Key::LeftAlt))
 	{
 		Input::HideCursor();
 
-		m_Yaw   += delta.x * ts * 0.1f;
-		m_Pitch -= delta.y * ts * 0.1f;
+		m_Yaw   += delta.x * 0.001f;
+		m_Pitch -= delta.y * 0.001f;
 
 		m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
 
@@ -185,8 +195,8 @@ void Camera::CheckForMouseMovement(float ts)
 	{
 		Input::HideCursor();
 
-		m_Position -= GetRightDirection() * delta.x * ts * 0.8f;
-		m_Position -= GetUpDirection()	  * delta.y * ts * 0.8f;
+		m_Position -= GetRightDirection() * delta.x * 0.01f;
+		m_Position -= GetUpDirection()	  * delta.y * 0.01f;
 
 		UpdateView();
 
