@@ -37,6 +37,10 @@ void NewPlanetState::OnUpdate(float ts)
 	m_NewPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
 }
 
+void NewPlanetState::OnTick()
+{
+}
+
 void NewPlanetState::OnRender()
 {
 }
@@ -55,16 +59,23 @@ void InterpolateViewState::OnEvent(Event& ev)
 
 void InterpolateViewState::OnUpdate(float ts)
 {
-	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.001f)
+}
+
+void InterpolateViewState::OnTick()
+{
+	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f)
 	{
+		m_EditorCamera->SetPosition(m_TargetPos);
+		m_EditorCamera->SetPitch(m_TargetPitch);
+		m_EditorCamera->SetYaw(m_TargetYaw);
 		m_ParentScene->CancelState();
 
 		return;
 	}
 
-	m_EditorCamera->Move(m_DeltaMove * 0.05f);
-	m_EditorCamera->MovePitch(m_DeltaPitch * 0.05f);
-	m_EditorCamera->MoveYaw(m_DeltaYaw * 0.05f);
+	m_EditorCamera->Move(m_DeltaMove * Application::TPS_STEP * 2.0f);
+	m_EditorCamera->MovePitch(m_DeltaPitch * Application::TPS_STEP * 2.0f);
+	m_EditorCamera->MoveYaw(m_DeltaYaw * Application::TPS_STEP * 2.0f);
 }
 
 void InterpolateViewState::OnRender()
@@ -101,6 +112,10 @@ void SettingVelocityState::OnUpdate(float ts)
 	m_TargetPlanet->SetVelocity(m_Velocity);
 }
 
+void SettingVelocityState::OnTick()
+{
+}
+
 void SettingVelocityState::OnRender()
 {
 	Renderer::SceneBegin(*m_EditorCamera);
@@ -131,14 +146,20 @@ void PanderingState::OnEvent(Event& ev)
 
 void PanderingState::OnUpdate(float ts)
 {
-	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.001f)
+	
+}
+
+void PanderingState::OnTick()
+{
+	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f)
 	{
+		m_EditorCamera->SetPosition(m_TargetPos);
 		m_ParentScene->CancelState();
 
 		return;
 	}
 
-	m_EditorCamera->Move(m_DeltaMove * 0.05f);
+	m_EditorCamera->Move(m_DeltaMove * Application::TPS_STEP * 2.0f);
 }
 
 void PanderingState::OnRender()
