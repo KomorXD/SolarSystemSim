@@ -154,6 +154,11 @@ void EditorScene::OnUpdate(float ts)
 
 void EditorScene::OnTick()
 {
+	if (m_ActiveState)
+	{
+		m_ActiveState->OnTick();
+	}
+
 	if (!m_Simulate)
 	{
 		return;
