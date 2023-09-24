@@ -51,7 +51,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryO
 
 		for (auto& planet : planetsCopy)
 		{
-			planet.OnUpdate(1.0f / 60.0f);
+			planet.OnUpdate(Application::TPS_STEP);
 		}
 
 		if (i % 10)
