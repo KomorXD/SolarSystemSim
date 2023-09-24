@@ -1,5 +1,6 @@
 #include "Simulator.hpp"
 #include "Logger.hpp"
+#include "Application.hpp"
 
 #include <execution>
 #include <algorithm>
@@ -19,7 +20,7 @@ void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
 			glm::vec3 dir = glm::normalize(other.GetPosition() - planet.GetPosition());
 			glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetMass() * other.GetMass() / distanceSquared;
 
-			planet.AddAcceleration(addAccel / planet.GetMass());
+			planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetMass());
 		});
 	}
 }
