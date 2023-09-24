@@ -23,6 +23,7 @@ public:
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 	inline std::vector<PlanetaryObject>& GetPlanetsRef() { return m_Planets; }
+	inline std::vector<PlanetaryObject> GetPlanetsCopy() const { return m_Planets; }
 
 	void CancelState();
 
