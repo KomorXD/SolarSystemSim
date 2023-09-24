@@ -111,10 +111,19 @@ void Application::Run()
 	double prevTime = 0.0f;
 	double currTime = 0.0f;
 	double timestep = 1.0f / 60.0f;
+	uint32_t tpsFired = 0;
 
-	TriggerClock tickClock([this]() { m_CurrentLayer->OnTick(); });
-	tickClock.SetInterval(1.0f / 60.0f);
+	TriggerClock tickClock([&]() { m_CurrentLayer->OnTick(); tpsFired++; });
+	tickClock.SetInterval(TPS_STEP * 1000);
 	tickClock.Start();
+
+	TriggerClock fpsClock([&]() { LOG_INFO("Timestep: {:.5f}ms", timestep); });
+	fpsClock.SetInterval(1000);
+	fpsClock.Start();
+
+	TriggerClock tpsClock([&]() { LOG_INFO("OnTick fired {} times last second", tpsFired); tpsFired = 0; });
+	tpsClock.SetInterval(1000);
+	tpsClock.Start();
 
 	while (!glfwWindowShouldClose(m_Window))
 	{
@@ -138,7 +147,6 @@ void Application::Run()
 
 		m_CurrentLayer->OnInput();
 		m_CurrentLayer->OnUpdate((float)timestep);
-		// m_CurrentLayer->OnTick();
 		m_CurrentLayer->OnImGuiRender();
 
 		TriggerClock::UpdateClocks();
