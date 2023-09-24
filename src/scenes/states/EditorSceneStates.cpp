@@ -96,14 +96,21 @@ void SettingVelocityState::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::MouseMoved)
+	if (ev.Type == Event::MouseMoved && !m_PathFuture.valid())
 	{
-		m_ApproximatedPath = SimPhysics::ApproximateNextNPoints(m_ParentScene->GetPlanetsRef(), m_TargetPlanet, 1024);
+		m_PathFuture = std::async(std::launch::async, SimPhysics::ApproximateNextNPoints, std::ref(m_ParentScene->GetPlanetsRef()), m_TargetPlanet, 1024);
 	}
 }
 
 void SettingVelocityState::OnUpdate(float ts)
 {
+	using namespace std::chrono_literals;
+
+	if (m_PathFuture.valid() && m_PathFuture.wait_for(0ms) == std::future_status::ready)
+	{
+		m_ApproximatedPath = m_PathFuture.get();
+	}
+
 	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(m_TargetPlanet->GetPosition());
 	glm::vec2 mouseScreenPos = Input::GetMousePosition();
 	glm::vec3 mouseWorldPos = Renderer::ScreenToWorldCoords(mouseScreenPos, planetScreenPos.z);
@@ -118,8 +125,13 @@ void SettingVelocityState::OnTick()
 
 void SettingVelocityState::OnRender()
 {
+	if (m_ApproximatedPath.size() < 2)
+	{
+		return;
+	}
+
 	Renderer::SceneBegin(*m_EditorCamera);
-	Renderer::SetLineWidth(5.0f);
+	Renderer::SetLineWidth(2.0f);
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetPosition(), m_TargetPlanet->GetPosition() - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 

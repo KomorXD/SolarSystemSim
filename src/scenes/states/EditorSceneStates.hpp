@@ -4,6 +4,7 @@
 #include "../../objects/Planet.hpp"
 
 #include <vector>
+#include <future>
 
 class EditorScene;
 
@@ -61,6 +62,7 @@ public:
 private:
 	glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
 	std::vector<glm::vec3> m_ApproximatedPath;
+	std::future<std::vector<glm::vec3>> m_PathFuture;
 
 	PlanetaryObject* m_TargetPlanet = nullptr;
 
