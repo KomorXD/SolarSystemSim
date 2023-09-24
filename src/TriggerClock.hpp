@@ -29,7 +29,6 @@ private:
 
 	void Update(float ts);
 
-	static void Init();
 	static void UpdateClocks();
 
 	static std::vector<TriggerClock*> m_Clocks;
