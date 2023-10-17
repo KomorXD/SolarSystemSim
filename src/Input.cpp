@@ -33,6 +33,13 @@ void Input::HideCursor()
 {
 	Application* app = Application::GetInstance();
 
+	glfwSetInputMode(app->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void Input::DisableCursor()
+{
+	Application* app = Application::GetInstance();
+
 	glfwSetInputMode(app->GetWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 

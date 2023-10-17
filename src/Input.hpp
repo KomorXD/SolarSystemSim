@@ -164,5 +164,6 @@ public:
 	static glm::vec2 GetMousePosition();
 
 	static void HideCursor();
+	static void DisableCursor();
 	static void ShowCursor();
 };
