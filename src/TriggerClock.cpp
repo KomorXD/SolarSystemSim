@@ -52,7 +52,7 @@ void TriggerClock::Update(float ts)
 	if (m_PassedTime >= m_Interval)
 	{
 		m_Func();
-		m_PassedTime = 0.0f;
+		m_PassedTime = m_PassedTime - m_Interval;
 	}
 }
 
