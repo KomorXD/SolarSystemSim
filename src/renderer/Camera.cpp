@@ -32,6 +32,8 @@ void Camera::OnEvent(Event& ev)
 		m_Position += GetForwardDirection() * ev.MouseWheel.OffsetY;
 
 		UpdateView();
+
+		return;
 	}
 }
 
@@ -158,7 +160,7 @@ void Camera::CheckForMoveInput(float ts)
 
 	if (glm::length(moveVec) != 0.0f)
 	{
-		m_Position += glm::normalize(moveVec) * 2.0f * ts;
+		m_Position += glm::normalize(moveVec) * 15.0f * ts;
 		UpdateView();
 	}
 }
@@ -179,7 +181,7 @@ void Camera::CheckForMouseMovement(float ts)
 
 	if (Input::IsKeyPressed(Key::LeftAlt))
 	{
-		Input::HideCursor();
+		Input::DisableCursor();
 
 		m_Yaw   += delta.x * 0.001f;
 		m_Pitch -= delta.y * 0.001f;
@@ -193,15 +195,16 @@ void Camera::CheckForMouseMovement(float ts)
 
 	if (Input::IsMouseButtonPressed(MouseButton::Middle))
 	{
-		Input::HideCursor();
+		Input::DisableCursor();
 
 		m_Position -= GetRightDirection() * delta.x * 0.01f;
 		m_Position -= GetUpDirection()	  * delta.y * 0.01f;
 
 		UpdateView();
-
-		return;
 	}
 
-	Input::ShowCursor();
+	if (m_ControlType == CameraControlType::EditorControl)
+	{
+		Input::ShowCursor();
+	}
 }

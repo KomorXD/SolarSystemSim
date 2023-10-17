@@ -41,6 +41,8 @@ public:
 	inline float GetPitch()					const { return m_Pitch; }
 	inline float GetYaw()					const { return m_Yaw; }
 
+	inline CameraControlType GetControlType() const { return m_ControlType; }
+
 private:
 	void UpdateProjection();
 	void UpdateView();
