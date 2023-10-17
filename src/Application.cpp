@@ -230,7 +230,7 @@ void Application::SetWindowCallbacks()
 
 			Event ev{};
 
-			ev.Type = action == GLFW_RELEASE ? Event::MouseButtonReleased : Event::MouseButtonPressed;
+			ev.Type = (action == GLFW_RELEASE ? Event::MouseButtonReleased : Event::MouseButtonPressed);
 			ev.MouseButton.Button = (MouseButton)button;
 
 			app->m_EventQueue.SubmitEvent(ev);
