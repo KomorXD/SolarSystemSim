@@ -7,6 +7,8 @@
 #include "../../Logger.hpp"
 #include "../Simulator.hpp"
 
+#include <glm/gtx/compatibility.hpp>
+
 NewPlanetState::NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet)
 	: m_NewPlanet(newPlanet)
 	, m_ParentScene(scene)
@@ -158,12 +160,10 @@ void PanderingState::OnEvent(Event& ev)
 
 void PanderingState::OnUpdate(float ts)
 {
-	
-}
+	glm::vec3 cameraPos = m_EditorCamera->GetPosition();
+	bool skippedTarget = glm::dot(m_DeltaMove, m_TargetPos - cameraPos) < 0.0f;
 
-void PanderingState::OnTick()
-{
-	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f)
+	if (skippedTarget || glm::distance2(cameraPos, m_TargetPos) < 0.01f * 0.01f)
 	{
 		m_EditorCamera->SetPosition(m_TargetPos);
 		m_ParentScene->CancelState();
@@ -171,7 +171,12 @@ void PanderingState::OnTick()
 		return;
 	}
 
-	m_EditorCamera->Move(m_DeltaMove * Application::TPS_STEP * 2.0f);
+	m_EditorCamera->SetPosition(glm::lerp(cameraPos, m_TargetPos, 10.0f * ts));
+}
+
+void PanderingState::OnTick()
+{
+	
 }
 
 void PanderingState::OnRender()
