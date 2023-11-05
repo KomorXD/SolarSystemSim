@@ -193,6 +193,8 @@ void EditorScene::OnRender()
 	m_MFB->BindBuffer();
 	m_MFB->BindRenderBuffer();
 
+	Renderer::SetViewPosition(m_Camera.GetPosition());
+
 	// Draw non selectable stuff
 	Renderer::ClearColor(glm::vec4(glm::vec3(0.55f), 1.0f));
 	Renderer::Clear();

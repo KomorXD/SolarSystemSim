@@ -606,6 +606,12 @@ void Renderer::SetSphereLightning(bool flag)
 	s_Data.SphereShader->SetUniform1i("u_Lightning", (int32_t)flag);
 }
 
+void Renderer::SetViewPosition(const glm::vec3& pos)
+{
+	s_Data.SphereShader->Bind();
+	s_Data.SphereShader->SetUniform3f("u_ViewPos", pos);
+}
+
 void Renderer::ToggleWireframe()
 {
 	GLint mode[2]{};

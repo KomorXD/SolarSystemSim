@@ -62,6 +62,8 @@ public:
 
 	static void SetSphereLightning(bool flag);
 
+	static void SetViewPosition(const glm::vec3& pos);
+
 	static void ToggleWireframe();
 	static void SetLineWidth(float width);
 
