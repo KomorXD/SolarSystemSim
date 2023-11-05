@@ -69,21 +69,14 @@ void EditorScene::OnEvent(Event& ev)
 		if (ev.MouseButton.Button == MouseButton::Left)
 		{
 			CheckForPlanetSelect();
-		}
-		else if (ev.MouseButton.Button == MouseButton::Right)
-		{
-			// Input::DisableCursor();
-			// m_Camera.SetCameraControlType(CameraControlType::WorldControl);
-			// m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
-		}
 
-		return;
+			return;
+		}
 	}
 
 	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Right)
 	{
 		Input::ShowCursor();
-		m_Camera.SetCameraControlType(CameraControlType::EditorControl);
 
 		return;
 	}
@@ -126,6 +119,14 @@ void EditorScene::OnEvent(Event& ev)
 
 		case Key::P:
 			Renderer::ToggleWireframe();
+
+			break;
+
+		case Key::LeftAlt:
+			if (m_SelectedPlanet && !m_ActiveState)
+			{
+				m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
+			}
 
 			break;
 		}

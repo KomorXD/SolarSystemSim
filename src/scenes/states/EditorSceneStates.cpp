@@ -96,7 +96,7 @@ SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, P
 
 void SettingVelocityState::OnEvent(Event& ev)
 {
-	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Right)
+	if (ev.Type == Event::KeyReleased && ev.Key.Code == Key::LeftAlt)
 	{
 		m_ParentScene->CancelState();
 
