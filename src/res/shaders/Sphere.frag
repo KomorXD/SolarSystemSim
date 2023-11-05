@@ -12,7 +12,6 @@ in Material outMaterial;
 
 out vec4 fragColor;
 
-uniform vec3 u_ViewPos;
 uniform int u_Lightning = 1;
 
 const int SHADING_LEVELS = 3;
@@ -47,15 +46,10 @@ void main()
 	diffuseStrength = diffuseLevel / SHADING_LEVELS;
 	directionalStrength = directionalLevel / SHADING_LEVELS;
 
-	vec3 viewDir = normalize(u_ViewPos - worldPos);
-	vec3 reflectDir = reflect(-viewDir, vertexNormal);
-	float specularLevel = pow(max(dot(viewDir, reflectDir), 0.0), outMaterial.shininess);
-	vec3 specular = lightColor * specularLevel * matColor.rgb;
-
 	vec3 ambient = (ambientStrength * lightColor);
 	vec3 diffuse = diffuseStrength * lightColor;
 
-	vec3 result = (ambient + diffuse + attenuation) * vec3(matColor); // + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
+	vec3 result = (ambient + diffuse + attenuation) * vec3(matColor) + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 
 	fragColor = vec4(result, matColor.a);
 
