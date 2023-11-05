@@ -239,7 +239,7 @@ void EditorScene::OnRender()
 
 	for (auto& planet : m_Planets)
 	{
-		Renderer::SubmitSphereInstanced(planet.GetTransform(), planet.GetColor());
+		Renderer::SubmitSphereInstanced(planet.GetTransform(), planet.GetMaterial());
 	}
 
 	Renderer::SceneEnd();
