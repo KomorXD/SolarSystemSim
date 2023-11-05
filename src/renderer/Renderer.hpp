@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.hpp"
+#include "Material.hpp"
 
 #include <glm/glm.hpp>
 #include <memory>
@@ -39,7 +40,8 @@ public:
 	static void DrawLine(const glm::vec3& start, const glm::vec3& end, const glm::vec4& color);
 	static void LoadLineUniform3f(const std::string& name, const glm::vec3& val);
 
-	static void SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4& color = { 0.2f, 0.2f, 0.2f, 1.0f });
+	static void SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4& color);
+	static void SubmitSphereInstanced(const glm::mat4& transform, Material material);
 	static void DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t instances);
 
 	static void DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count = 0);
