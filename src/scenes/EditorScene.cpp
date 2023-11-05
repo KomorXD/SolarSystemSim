@@ -64,8 +64,6 @@ EditorScene::~EditorScene()
 
 void EditorScene::OnEvent(Event& ev)
 {
-	LOG_WARN("Received event #{} with mosue button arg: {}", (int)ev.Type, (int)ev.MouseButton.Button);
-
 	if (ev.Type == Event::MouseButtonPressed)
 	{
 		if (ev.MouseButton.Button == MouseButton::Left)

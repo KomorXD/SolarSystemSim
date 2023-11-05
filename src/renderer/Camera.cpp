@@ -174,12 +174,12 @@ void Camera::CheckForMouseMovement(float ts)
 
 	float deltaLen = glm::length(delta);
 
-	/*if (deltaLen == 0.0f || deltaLen > 100.0f)
+	if (deltaLen == 0.0f || deltaLen > 100.0f)
 	{
 		return;
-	}*/
+	}
 
-	if (Input::IsKeyPressed(Key::LeftAlt))
+	if (Input::IsMouseButtonPressed(MouseButton::Right))
 	{
 		Input::DisableCursor();
 
@@ -193,7 +193,7 @@ void Camera::CheckForMouseMovement(float ts)
 		return;
 	}
 
-	if (Input::IsMouseButtonPressed(MouseButton::Right))
+	if (Input::IsMouseButtonPressed(MouseButton::Middle))
 	{
 		Input::DisableCursor();
 
@@ -201,9 +201,11 @@ void Camera::CheckForMouseMovement(float ts)
 		m_Position -= GetUpDirection()	  * delta.y * 0.01f;
 
 		UpdateView();
+
+		return;
 	}
 
-	if (m_ControlType == CameraControlType::EditorControl)
+	if (m_ControlType == CameraControlType::EditorControl && !Input::IsMouseButtonPressed(MouseButton::Middle))
 	{
 		Input::ShowCursor();
 	}
