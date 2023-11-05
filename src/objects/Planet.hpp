@@ -6,6 +6,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "../renderer/Material.hpp"
+
 class PlanetaryObject
 {
 public:
@@ -31,6 +33,7 @@ public:
 	inline glm::vec3 GetRotation() const { return m_Rotation; }
 	inline glm::vec3 GetScale()	   const { return m_Scale;	  }
 	inline glm::vec4 GetColor()	   const { return m_Color;    }
+	inline Material GetMaterial()  const { return m_Material; }
 	inline float GetRadius()	   const { return m_Radius;   }
 	inline float GetMass()		   const { return m_Mass;	  }
 	inline uint32_t GetEntityID()  const { return m_EntityID; }
@@ -49,6 +52,8 @@ private:
 	glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Scale	 = { 1.0f, 1.0f, 1.0f };
 	glm::vec4 m_Color	 = { 0.44f, 0.44f, 0.44f, 1.0f };
+
+	Material m_Material;
 
 	glm::vec3 m_Velocity	 = { 0.0f, 0.0f, 0.0f };
 
