@@ -110,7 +110,7 @@ glm::vec3 Camera::GetForwardDirection() const
 
 glm::quat Camera::GetOrientation() const
 {
-	return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
+	return glm::quat(glm::vec3(glm::radians(-m_Pitch), glm::radians(-m_Yaw), 0.0f));
 }
 
 void Camera::UpdateProjection()
@@ -183,8 +183,8 @@ void Camera::CheckForMouseMovement(float ts)
 	{
 		Input::DisableCursor();
 
-		m_Yaw   += delta.x * 0.001f;
-		m_Pitch -= delta.y * 0.001f;
+		m_Yaw   += delta.x * 0.01f;
+		m_Pitch -= delta.y * 0.01f;
 
 		m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
 
