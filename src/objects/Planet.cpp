@@ -44,11 +44,6 @@ void PlanetaryObject::SetRotation(const glm::vec3& rotation)
 	m_Rotation = rotation;
 }
 
-void PlanetaryObject::SetColor(const glm::vec4& color)
-{
-	m_Color = color;
-}
-
 void PlanetaryObject::SetMass(float mass)
 {
 	m_Mass = mass;

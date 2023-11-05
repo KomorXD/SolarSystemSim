@@ -21,7 +21,6 @@ public:
 	void SetScale(const glm::vec3& scale);
 	void SetRadius(float radius);
 	void SetRotation(const glm::vec3& rotation);
-	void SetColor(const glm::vec4& color);
 	void SetMass(float mass);
 
 	void SetVelocity(const glm::vec3& velocity);
@@ -32,7 +31,6 @@ public:
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	inline glm::vec3 GetRotation() const { return m_Rotation; }
 	inline glm::vec3 GetScale()	   const { return m_Scale;	  }
-	inline glm::vec4 GetColor()	   const { return m_Color;    }
 	inline Material GetMaterial()  const { return m_Material; }
 	inline float GetRadius()	   const { return m_Radius;   }
 	inline float GetMass()		   const { return m_Mass;	  }
@@ -51,11 +49,9 @@ private:
 	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Scale	 = { 1.0f, 1.0f, 1.0f };
-	glm::vec4 m_Color	 = { 0.44f, 0.44f, 0.44f, 1.0f };
+	glm::vec3 m_Velocity	 = { 0.0f, 0.0f, 0.0f };
 
 	Material m_Material;
-
-	glm::vec3 m_Velocity	 = { 0.0f, 0.0f, 0.0f };
 
 	float m_Radius = 1.0f;
 	float m_Mass   = 1.0f;
