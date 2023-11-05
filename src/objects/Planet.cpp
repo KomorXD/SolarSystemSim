@@ -71,7 +71,10 @@ void PlanetaryObject::OnConfigRender()
 	ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::ColorEdit4("Color", glm::value_ptr(m_Color));
+	ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_Material.Ambient));
+	ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(m_Material.Diffuse));
+	ImGui::ColorEdit4("Specular Color", glm::value_ptr(m_Material.Specular));
+	ImGui::DragFloat("Shininess Color", &m_Material.Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
 	ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat("Mass", &m_Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::EndChild();
