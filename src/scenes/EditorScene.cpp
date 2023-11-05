@@ -227,7 +227,7 @@ void EditorScene::OnRender()
 
 		glm::vec3 color = &planet == m_SelectedPlanet ? glm::vec3(0.98f, 0.24f, 0.0f) : glm::vec3(0.0f);
 
-		Renderer::SubmitSphereInstanced(planet.GetTransform() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, planet.GetMaterial().Ambient.a));
+		Renderer::SubmitSphereInstanced(planet.GetTransform() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, planet.GetMaterial().Color.a));
 	}
 
 	Renderer::SceneEnd();

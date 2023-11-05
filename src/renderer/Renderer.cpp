@@ -31,7 +31,6 @@ glm::mat4 Renderer::s_View = glm::mat4(1.0f);
 struct SphereInstance
 {
 	glm::mat4 Transform;
-	glm::vec4 Color;
 	Material Material;
 };
 
@@ -261,10 +260,7 @@ void Renderer::Init()
 		layout.Push<float>(4); // Transform
 		layout.Push<float>(4); // Transform
 		layout.Push<float>(4); // Transform
-		layout.Push<float>(4); // Color
-		layout.Push<float>(4); // Material ambient
-		layout.Push<float>(4); // Material diffuse
-		layout.Push<float>(4); // Material specular
+		layout.Push<float>(4); // Material color
 		layout.Push<float>(1); // Material shininess
 
 		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * (sizeof(glm::mat4) + sizeof(glm::vec4)));
@@ -470,10 +466,9 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4
 	}
 
 	Material mat;
-	mat.Ambient = mat.Diffuse = mat.Specular = color;
+	mat.Color = color;
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
-	s_Data.SpheresTransformsBufferPtr->Color = color;
 	s_Data.SpheresTransformsBufferPtr->Material = mat;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
@@ -487,7 +482,6 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, Material materi
 	}
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
-	s_Data.SpheresTransformsBufferPtr->Color = material.Ambient;
 	s_Data.SpheresTransformsBufferPtr->Material = material;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;

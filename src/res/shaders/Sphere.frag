@@ -2,15 +2,12 @@
 
 struct Material
 {
-	vec4 ambient;
-	vec4 diffuse;
-	vec4 specular;
+	vec4 color;
 	float shininess;
 };
 
 in vec3 worldPos;
 in vec3 vertexNormal;
-in vec4 outColor;
 in Material outMaterial;
 
 out vec4 fragColor;
@@ -23,10 +20,13 @@ void main()
 {
 	if(u_Lightning == 0)
 	{
-		fragColor = outColor;
+		fragColor = outMaterial.color;
 
 		return;
 	}
+
+	vec4 matColor = outMaterial.color;
+	float matShininess = outMaterial.shininess;
 
 	vec3 dirLightVec = normalize(vec3(-0.3, -0.5, -0.6));
 	vec3 lightPos = vec3(6.0, 10.0, 7.0);
@@ -49,9 +49,9 @@ void main()
 	vec3 ambient = (ambientStrength * lightColor);
 	vec3 diffuse = diffuseStrength * lightColor;
 
-	vec3 result = (ambient + diffuse + attenuation) * vec3(outColor) + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
+	vec3 result = (ambient + diffuse + attenuation) * vec3(matColor) + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 
-	fragColor = vec4(result, outColor.a);
+	fragColor = vec4(result, matColor.a);
 
 	float gamma = 2.2;
 

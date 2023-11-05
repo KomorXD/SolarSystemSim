@@ -71,9 +71,7 @@ void PlanetaryObject::OnConfigRender()
 
 	if (ImGui::CollapsingHeader("Material"))
 	{
-		ImGui::ColorEdit4("Ambient Color", glm::value_ptr(m_Material.Ambient));
-		ImGui::ColorEdit4("Diffuse Color", glm::value_ptr(m_Material.Diffuse));
-		ImGui::ColorEdit4("Specular Color", glm::value_ptr(m_Material.Specular));
+		ImGui::ColorEdit4("Color", glm::value_ptr(m_Material.Color));
 		ImGui::DragFloat("Shininess Color", &m_Material.Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
 	}
 	
