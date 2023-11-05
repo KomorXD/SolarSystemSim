@@ -253,3 +253,26 @@ private:
 	int32_t m_Height	   = 0;
 	int32_t m_BPP		   = 0;
 };
+
+class Texture
+{
+public:
+	Texture(const std::string& filepath);
+	~Texture();
+
+	void Bind(uint32_t slot = 0) const;
+	void Unbind() const;
+
+	inline int32_t GetWidth() const { return m_Width; }
+	inline int32_t GetHeight() const { return m_Height; }
+	inline uint32_t GetID() const { return m_ID; }
+	inline std::string GetPath() { return m_Path; }
+
+private:
+	uint32_t    m_ID     = 0;
+	uint8_t*    m_LocalBuffer = nullptr;
+	int32_t		m_Width  = 0;
+	int32_t		m_Height = 0;
+	int32_t		m_BPP    = 0;
+	std::string	m_Path;
+};
