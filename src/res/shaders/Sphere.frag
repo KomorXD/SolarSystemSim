@@ -1,8 +1,17 @@
 #version 330 core
 
-in vec4 outColor;
+struct Material
+{
+	vec4 ambient;
+	vec4 diffuse;
+	vec4 specular;
+	float shininess;
+};
+
 in vec3 worldPos;
 in vec3 vertexNormal;
+in vec4 outColor;
+in Material outMaterial;
 
 out vec4 fragColor;
 
