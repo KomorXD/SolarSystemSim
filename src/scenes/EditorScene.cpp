@@ -64,6 +64,32 @@ EditorScene::~EditorScene()
 
 void EditorScene::OnEvent(Event& ev)
 {
+	LOG_WARN("Received event #{} with mosue button arg: {}", (int)ev.Type, (int)ev.MouseButton.Button);
+
+	if (ev.Type == Event::MouseButtonPressed)
+	{
+		if (ev.MouseButton.Button == MouseButton::Left)
+		{
+			CheckForPlanetSelect();
+		}
+		else if (ev.MouseButton.Button == MouseButton::Right)
+		{
+			// Input::DisableCursor();
+			// m_Camera.SetCameraControlType(CameraControlType::WorldControl);
+			// m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
+		}
+
+		return;
+	}
+
+	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Right)
+	{
+		Input::ShowCursor();
+		m_Camera.SetCameraControlType(CameraControlType::EditorControl);
+
+		return;
+	}
+
 	if (ev.Type == Event::WindowResized)
 	{
 		m_FB->BindBuffer();
@@ -116,25 +142,16 @@ void EditorScene::OnEvent(Event& ev)
 		return;
 	}
 
-	if (ev.Type == Event::MouseButtonPressed)
-	{
-		if (ev.MouseButton.Button == MouseButton::Left)
-		{
-			CheckForPlanetSelect();
-		}
-		else if (ev.MouseButton.Button == MouseButton::Right && m_SelectedPlanet)
-		{
-			m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
-		}
-
-		return;
-	}
-
 	m_Camera.OnEvent(ev);
 }
 
 void EditorScene::OnInput()
 {
+	if (!Input::IsMouseButtonPressed(MouseButton::Right) && m_Camera.GetControlType() == CameraControlType::WorldControl)
+	{
+		Input::ShowCursor();
+		m_Camera.SetCameraControlType(CameraControlType::EditorControl);
+	}
 }
 
 void EditorScene::OnUpdate(float ts)

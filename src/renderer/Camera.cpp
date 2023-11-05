@@ -193,7 +193,7 @@ void Camera::CheckForMouseMovement(float ts)
 		return;
 	}
 
-	if (Input::IsMouseButtonPressed(MouseButton::Middle))
+	if (Input::IsMouseButtonPressed(MouseButton::Right))
 	{
 		Input::DisableCursor();
 

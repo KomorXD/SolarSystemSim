@@ -44,6 +44,8 @@ private:
 
 	float m_TargetYaw = 0.0f;
 	float m_DeltaYaw  = 0.0f;
+
+	float m_DistanceFromTarget = 0.0f;
 	
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;
@@ -82,7 +84,7 @@ public:
 
 private:
 	glm::vec3 m_TargetPos = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_DeltaMove = { 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_DeltaMove = { 0.0f, 0.0f, 0.0f };;
 
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;

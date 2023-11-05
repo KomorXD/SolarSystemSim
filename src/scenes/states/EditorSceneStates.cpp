@@ -53,6 +53,8 @@ InterpolateViewState::InterpolateViewState(EditorScene* scene, Camera* camera, c
 	m_DeltaMove  = targetPos - camera->GetPosition();
 	m_DeltaPitch = targetPitch - camera->GetPitch();
 	m_DeltaYaw   = targetYaw - camera->GetYaw();
+
+	m_DistanceFromTarget = glm::distance(camera->GetPosition(), m_TargetPos);
 }
 
 void InterpolateViewState::OnEvent(Event& ev)
@@ -61,10 +63,10 @@ void InterpolateViewState::OnEvent(Event& ev)
 
 void InterpolateViewState::OnUpdate(float ts)
 {
-}
+	
 
-void InterpolateViewState::OnTick()
-{
+	return;
+
 	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f)
 	{
 		m_EditorCamera->SetPosition(m_TargetPos);
@@ -78,6 +80,10 @@ void InterpolateViewState::OnTick()
 	m_EditorCamera->Move(m_DeltaMove * Application::TPS_STEP * 2.0f);
 	m_EditorCamera->MovePitch(m_DeltaPitch * Application::TPS_STEP * 2.0f);
 	m_EditorCamera->MoveYaw(m_DeltaYaw * Application::TPS_STEP * 2.0f);
+}
+
+void InterpolateViewState::OnTick()
+{
 }
 
 void InterpolateViewState::OnRender()
