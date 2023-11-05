@@ -183,8 +183,8 @@ void Camera::CheckForMouseMovement(float ts)
 	{
 		Input::DisableCursor();
 
-		m_Yaw   += delta.x * 0.01f;
-		m_Pitch -= delta.y * 0.01f;
+		m_Yaw   += delta.x * 0.1f;
+		m_Pitch -= delta.y * 0.1f;
 
 		m_Pitch = glm::max(glm::min(m_Pitch, 90.0f), -90.0f);
 
