@@ -196,33 +196,39 @@ void EditorLayer::RenderControlPanel()
 
 	ImGui::Separator();
 	ImGui::NewLine();
-	
+
+	Camera& editorCam = m_Scene->m_Camera;
+	PlanetaryObject* planet = m_Scene->m_SelectedPlanet;
+
 	if (ImGui::Button("X view"))
 	{
-		float distance = glm::length(m_Scene->m_Camera.GetPosition());
+		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
+			rotatePoint + glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
 	}
 	
 	ImGui::SameLine();
 	
 	if (ImGui::Button("Y view"))
 	{
-		float distance = glm::length(m_Scene->m_Camera.GetPosition());
+		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
+			rotatePoint + glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
 	}
 	
 	ImGui::SameLine();
 	
 	if (ImGui::Button("Z view"))
 	{
-		float distance = glm::length(m_Scene->m_Camera.GetPosition());
+		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
+			rotatePoint + glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
 	}
 	
 	ImGui::NewLine();
