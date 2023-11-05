@@ -60,7 +60,6 @@ void InterpolateViewState::OnEvent(Event& ev)
 void InterpolateViewState::OnUpdate(float ts)
 {
 	glm::vec3 cameraPos = m_EditorCamera->GetPosition();
-	// bool skippedTarget = glm::dot(m_DeltaMove, m_TargetPos - cameraPos) < 0.0f;
 
 	if (glm::distance2(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f * 0.01f)
 	{
@@ -73,13 +72,13 @@ void InterpolateViewState::OnUpdate(float ts)
 	glm::vec3 dir(0.0f, 0.0f, -glm::distance(cameraPos, glm::vec3(0.0f)));
 	glm::quat rot(glm::vec3(-glm::radians(m_EditorCamera->GetPitch()), -glm::radians(m_EditorCamera->GetYaw()), 0.0f));
 	glm::vec3 newPos = rot * dir;
-	rot = glm::slerp(rot, m_TargetRotation, 15.0f * ts);
+	rot = glm::slerp(rot, m_TargetRotation, 10.0f * ts);
 
-	glm::vec3 lols = glm::eulerAngles(rot);
-	m_EditorCamera->SetPitch(-glm::degrees(lols.x));
-	m_EditorCamera->SetYaw(-glm::degrees(lols.y));
+	glm::vec3 eulerAngles = glm::eulerAngles(rot);
+	m_EditorCamera->SetPitch(-glm::degrees(eulerAngles.x));
+	m_EditorCamera->SetYaw(-glm::degrees(eulerAngles.y));
 	
-	m_EditorCamera->SetPosition(glm::lerp(cameraPos, m_TargetPos, 15.0f * ts));
+	m_EditorCamera->SetPosition(glm::lerp(cameraPos, m_TargetPos, 10.0f * ts));
 }
 
 void InterpolateViewState::OnTick()
