@@ -172,6 +172,7 @@ void EditorLayer::RenderControlPanel()
 	ImGui::NewLine();
 	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
 	ImGui::NewLine();
+	ImGui::Text("Camera rotation: [%.2f %.2f %.2f]", m_Scene->m_Camera.GetPitch(), m_Scene->m_Camera.GetYaw(), 0.0f);
 	ImGui::Separator();
 	ImGui::NewLine();
 	
