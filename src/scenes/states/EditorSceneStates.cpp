@@ -48,13 +48,9 @@ void NewPlanetState::OnRender()
 }
 
 InterpolateViewState::InterpolateViewState(EditorScene* scene, Camera* camera, const glm::vec3& targetPos, float targetPitch, float targetYaw)
-	: m_TargetPos(targetPos), m_TargetPitch(targetPitch), m_TargetYaw(targetYaw), m_ParentScene(scene), m_EditorCamera(camera)
+	: m_TargetPos(targetPos), m_ParentScene(scene), m_EditorCamera(camera)
 {
-	m_DeltaMove  = targetPos - camera->GetPosition();
-	m_DeltaPitch = targetPitch - camera->GetPitch();
-	m_DeltaYaw   = targetYaw - camera->GetYaw();
-
-	m_DistanceFromTarget = glm::distance(camera->GetPosition(), m_TargetPos);
+	m_TargetRotation = glm::quat(glm::vec3(-targetPitch, -targetYaw, 0.0f));
 }
 
 void InterpolateViewState::OnEvent(Event& ev)
@@ -63,23 +59,27 @@ void InterpolateViewState::OnEvent(Event& ev)
 
 void InterpolateViewState::OnUpdate(float ts)
 {
-	
+	glm::vec3 cameraPos = m_EditorCamera->GetPosition();
+	// bool skippedTarget = glm::dot(m_DeltaMove, m_TargetPos - cameraPos) < 0.0f;
 
-	return;
-
-	if (glm::distance(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f)
+	if (glm::distance2(m_EditorCamera->GetPosition(), m_TargetPos) < 0.01f * 0.01f)
 	{
 		m_EditorCamera->SetPosition(m_TargetPos);
-		m_EditorCamera->SetPitch(m_TargetPitch);
-		m_EditorCamera->SetYaw(m_TargetYaw);
 		m_ParentScene->CancelState();
 
 		return;
 	}
 
-	m_EditorCamera->Move(m_DeltaMove * Application::TPS_STEP * 2.0f);
-	m_EditorCamera->MovePitch(m_DeltaPitch * Application::TPS_STEP * 2.0f);
-	m_EditorCamera->MoveYaw(m_DeltaYaw * Application::TPS_STEP * 2.0f);
+	glm::vec3 dir(0.0f, 0.0f, -glm::distance(cameraPos, glm::vec3(0.0f)));
+	glm::quat rot(glm::vec3(-glm::radians(m_EditorCamera->GetPitch()), -glm::radians(m_EditorCamera->GetYaw()), 0.0f));
+	glm::vec3 newPos = rot * dir;
+	rot = glm::slerp(rot, m_TargetRotation, 15.0f * ts);
+
+	glm::vec3 lols = glm::eulerAngles(rot);
+	m_EditorCamera->SetPitch(-glm::degrees(lols.x));
+	m_EditorCamera->SetYaw(-glm::degrees(lols.y));
+	
+	m_EditorCamera->SetPosition(glm::lerp(cameraPos, m_TargetPos, 15.0f * ts));
 }
 
 void InterpolateViewState::OnTick()
