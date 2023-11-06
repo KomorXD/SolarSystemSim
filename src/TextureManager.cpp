@@ -1,6 +1,6 @@
 #include "TextureManager.hpp"
 #include "stb_rect_pack/stb_rect_pack.h"
-#include "stb_image/stb_image_write.h"
+#include "stb_image/stb_image.h"
 #include "Logger.hpp"
 #include "Timer.hpp"
 
@@ -17,7 +17,7 @@ void TextureManager::Init()
 	FUNC_PROFILE();
 
 	s_Atlas = std::make_unique<Texture>(4096, 4096);
-	s_Nodes.resize(255);
+	s_Nodes.resize(256);
 
 	stbrp_rect whitePixelRect{};
 	whitePixelRect.id = s_IndexCounter;
@@ -59,11 +59,35 @@ TextureInfo TextureManager::AddTexture(const std::string& path)
 		return *texItr;
 	}
 
-	// add to atlas
-	
+	stbi_set_flip_vertically_on_load(0);
+	int32_t width{}, height{}, bpp{};
+	uint8_t* buffer = stbi_load(path.c_str(), &width, &height, &bpp, 4);
 
-	s_Textures.push_back({ s_IndexCounter, path });
+	// ===
+	stbrp_rect texRect{};
+	texRect.id = s_IndexCounter;
+	texRect.w = width;
+	texRect.h = height;
+	s_Rects.push_back(texRect);
 	s_IndexCounter++;
+
+	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
+
+	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
+	{
+		LOG_INFO("Added texture");
+	}
+	else
+	{
+		LOG_ERROR("Texture did not fit");
+	}
+
+	texRect = s_Rects.back();
+
+	s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
+	s_Textures.push_back({ texRect.id, path, { texRect.x / 4096.0f, texRect.y / 4096.0f },
+		{ texRect.w / 4096.0f, texRect.h / 4096.0f } });
+	// ===
 
 	return s_Textures.back();
 }
