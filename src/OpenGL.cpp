@@ -788,6 +788,26 @@ Texture::Texture(const std::string& filepath)
 	}
 }
 
+Texture::Texture(uint32_t width, uint32_t height)
+	: m_ID(0), m_Width(width), m_Height(height), m_BPP(4)
+{
+	std::vector<uint8_t> def;
+	def.resize(static_cast<size_t>(m_Width) * m_Height * m_BPP);
+	std::fill(def.begin(), def.end(), 0);
+
+	GLCall(glGenTextures(1, &m_ID));
+	GLCall(glBindTexture(GL_TEXTURE_2D, m_ID));
+		
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		
+	GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, def.data()));
+	GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
 Texture::~Texture()
 {
 	if (m_ID != 0)
@@ -805,4 +825,21 @@ void Texture::Bind(uint32_t slot) const
 void Texture::Unbind() const
 {
 	GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
+void Texture::SetSubtexture(const uint8_t* data, const glm::ivec2& offset, const glm::ivec2& size)
+{
+	Bind();
+	GLCall(glTexSubImage2D(GL_TEXTURE_2D, 0, offset.x, offset.y, size.x, size.y, GL_RGBA, GL_UNSIGNED_BYTE, data));
+}
+
+std::vector<uint8_t> Texture::GetTextureData()
+{
+	std::vector<uint8_t> pixels;
+	pixels.resize(static_cast<size_t>(m_Width) * m_Height * m_BPP);
+	
+	Bind();
+	GLCall(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data()));
+
+	return pixels;
 }

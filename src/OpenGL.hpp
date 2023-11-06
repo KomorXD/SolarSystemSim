@@ -258,10 +258,15 @@ class Texture
 {
 public:
 	Texture(const std::string& filepath);
+	Texture(uint32_t width, uint32_t height);
 	~Texture();
 
 	void Bind(uint32_t slot = 0) const;
 	void Unbind() const;
+
+	void SetSubtexture(const uint8_t* data, const glm::ivec2& offset, const glm::ivec2& size);
+
+	std::vector<uint8_t> GetTextureData();
 
 	inline int32_t GetWidth() const { return m_Width; }
 	inline int32_t GetHeight() const { return m_Height; }
