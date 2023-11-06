@@ -44,6 +44,11 @@ void TextureManager::Init()
 	s_Textures.push_back({ whitePixelRect.id, "", { whitePixelRect.x, whitePixelRect.y }, { whitePixelRect.w, whitePixelRect.h } });
 }
 
+void TextureManager::BindAtlas(uint32_t slot)
+{
+	s_Atlas->Bind(slot);
+}
+
 TextureInfo TextureManager::AddTexture(const std::string& path)
 {
 	auto texItr = std::find_if(s_Textures.begin(), s_Textures.end(), [&](const TextureInfo& tex) { return tex.Path == path; });

@@ -19,6 +19,7 @@ class TextureManager
 {
 public:
 	static void Init();
+	static void BindAtlas(uint32_t slot = 0);
 
 	static TextureInfo AddTexture(const std::string& path);
 
