@@ -25,6 +25,8 @@ public:
 
 	static std::optional<TextureInfo> GetTexture(const std::string& path);
 	static std::optional<TextureInfo> GetTexture(uint32_t id);
+
+	static inline uint32_t GetAtlasTextureID() { return s_Atlas->GetID(); }
 	
 	static bool RemoveTexture(const std::string& path);
 	static bool RemoveTexture(uint32_t id);

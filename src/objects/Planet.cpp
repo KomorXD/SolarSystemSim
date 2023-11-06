@@ -1,4 +1,5 @@
 #include "Planet.hpp"
+#include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -30,7 +31,7 @@ void PlanetaryObject::SetPosition(const glm::vec3& position)
 void PlanetaryObject::SetScale(const glm::vec3& scale)
 {
 	m_Scale = scale;
-	m_Radius = glm::max(glm::max(scale.x, scale.y), scale.z);
+	m_Radius = max(max(scale.x, scale.y), scale.z);
 }
 
 void PlanetaryObject::SetRadius(float radius)
@@ -76,8 +77,17 @@ void PlanetaryObject::OnConfigRender()
 
 	if (ImGui::CollapsingHeader("Material"))
 	{
+		ImGui::Indent(16.0f);
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Material.Color));
 		ImGui::DragFloat("Shininess Color", &m_Material.Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
+
+		TextureInfo tex = TextureManager::GetTexture(m_Material.TextureID).value();
+		
+		ImGui::Text("Texture");
+		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(128.0f, 128.0f), 
+			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+
+		ImGui::Unindent(16.0f);
 	}
 	
 	ImGui::EndChild();
