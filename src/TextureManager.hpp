@@ -11,8 +11,8 @@ struct TextureInfo
 {
 	int32_t TextureID;
 	std::string Path;
-	glm::ivec2 UV;
-	glm::ivec2 Size;
+	glm::vec2 UV;
+	glm::vec2 Size;
 };
 
 class TextureManager

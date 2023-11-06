@@ -41,7 +41,8 @@ void TextureManager::Init()
 	whitePixelRect = s_Rects[0];
 
 	s_Atlas->SetSubtexture(whitePixelData, { whitePixelRect.x, whitePixelRect.y }, { whitePixelRect.w, whitePixelRect.h });
-	s_Textures.push_back({ whitePixelRect.id, "", { whitePixelRect.x, whitePixelRect.y }, { whitePixelRect.w, whitePixelRect.h } });
+	s_Textures.push_back({ whitePixelRect.id, "", { whitePixelRect.x / 4096.0f, whitePixelRect.y / 4096.0f }, 
+		{ whitePixelRect.w / 4096.0f, whitePixelRect.h / 4096.0f } });
 }
 
 void TextureManager::BindAtlas(uint32_t slot)
