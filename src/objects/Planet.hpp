@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <string>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
@@ -29,6 +30,7 @@ public:
 
 	void OnConfigRender();
 
+	inline std::string GetTag() const	 { return m_Tag; }
 	inline glm::vec3 GetPosition() const { return m_Position; }
 	inline glm::vec3 GetRotation() const { return m_Rotation; }
 	inline glm::vec3 GetScale()	   const { return m_Scale;	  }
@@ -47,6 +49,8 @@ public:
 	inline static constexpr uint32_t MAX_PLANETS = 254;
 
 private:
+	std::string m_Tag;
+
 	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
 	glm::vec3 m_Scale	 = { 1.0f, 1.0f, 1.0f };

@@ -10,6 +10,8 @@ PlanetaryObject::PlanetaryObject(const glm::vec3& position)
 	: m_Position(position)
 {
 	m_EntityID = s_IdCounter;
+	m_Tag.reserve(24);
+	m_Tag = std::string("Planet #") + std::to_string(m_EntityID);
 	++s_IdCounter;
 }
 
@@ -68,7 +70,7 @@ void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
 void PlanetaryObject::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
-	ImGui::Text("Planet #%d", m_EntityID);
+	ImGui::InputText("##", m_Tag.data(), m_Tag.capacity());
 	ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");

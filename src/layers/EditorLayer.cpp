@@ -63,10 +63,7 @@ void EditorLayer::OnInput()
 
 void EditorLayer::OnUpdate(float ts)
 {
-	if (m_IsViewportFocused || true)
-	{
-		m_Scene->OnUpdate(ts);
-	}
+	m_Scene->OnUpdate(ts);
 }
 
 void EditorLayer::OnTick()
