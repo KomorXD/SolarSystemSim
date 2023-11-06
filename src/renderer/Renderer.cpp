@@ -179,7 +179,7 @@ void Renderer::Init()
 	{
 		SCOPE_PROFILE("Sphere data init");
 
-		auto [sphereVertices, sphereIndices] = GenerateIcosahedronSphere();
+		auto [sphereVertices, sphereIndices] = GenerateIcosahedronSphere(4);
 
 		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
 		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::vec3));
