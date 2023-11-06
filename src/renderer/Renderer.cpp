@@ -2,6 +2,7 @@
 #include "../OpenGL.hpp"
 #include "../Logger.hpp"
 #include "../Timer.hpp"
+#include "../TextureManager.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -31,7 +32,10 @@ glm::mat4 Renderer::s_View = glm::mat4(1.0f);
 struct SphereInstance
 {
 	glm::mat4 Transform;
-	Material Material;
+	glm::vec4 Color;
+	float Shininess;
+	glm::vec2 StartUV;
+	glm::vec2 EndUV;
 };
 
 struct QuadVertex
@@ -262,8 +266,10 @@ void Renderer::Init()
 		layout.Push<float>(4); // Transform
 		layout.Push<float>(4); // Material color
 		layout.Push<float>(1); // Material shininess
+		layout.Push<float>(2); // UV Start
+		layout.Push<float>(2); // UV End
 
-		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * (sizeof(glm::mat4) + sizeof(glm::vec4)));
+		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereInstance));
 		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 1);
 
 		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
@@ -465,11 +471,13 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4
 		NextBatch();
 	}
 
-	Material mat;
-	mat.Color = color;
+	TextureInfo defaultTex = TextureManager::GetTexture(1).value();
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
-	s_Data.SpheresTransformsBufferPtr->Material = mat;
+	s_Data.SpheresTransformsBufferPtr->Color = color;
+	s_Data.SpheresTransformsBufferPtr->Shininess = 1.0f;
+	s_Data.SpheresTransformsBufferPtr->StartUV = defaultTex.UV;
+	s_Data.SpheresTransformsBufferPtr->EndUV = defaultTex.UV + defaultTex.Size;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }
@@ -481,8 +489,14 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, Material materi
 		NextBatch();
 	}
 
+	std::optional<TextureInfo> textureInfo = TextureManager::GetTexture(material.TextureID);
+	TextureInfo tex = textureInfo.value_or(TextureManager::GetTexture(1).value());
+
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
-	s_Data.SpheresTransformsBufferPtr->Material = material;
+	s_Data.SpheresTransformsBufferPtr->Color = material.Color;
+	s_Data.SpheresTransformsBufferPtr->Shininess = material.Shininess;
+	s_Data.SpheresTransformsBufferPtr->StartUV = tex.UV;
+	s_Data.SpheresTransformsBufferPtr->EndUV = tex.UV + tex.Size;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }
@@ -491,6 +505,8 @@ void Renderer::DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const
 {
 	shader->Bind();
 	shader->SetUniformMat4("u_ViewProjection", s_ViewProjection);
+	shader->SetUniform1i("u_TextureAtlas", 1);
+	TextureManager::BindAtlas(1);
 
 	vao->Bind();
 
