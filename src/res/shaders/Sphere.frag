@@ -1,15 +1,17 @@
 #version 330 core
 
-struct FragmentMaterial
+struct Material
 {
 	vec4 color;
 	float shininess;
-	vec2 uv;
+	vec2 uvStart;
+	vec2 uvEnd;
 };
 
 in vec3 worldPos;
 in vec3 vertexNormal;
-in FragmentMaterial outMaterial;
+in vec3 staticNormal;
+in Material material;
 
 out vec4 fragColor;
 
@@ -22,13 +24,13 @@ void main()
 {
 	if(u_Lightning == 0)
 	{
-		fragColor = outMaterial.color;
+		fragColor = material.color;
 
 		return;
 	}
 
-	vec4 matColor = outMaterial.color;
-	float matShininess = outMaterial.shininess;
+	vec4 matColor = material.color;
+	float matShininess = material.shininess;
 
 	vec3 dirLightVec = normalize(vec3(-0.3, -0.5, -0.6));
 	vec3 lightPos = vec3(6.0, 10.0, 7.0);
@@ -54,7 +56,14 @@ void main()
 	vec3 result = (ambient + diffuse + attenuation) * vec3(matColor) + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 
 	fragColor = vec4(result, matColor.a);
-	fragColor = texture(u_TextureAtlas, outMaterial.uv) * fragColor;
+
+	float pi = 3.14159265358979323846;
+	vec2 uv;
+	uv.x = 0.5 + atan(staticNormal.z, staticNormal.x) / (2.0 * pi);
+	uv.y = 0.5 - asin(staticNormal.y) / pi;
+	uv = material.uvStart + (material.uvEnd - material.uvStart) * uv;
+
+	fragColor = texture(u_TextureAtlas, uv) * fragColor;
 
 	float gamma = 2.2;
 
