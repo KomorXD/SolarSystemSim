@@ -22,6 +22,7 @@ public:
 	void SetRadius(float radius);
 	void SetRotation(const glm::vec3& rotation);
 	void SetMass(float mass);
+	void SetTextureID(int32_t id);
 
 	void SetVelocity(const glm::vec3& velocity);
 	void AddVelocity(const glm::vec3& addVelocity);

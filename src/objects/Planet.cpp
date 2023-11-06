@@ -49,6 +49,11 @@ void PlanetaryObject::SetMass(float mass)
 	m_Mass = mass;
 }
 
+void PlanetaryObject::SetTextureID(int32_t id)
+{
+	m_Material.TextureID = id;
+}
+
 void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
 {
 	m_Velocity = velocity;
