@@ -71,8 +71,6 @@ TextureInfo TextureManager::AddTexture(const std::string& path)
 	s_Rects.push_back(texRect);
 	s_IndexCounter++;
 
-	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
-
 	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
 	{
 		LOG_INFO("Added texture");
