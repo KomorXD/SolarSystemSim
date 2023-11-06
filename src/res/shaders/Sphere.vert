@@ -28,6 +28,7 @@ out FragmentMaterial outMaterial;
 void main()
 {
 	float pi = 3.14159265358979323846;
+	vec3 staticNormal = normalize(a_Position - vec3(0.0));
 
 	worldPos	 = (a_Transform * vec4(a_Position, 1.0)).xyz;
 	vertexNormal = normalize(worldPos - (a_Transform * vec4(vec3(0.0), 1.0)).xyz);
@@ -36,8 +37,8 @@ void main()
 	outMaterial.shininess = a_Material.shininess;
 	
 	vec2 standardUV;
-	standardUV.x = atan(vertexNormal.x, vertexNormal.z) / (2.0 * pi) + 0.5;
-	standardUV.y = vertexNormal.y * 0.5 + 0.5;
+	standardUV.x = atan(staticNormal.x, staticNormal.z) / (2.0 * pi) + 0.5;
+	standardUV.y = staticNormal.y * 0.5 + 0.5;
 
 	outMaterial.uv = a_Material.uvStart + (a_Material.uvEnd - a_Material.uvStart) * standardUV;
 
