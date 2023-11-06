@@ -1,18 +1,20 @@
 #version 330 core
 
-struct Material
+struct FragmentMaterial
 {
 	vec4 color;
 	float shininess;
+	vec2 uv;
 };
 
 in vec3 worldPos;
 in vec3 vertexNormal;
-in Material outMaterial;
+in FragmentMaterial outMaterial;
 
 out vec4 fragColor;
 
 uniform int u_Lightning = 1;
+uniform sampler2D u_TextureAtlas;
 
 const int SHADING_LEVELS = 3;
 
@@ -52,6 +54,7 @@ void main()
 	vec3 result = (ambient + diffuse + attenuation) * vec3(matColor) + directionalStrength * vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 
 	fragColor = vec4(result, matColor.a);
+	fragColor = texture(u_TextureAtlas, outMaterial.uv) * fragColor;
 
 	float gamma = 2.2;
 
