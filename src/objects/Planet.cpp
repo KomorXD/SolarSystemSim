@@ -70,7 +70,7 @@ void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
 void PlanetaryObject::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
-	ImGui::InputText("##", m_Tag.data(), m_Tag.capacity());
+	ImGui::InputText("##Tag", m_Tag.data(), m_Tag.capacity());
 	ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
@@ -84,9 +84,19 @@ void PlanetaryObject::OnConfigRender()
 		ImGui::DragFloat("Shininess Color", &m_Material.Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
 
 		TextureInfo tex = TextureManager::GetTexture(m_Material.TextureID).value();
-		
+		float ratio = tex.Size.y / tex.Size.x;
+
 		ImGui::Text("Texture");
-		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(128.0f, 128.0f), 
+		ImGui::InputText("##TexturePath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+		float sizeY = ImGui::GetItemRectSize().y;
+		ImGui::SameLine();
+
+		if(ImGui::Button("...", ImVec2(sizeY, sizeY)))
+		{
+			printf("boooo\n");
+		}
+
+		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
 			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
 
 		ImGui::Unindent(16.0f);
