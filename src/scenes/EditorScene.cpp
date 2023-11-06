@@ -7,6 +7,7 @@
 #include "../Random.hpp"
 #include "states/EditorSceneStates.hpp"
 #include "../Simulator.hpp"
+#include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,13 +45,17 @@ EditorScene::EditorScene()
 	};
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
+	TextureInfo ti = TextureManager::AddTexture("res/textures/earf.jpg");
 
 	m_Planets.emplace_back(glm::vec3(0.0f));
 	m_Planets[0].SetMass(1000000.0f);
 	m_Planets[0].SetRadius(10.0f);
+	m_Planets[0].SetTextureID(ti.TextureID);
 
 	m_Planets.emplace_back(glm::vec3(30.0f, 0.0f, 0.0f));
 	m_Planets[1].SetMass(10000.0f);
+	
+	m_Planets[1].SetTextureID(ti.TextureID);
 
 	LOG_INFO("EditorScene initialized.");
 }
