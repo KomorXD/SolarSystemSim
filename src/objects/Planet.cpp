@@ -70,14 +70,33 @@ void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
 void PlanetaryObject::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
-	ImGui::InputText("##Tag", m_Tag.data(), m_Tag.capacity());
-	ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat3("Scale", glm::value_ptr(m_Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-	ImGui::DragFloat("Mass", &m_Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
 
-	if (ImGui::CollapsingHeader("Material"))
+	ImGui::Text("Planet #%d", m_EntityID);
+	ImGui::Indent(16.0f);
+	ImGui::InputText("##Planet tag", m_Tag.data(), m_Tag.capacity());
+	ImGui::Unindent(16.0f);
+	ImGui::NewLine();
+
+	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent(16.0f);
+		ImGui::DragFloat3("Position", glm::value_ptr(m_Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::DragFloat3("Rotation", glm::value_ptr(m_Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::DragFloat3("Scale",    glm::value_ptr(m_Scale),    0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::Unindent(16.0f);
+		ImGui::NewLine();
+	}
+
+	if (ImGui::CollapsingHeader("Physics properties", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent(16.0f);
+		ImGui::DragFloat3("Velocity", glm::value_ptr(m_Velocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::DragFloat("Mass", &m_Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::Unindent(16.0f);
+		ImGui::NewLine();
+	}
+
+	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent(16.0f);
 		ImGui::ColorEdit4("Color", glm::value_ptr(m_Material.Color));
@@ -100,6 +119,7 @@ void PlanetaryObject::OnConfigRender()
 			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
 
 		ImGui::Unindent(16.0f);
+		ImGui::NewLine();
 	}
 	
 	ImGui::EndChild();
