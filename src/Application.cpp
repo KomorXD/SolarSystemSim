@@ -129,11 +129,11 @@ void Application::Run()
 
 	TriggerClock fpsClock([&]() { LOG_INFO("Timestep: {:.5f}ms", timestep); });
 	fpsClock.SetInterval(1000);
-	fpsClock.Start();
+	// fpsClock.Start();
 
 	TriggerClock tpsClock([&]() { LOG_INFO("OnTick fired {} times last second", tpsFired); tpsFired = 0; });
 	tpsClock.SetInterval(1000);
-	tpsClock.Start();
+	// tpsClock.Start();
 
 	std::thread clockThread(&Application::UpdateClocksWorker, this);
 
