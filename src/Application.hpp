@@ -35,6 +35,7 @@ public:
 private:
 	void SetWindowCallbacks();
 	void UpdateClocksWorker();
+	void ApplyImGuiStyles();
 
 	std::unique_ptr<Layer> m_CurrentLayer;
 
