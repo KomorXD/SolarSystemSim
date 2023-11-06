@@ -793,7 +793,7 @@ Texture::Texture(uint32_t width, uint32_t height)
 {
 	std::vector<uint8_t> def;
 	def.resize(static_cast<size_t>(m_Width) * m_Height * m_BPP);
-	std::fill(def.begin(), def.end(), 0);
+	std::fill(def.begin(), def.end(), 255);
 
 	GLCall(glGenTextures(1, &m_ID));
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_ID));
