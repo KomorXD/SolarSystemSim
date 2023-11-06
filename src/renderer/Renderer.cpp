@@ -3,6 +3,7 @@
 #include "../Logger.hpp"
 #include "../Timer.hpp"
 #include "../TextureManager.hpp"
+#include "IcosahedronSphere.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -94,72 +95,6 @@ struct RendererData
 
 static RendererData s_Data{};
 
-static std::vector<glm::vec3> GenerateUVSphereData(int32_t sectorCount, int32_t stackCount)
-{
-	constexpr float PI = 3.14159265358979323846f;
-	constexpr float radius = 1.0f;
-
-	std::vector<glm::vec3> vertices;
-
-	vertices.reserve((stackCount + 1) * (sectorCount + 1));
-
-	float lengthInv = 1.0f / radius;
-	float sectorStep = 2.0f * PI / sectorCount;
-	float stackStep = PI / stackCount;
-
-	for (int32_t i = 0; i <= stackCount; ++i)
-	{
-		float stackAngle = PI / 2.0f - i * stackStep;
-
-		float xy = radius * std::cosf(stackAngle);
-		float z = radius * std::sinf(stackAngle);
-
-		for (int32_t j = 0; j <= sectorCount; ++j)
-		{
-			float sectorAngle = j * sectorStep;
-
-			float x = xy * std::cosf(sectorAngle);
-			float y = xy * std::sinf(sectorAngle);
-
-			vertices.emplace_back(x, y, z);
-		}
-	}
-
-	return vertices;
-}
-
-static std::vector<uint32_t> GenerateUVSphereIndices(int32_t sectorCount, int32_t stackCount)
-{
-	std::vector<uint32_t> indices{};
-	int32_t k1{};
-	int32_t k2{};
-
-	for (int32_t i = 0; i < stackCount; ++i)
-	{
-		k1 = i * (sectorCount + 1);
-		k2 = k1 + sectorCount + 1;
-
-		for (int32_t j = 0; j < sectorCount; ++j, ++k1, ++k2)
-		{
-			if (i != 0)
-			{
-				indices.push_back(k1);
-				indices.push_back(k2);
-				indices.push_back(k1 + 1);
-			}
-
-			if (i != (stackCount - 1))
-			{
-				indices.push_back(k1 + 1);
-				indices.push_back(k2);
-				indices.push_back(k2 + 1);
-			}
-		}
-	}
-
-	return indices;
-}
-
 void Renderer::Init()
 {
 	FUNC_PROFILE();
@@ -244,7 +179,7 @@ void Renderer::Init()
 	{
 		SCOPE_PROFILE("Sphere data init");
 
-		std::vector<glm::vec3> sphereVertices = GenerateUVSphereData(32, 32);
+		auto [sphereVertices, sphereIndices] = GenerateIcosahedronSphere();
 
 		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
 		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::vec3));
@@ -254,7 +189,6 @@ void Renderer::Init()
 
 		layout.Push<float>(3); // Position
 		
-		std::vector<uint32_t> sphereIndices = GenerateUVSphereIndices(32, 32);
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), (uint32_t)sphereIndices.size());
 
 		s_Data.SphereVertexArray->AddBuffers(s_Data.SphereVertexBuffer, ibo, layout);
