@@ -21,6 +21,7 @@ public:
 	void SetRotation(const glm::vec3& rotation);
 	void SetMass(float mass);
 	void SetTextureID(int32_t id);
+	void SetRelative(PlanetaryObject* other);
 
 	void SetVelocity(const glm::vec3& velocity);
 	void AddVelocity(const glm::vec3& addVelocity);
@@ -34,6 +35,9 @@ public:
 	inline float GetMinRadius()	    const { return glm::min(glm::min(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
 	inline float GetMaxRadius()	    const { return glm::max(glm::max(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
 	inline uint32_t GetEntityID()   const { return m_EntityID;  }
+
+	// Editor use only
+	inline PlanetaryObject* GetRelative() const { return m_EditorRelative; }
 	
 	inline static constexpr uint32_t MAX_PLANETS = 254;
 
@@ -45,4 +49,7 @@ private:
 	Material  m_Material;
 
 	uint32_t m_EntityID = 0;
+
+	// Editor use only
+	PlanetaryObject* m_EditorRelative = nullptr;
 };

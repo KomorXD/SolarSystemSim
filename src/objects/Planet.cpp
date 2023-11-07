@@ -57,6 +57,11 @@ void PlanetaryObject::SetTextureID(int32_t id)
 	m_Material.TextureID = id;
 }
 
+void PlanetaryObject::SetRelative(PlanetaryObject* other)
+{
+	m_EditorRelative = other;
+}
+
 void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
 {
 	m_Physics.LinearVelocity = velocity;
