@@ -195,11 +195,11 @@ void EditorLayer::RenderControlPanel()
 	ImGui::NewLine();
 
 	Camera& editorCam = m_Scene->m_Camera;
-	PlanetaryObject* planet = m_Scene->m_SelectedPlanet;
+	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
 
 	if (ImGui::Button("X view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
@@ -210,7 +210,7 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Y view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
@@ -221,11 +221,43 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Z view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			rotatePoint + glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
+	}
+	
+	if (selectedPlanet != nullptr)
+	{
+		ImGui::NewLine();
+		ImGui::BeginChild("PlanetsList", { ImGui::GetContentRegionAvail().x, 128.0f }, true);
+
+		if (ImGui::Selectable("None", selectedPlanet->GetRelative() == nullptr))
+		{
+			selectedPlanet->SetRelative(nullptr);
+		}
+		
+		for (size_t i = 0; i < m_Scene->m_Planets.size(); i++)
+		{
+			PlanetaryObject& planet = m_Scene->m_Planets[i];
+
+			if (&planet == selectedPlanet)
+			{
+				continue;
+			}
+
+			ImGui::PushID(i);
+
+			if (ImGui::Selectable(planet.GetTag().c_str(), &planet == selectedPlanet->GetRelative()))
+			{
+				selectedPlanet->SetRelative(&planet);
+			}
+
+			ImGui::PopID();
+		}
+
+		ImGui::EndChild();
 	}
 	
 	ImGui::NewLine();
