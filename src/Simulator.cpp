@@ -4,6 +4,7 @@
 
 #include <execution>
 #include <algorithm>
+#include <glm/gtx/norm.hpp>
 
 void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
 {
@@ -16,11 +17,11 @@ void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
 				return;
 			}
 
-			float distanceSquared = glm::distance2(planet.GetPosition(), other.GetPosition());
-			glm::vec3 dir = glm::normalize(other.GetPosition() - planet.GetPosition());
-			glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetMass() * other.GetMass() / distanceSquared;
+			float distanceSquared = glm::distance2(planet.GetTransform().Position, other.GetTransform().Position);
+			glm::vec3 dir = glm::normalize(other.GetTransform().Position - planet.GetTransform().Position);
+			glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
 
-			planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetMass());
+			planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetPhysics().Mass);
 		});
 	}
 }
@@ -43,7 +44,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryO
 	PlanetaryObject* targetCopy = &planetsCopy[copiedPlanetIdx];
 	
 	points.reserve(N);
-	points.emplace_back(targetCopy->GetPosition());
+	points.emplace_back(targetCopy->GetTransform().Position);
 
 	for (uint32_t i = 0; i < N * 10; i++)
 	{
@@ -56,7 +57,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryO
 
 		if (i % 10)
 		{
-			points.emplace_back(targetCopy->GetPosition());
+			points.emplace_back(targetCopy->GetTransform().Position);
 		}
 	}
 

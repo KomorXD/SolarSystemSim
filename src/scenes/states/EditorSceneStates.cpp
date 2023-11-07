@@ -118,11 +118,11 @@ void SettingVelocityState::OnUpdate(float ts)
 		m_ApproximatedPath = m_PathFuture.get();
 	}
 
-	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(m_TargetPlanet->GetPosition());
+	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(m_TargetPlanet->GetTransform().Position);
 	glm::vec2 mouseScreenPos = Input::GetMousePosition();
 	glm::vec3 mouseWorldPos = Renderer::ScreenToWorldCoords(mouseScreenPos, planetScreenPos.z);
 
-	m_Velocity = m_TargetPlanet->GetPosition() - mouseWorldPos;
+	m_Velocity = m_TargetPlanet->GetTransform().Position - mouseWorldPos;
 	m_TargetPlanet->SetVelocity(m_Velocity);
 }
 
@@ -140,7 +140,7 @@ void SettingVelocityState::OnRender()
 	Renderer::SceneBegin(*m_EditorCamera);
 	Renderer::SetLineWidth(2.0f);
 	Renderer::DisableDepth();
-	Renderer::DrawLine(m_TargetPlanet->GetPosition(), m_TargetPlanet->GetPosition() - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
+	Renderer::DrawLine(m_TargetPlanet->GetTransform().Position, m_TargetPlanet->GetTransform().Position - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 
 	for (uint32_t i = 1; i < m_ApproximatedPath.size(); i++)
 	{
@@ -155,7 +155,7 @@ PanderingState::PanderingState(EditorScene* scene, Camera* camera, PlanetaryObje
 {
 	glm::vec3 normalizedCameraForward = glm::normalize(camera->GetForwardDirection());
 
-	m_TargetPos = targetPlanet->GetPosition() - normalizedCameraForward * 6.0f * targetPlanet->GetRadius();
+	m_TargetPos = targetPlanet->GetTransform().Position - normalizedCameraForward * 6.0f * targetPlanet->GetMaxRadius();
 	m_DeltaMove = m_TargetPos - camera->GetPosition();
 }
 

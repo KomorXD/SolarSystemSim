@@ -6,6 +6,9 @@
 #include <vector>
 #include <future>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 class EditorScene;
 
 class NewPlanetState : public SceneState

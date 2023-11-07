@@ -115,7 +115,7 @@ void EditorLayer::RenderImGuizmo()
 
 	const glm::mat4& cameraProj = editorCamera.GetProjection();
 	glm::mat4 cameraView = editorCamera.GetViewMatrix();
-	glm::mat4 planetTransform = selectedPlanet->GetTransform();
+	glm::mat4 planetTransform = selectedPlanet->GetTransform().Matrix();
 
 	bool doSnap = Input::IsKeyPressed(Key::LeftControl);
 	float snapStep = m_GizmoMode == ImGuizmo::ROTATE ? 45.0f : 0.5f;
@@ -135,10 +135,10 @@ void EditorLayer::RenderImGuizmo()
 
 		Math::TransformDecompose(planetTransform, translation, rotation, scale);
 
-		glm::vec3 deltaRotation = rotation - selectedPlanet->GetRotation();
+		glm::vec3 deltaRotation = rotation - selectedPlanet->GetTransform().Rotation;
 
 		selectedPlanet->SetPosition(translation);
-		selectedPlanet->SetRotation(selectedPlanet->GetRotation() + deltaRotation);
+		selectedPlanet->SetRotation(selectedPlanet->GetTransform().Rotation + deltaRotation);
 		selectedPlanet->SetScale(scale);
 	}
 }
@@ -199,7 +199,7 @@ void EditorLayer::RenderControlPanel()
 
 	if (ImGui::Button("X view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
@@ -210,7 +210,7 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Y view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
@@ -221,7 +221,7 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("Z view"))
 	{
-		glm::vec3 rotatePoint = planet ? planet->GetPosition() : glm::vec3(0.0f);
+		glm::vec3 rotatePoint = planet ? planet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
 
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,

@@ -4,10 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
-#include "../renderer/Material.hpp"
+#include "../objects/Components.hpp"
 
 class PlanetaryObject
 {
@@ -30,36 +27,22 @@ public:
 
 	void OnConfigRender();
 
-	inline std::string GetTag() const	 { return m_Tag; }
-	inline glm::vec3 GetPosition() const { return m_Position; }
-	inline glm::vec3 GetRotation() const { return m_Rotation; }
-	inline glm::vec3 GetScale()	   const { return m_Scale;	  }
-	inline Material GetMaterial()  const { return m_Material; }
-	inline float GetRadius()	   const { return m_Radius;   }
-	inline float GetMass()		   const { return m_Mass;	  }
-	inline uint32_t GetEntityID()  const { return m_EntityID; }
-
-	inline glm::mat4 GetTransform() const
-	{
-		return glm::translate(glm::mat4(1.0f), m_Position) 
-			* glm::scale(glm::mat4(1.0f), m_Scale)
-			* glm::toMat4(glm::quat(m_Rotation));
-	}
-
+	inline std::string GetTag()     const { return m_Tag;		}
+	inline Transform GetTransform() const { return m_Transform; }
+	inline Physics GetPhysics()     const { return m_Physics;   }
+	inline Material GetMaterial()   const { return m_Material;  }
+	inline float GetMinRadius()	    const { return glm::min(glm::min(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
+	inline float GetMaxRadius()	    const { return glm::max(glm::max(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
+	inline uint32_t GetEntityID()   const { return m_EntityID;  }
+	
 	inline static constexpr uint32_t MAX_PLANETS = 254;
 
 private:
 	std::string m_Tag;
-
-	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_Rotation = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 m_Scale	 = { 1.0f, 1.0f, 1.0f };
-	glm::vec3 m_Velocity	 = { 0.0f, 0.0f, 0.0f };
-
-	Material m_Material;
-
-	float m_Radius = 1.0f;
-	float m_Mass   = 1.0f;
+	
+	Transform m_Transform;
+	Physics   m_Physics;
+	Material  m_Material;
 
 	uint32_t m_EntityID = 0;
 };
