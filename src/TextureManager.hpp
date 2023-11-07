@@ -21,7 +21,7 @@ public:
 	static void Init();
 	static void BindAtlas(uint32_t slot = 0);
 
-	static TextureInfo AddTexture(const std::string& path);
+	static std::optional<TextureInfo> AddTexture(const std::string& path);
 
 	static std::optional<TextureInfo> GetTexture(const std::string& path);
 	static std::optional<TextureInfo> GetTexture(uint32_t id);

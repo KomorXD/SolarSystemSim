@@ -83,48 +83,8 @@ void PlanetaryObject::OnConfigRender()
 	m_Physics.OnImGuiRender();
 	ImGui::NewLine();
 	
-	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
-	{
-		ImGui::Indent(16.0f);
-		ImGui::ColorEdit4("Color", glm::value_ptr(m_Material.Color));
-		ImGui::DragFloat("Shininess Color", &m_Material.Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
-
-		TextureInfo tex = TextureManager::GetTexture(m_Material.TextureID).value();
-		float ratio = tex.Size.y / tex.Size.x;
-
-		ImGui::Text("Texture");
-		ImGui::InputText("##TexturePath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
-		float sizeY = ImGui::GetItemRectSize().y;
-		ImGui::SameLine();
-
-		if (ImGui::Button("...", ImVec2(sizeY, sizeY)))
-		{
-			ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
-				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
-		}
-
-		if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
-		{
-			if (ImGuiFileDialog::Instance()->IsOk())
-			{
-				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
-
-				if (res.has_value())
-				{
-					m_Material.TextureID = res.value().TextureID;
-				}
-			}
-
-			ImGuiFileDialog::Instance()->Close();
-		}
-
-		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
-			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
-
-		ImGui::Unindent(16.0f);
-		ImGui::NewLine();
-	}
+	m_Material.OnImGuiRender();
+	ImGui::NewLine();
 	
 	ImGui::EndChild();
 }

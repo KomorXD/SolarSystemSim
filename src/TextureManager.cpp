@@ -50,7 +50,7 @@ void TextureManager::BindAtlas(uint32_t slot)
 	s_Atlas->Bind(slot);
 }
 
-TextureInfo TextureManager::AddTexture(const std::string& path)
+std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 {
 	auto texItr = std::find_if(s_Textures.begin(), s_Textures.end(), [&](const TextureInfo& tex) { return tex.Path == path; });
 
@@ -62,6 +62,11 @@ TextureInfo TextureManager::AddTexture(const std::string& path)
 	stbi_set_flip_vertically_on_load(0);
 	int32_t width{}, height{}, bpp{};
 	uint8_t* buffer = stbi_load(path.c_str(), &width, &height, &bpp, 4);
+
+	if (buffer == nullptr)
+	{
+		return {};
+	}
 
 	// ===
 	stbrp_rect texRect{};

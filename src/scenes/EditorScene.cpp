@@ -45,7 +45,7 @@ EditorScene::EditorScene()
 	};
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
-	TextureInfo ti = TextureManager::AddTexture("res/textures/earf.jpg");
+	TextureInfo ti = TextureManager::AddTexture("res/textures/earf.jpg").value();
 
 	m_Planets.emplace_back(glm::vec3(0.0f));
 	m_Planets[0].SetMass(1000000.0f);
