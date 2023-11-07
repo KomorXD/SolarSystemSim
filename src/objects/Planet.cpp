@@ -2,6 +2,7 @@
 #include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
+#include <imgui_dialog/ImGuiFileDialog.h>
 #include <glm/gtc/type_ptr.hpp>
 
 static uint32_t s_IdCounter = 1;
@@ -110,9 +111,26 @@ void PlanetaryObject::OnConfigRender()
 		float sizeY = ImGui::GetItemRectSize().y;
 		ImGui::SameLine();
 
-		if(ImGui::Button("...", ImVec2(sizeY, sizeY)))
+		if (ImGui::Button("...", ImVec2(sizeY, sizeY)))
 		{
-			printf("boooo\n");
+			ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
+				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+		}
+
+		if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+		{
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
+
+				if (res.has_value())
+				{
+					m_Material.TextureID = res.value().TextureID;
+				}
+			}
+
+			ImGuiFileDialog::Instance()->Close();
 		}
 
 		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
