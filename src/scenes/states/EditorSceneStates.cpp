@@ -105,7 +105,9 @@ void SettingVelocityState::OnEvent(Event& ev)
 
 	if (ev.Type == Event::MouseMoved && !m_PathFuture.valid())
 	{
-		m_PathFuture = std::async(std::launch::async, SimPhysics::ApproximateNextNPoints, std::ref(m_ParentScene->GetPlanetsRef()), m_TargetPlanet, 1024);
+		m_PathFuture = std::async(std::launch::async, 
+			m_TargetPlanet->GetRelative() == nullptr ? SimPhysics::ApproximateNextNPoints : SimPhysics::ApproximateRelativeNextNPoints, 
+			std::ref(m_ParentScene->GetPlanetsRef()), m_TargetPlanet, 1024);
 	}
 }
 
@@ -142,9 +144,21 @@ void SettingVelocityState::OnRender()
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetTransform().Position, m_TargetPlanet->GetTransform().Position - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	for (uint32_t i = 1; i < m_ApproximatedPath.size(); i++)
+	if (PlanetaryObject* parent = m_TargetPlanet->GetRelative())
 	{
-		Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
+		glm::vec3 parentPos = parent->GetTransform().Position;
+
+		for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
+		{
+			Renderer::DrawLine(parentPos + m_ApproximatedPath[i - 1], parentPos + m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
+		}
+	}
+	else
+	{
+		for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
+		{
+			Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
+		}
 	}
 
 	Renderer::SceneEnd();
