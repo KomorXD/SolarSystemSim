@@ -325,6 +325,8 @@ void EditorScene::DrawGridPlane()
 {
 	constexpr float distance = 400.0f;
 	constexpr glm::vec4 lineColor(glm::vec3(0.22f), 1.0f);
+	constexpr glm::vec4 darkLineColor(glm::vec3(0.11f), 1.0f);
+	constexpr glm::vec4 mainAxisLineColor(0.98f, 0.24f, 0.0f, 1.0f);
 	
 	glm::vec3 cameraPos = m_Camera.GetPosition();
 	int32_t xOffset = cameraPos.x / 4;
@@ -335,13 +337,17 @@ void EditorScene::DrawGridPlane()
 
 	for (float x = -distance + xOffset * 4.0f; x <= distance + xOffset * 4.0f; x += 4.0f)
 	{
-		Renderer::DrawLine({ x, 0.0f, -distance + zOffset * 4.0f }, { x, 0.0f, distance + zOffset * 4.0f },
-			x == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
+		glm::vec4 color = (x == 0.0f ? mainAxisLineColor : ((int32_t)x % 10 == 0 ? darkLineColor : lineColor ));
+
+		Renderer::DrawLine({ x, 0.0f, -distance + zOffset * 4.0f }, 
+			{ x, 0.0f, distance + zOffset * 4.0f }, color);
 	}
 
 	for (float z = -distance + zOffset * 4.0f; z <= distance + zOffset * 4.0f; z += 4.0f)
 	{
-		Renderer::DrawLine({ -distance + xOffset * 4.0f, 0.0f, z }, { distance + xOffset * 4.0f, 0.0f, z },
-			z == 0.0f ? glm::vec4(0.98f, 0.24f, 0.0f, 1.0f) : lineColor);
+		glm::vec4 color = (z == 0.0f ? mainAxisLineColor : ((int32_t)z % 10 == 0 ? darkLineColor : lineColor));
+
+		Renderer::DrawLine({ -distance + xOffset * 4.0f, 0.0f, z }, 
+			{ distance + xOffset * 4.0f, 0.0f, z }, color);
 	}
 }
