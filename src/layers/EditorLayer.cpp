@@ -231,13 +231,31 @@ void EditorLayer::RenderControlPanel()
 	if (selectedPlanet != nullptr)
 	{
 		ImGui::NewLine();
-		ImGui::BeginChild("PlanetsList", { ImGui::GetContentRegionAvail().x, 128.0f }, true);
+		RenderPlanetsCombo();
+	}
+	
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::NewLine();
+
+	RenderEntityData();
+
+	ImGui::End();
+}
+
+void EditorLayer::RenderPlanetsCombo()
+{
+	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
+
+	if (ImGui::BeginCombo("Relative planet",
+		selectedPlanet->GetRelative() != nullptr ? selectedPlanet->GetRelative()->GetTag().c_str() : "None"))
+	{
 
 		if (ImGui::Selectable("None", selectedPlanet->GetRelative() == nullptr))
 		{
 			selectedPlanet->SetRelative(nullptr);
 		}
-		
+
 		for (size_t i = 0; i < m_Scene->m_Planets.size(); i++)
 		{
 			PlanetaryObject& planet = m_Scene->m_Planets[i];
@@ -257,16 +275,8 @@ void EditorLayer::RenderControlPanel()
 			ImGui::PopID();
 		}
 
-		ImGui::EndChild();
+		ImGui::EndCombo();
 	}
-	
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
-
-	RenderEntityData();
-
-	ImGui::End();
 }
 
 void EditorLayer::RenderEntityData()

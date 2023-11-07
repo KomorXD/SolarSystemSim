@@ -20,6 +20,7 @@ private:
 	void RenderViewport();
 	void RenderImGuizmo();
 	void RenderControlPanel();
+	void RenderPlanetsCombo();
 	void RenderEntityData();
 
 	std::unique_ptr<EditorScene> m_Scene;
