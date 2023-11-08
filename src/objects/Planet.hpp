@@ -24,7 +24,7 @@ public:
 	void SetVelocity(const glm::vec3& velocity);
 	void AddVelocity(const glm::vec3& addVelocity);
 
-	void OnConfigRender();
+	virtual void OnConfigRender();
 
 	inline std::string GetTag()     const { return m_Tag;		}
 	inline Transform GetTransform() const { return m_Transform; }
