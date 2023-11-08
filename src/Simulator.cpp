@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <glm/gtx/norm.hpp>
 
-void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
+void SimPhysics::ProgressAllOneStep(std::vector<Planet>& planets)
 {
 	for (auto& planet : planets)
 	{
-		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](PlanetaryObject& other)
+		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](Planet& other)
 		{
 			if (&other == &planet)
 			{
@@ -26,10 +26,10 @@ void SimPhysics::ProgressAllOneStep(std::vector<PlanetaryObject>& planets)
 	}
 }
 
-std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryObject>& planets, PlanetaryObject* target, uint32_t N)
+std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<Planet>& planets, Planet* target, uint32_t N)
 {
 	std::vector<glm::vec3> points;
-	std::vector<PlanetaryObject> planetsCopy = planets;
+	std::vector<Planet> planetsCopy = planets;
 	
 	size_t copiedPlanetIdx{};
 	for (size_t i = 0; i < planets.size(); i++)
@@ -41,7 +41,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryO
 		}
 	}
 
-	PlanetaryObject* targetCopy = &planetsCopy[copiedPlanetIdx];
+	Planet* targetCopy = &planetsCopy[copiedPlanetIdx];
 	
 	points.reserve(N);
 	points.emplace_back(targetCopy->GetTransform().Position);
@@ -64,9 +64,9 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<PlanetaryO
 	return points;
 }
 
-std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<PlanetaryObject>& planets, PlanetaryObject* target, uint32_t N)
+std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Planet>& planets, Planet* target, uint32_t N)
 {
-	PlanetaryObject* parent = target->GetRelative();
+	Planet* parent = target->GetRelative();
 
 	if (parent == nullptr)
 	{
@@ -74,7 +74,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Pl
 	}
 
 	std::vector<glm::vec3> relToPlanetVectors;
-	std::vector<PlanetaryObject> planetsCopy = planets;
+	std::vector<Planet> planetsCopy = planets;
 			 
 	size_t copiedPlanetIdx{};
 	size_t copiedParentIdx{};
@@ -90,8 +90,8 @@ std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Pl
 		}
 	}		 
 			 
-	PlanetaryObject* targetCopy = &planetsCopy[copiedPlanetIdx];
-	PlanetaryObject* targetRelCopy = &planetsCopy[copiedParentIdx];
+	Planet* targetCopy = &planetsCopy[copiedPlanetIdx];
+	Planet* targetRelCopy = &planetsCopy[copiedParentIdx];
 			 
 	relToPlanetVectors.reserve(N);
 	relToPlanetVectors.emplace_back(targetCopy->GetTransform().Position - targetRelCopy->GetTransform().Position);
