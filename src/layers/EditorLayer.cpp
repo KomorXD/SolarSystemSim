@@ -104,7 +104,7 @@ void EditorLayer::RenderImGuizmo()
 		return;
 	}
 
-	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
+	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
 	Camera& editorCamera = m_Scene->m_Camera;
 
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
@@ -195,7 +195,7 @@ void EditorLayer::RenderControlPanel()
 	ImGui::NewLine();
 
 	Camera& editorCam = m_Scene->m_Camera;
-	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
+	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
 
 	if (ImGui::Button("X view"))
 	{
@@ -245,7 +245,7 @@ void EditorLayer::RenderControlPanel()
 
 void EditorLayer::RenderPlanetsCombo()
 {
-	PlanetaryObject* selectedPlanet = m_Scene->m_SelectedPlanet;
+	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
 
 	if (ImGui::BeginCombo("Relative planet",
 		selectedPlanet->GetRelative() != nullptr ? selectedPlanet->GetRelative()->GetTag().c_str() : "None"))
@@ -258,7 +258,7 @@ void EditorLayer::RenderPlanetsCombo()
 
 		for (size_t i = 0; i < m_Scene->m_Planets.size(); i++)
 		{
-			PlanetaryObject& planet = m_Scene->m_Planets[i];
+			Planet& planet = m_Scene->m_Planets[i];
 
 			if (&planet == selectedPlanet)
 			{

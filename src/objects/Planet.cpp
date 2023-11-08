@@ -7,7 +7,7 @@
 
 static uint32_t s_IdCounter = 1;
 
-PlanetaryObject::PlanetaryObject(const glm::vec3& position)
+Planet::Planet(const glm::vec3& position)
 {
 	m_EntityID = s_IdCounter;
 	m_Tag.reserve(24);
@@ -17,62 +17,57 @@ PlanetaryObject::PlanetaryObject(const glm::vec3& position)
 	m_Transform.Position = position;
 }
 
-void PlanetaryObject::OnUpdate(float ts)
+void Planet::OnUpdate(float ts)
 {
 	m_Transform.Position += m_Physics.LinearVelocity * ts;
 }
 
-void PlanetaryObject::Move(const glm::vec3& offset)
-{
-	m_Transform.Position += offset;
-}
-
-void PlanetaryObject::SetPosition(const glm::vec3& position)
+void Planet::SetPosition(const glm::vec3& position)
 {
 	m_Transform.Position = position;
 }
 
-void PlanetaryObject::SetScale(const glm::vec3& scale)
+void Planet::SetScale(const glm::vec3& scale)
 {
 	m_Transform.Scale = scale;
 }
 
-void PlanetaryObject::SetRadius(float radius)
+void Planet::SetRadius(float radius)
 {
 	m_Transform.Scale = glm::vec3(radius);
 }
 
-void PlanetaryObject::SetRotation(const glm::vec3& rotation)
+void Planet::SetRotation(const glm::vec3& rotation)
 {
 	m_Transform.Rotation = rotation;
 }
 
-void PlanetaryObject::SetMass(float mass)
+void Planet::SetMass(float mass)
 {
 	m_Physics.Mass = mass;
 }
 
-void PlanetaryObject::SetTextureID(int32_t id)
+void Planet::SetTextureID(int32_t id)
 {
 	m_Material.TextureID = id;
 }
 
-void PlanetaryObject::SetRelative(PlanetaryObject* other)
+void Planet::SetRelative(Planet* other)
 {
 	m_EditorRelative = other;
 }
 
-void PlanetaryObject::SetVelocity(const glm::vec3& velocity)
+void Planet::SetVelocity(const glm::vec3& velocity)
 {
 	m_Physics.LinearVelocity = velocity;
 }
 
-void PlanetaryObject::AddVelocity(const glm::vec3& addVelocity)
+void Planet::AddVelocity(const glm::vec3& addVelocity)
 {
 	m_Physics.LinearVelocity += addVelocity;
 }
 
-void PlanetaryObject::OnConfigRender()
+void Planet::OnConfigRender()
 {
 	ImGui::BeginChild("Sphere settings");
 

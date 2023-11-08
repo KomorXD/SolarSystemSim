@@ -6,14 +6,12 @@
 
 #include "../objects/Components.hpp"
 
-class PlanetaryObject
+class Planet
 {
 public:
-	PlanetaryObject(const glm::vec3& position);
+	Planet(const glm::vec3& position);
 
 	void OnUpdate(float ts);
-
-	void Move(const glm::vec3& offset);
 	
 	void SetPosition(const glm::vec3& position);
 	void SetScale(const glm::vec3& scale);
@@ -21,7 +19,7 @@ public:
 	void SetRotation(const glm::vec3& rotation);
 	void SetMass(float mass);
 	void SetTextureID(int32_t id);
-	void SetRelative(PlanetaryObject* other);
+	void SetRelative(Planet* other);
 
 	void SetVelocity(const glm::vec3& velocity);
 	void AddVelocity(const glm::vec3& addVelocity);
@@ -37,11 +35,11 @@ public:
 	inline uint32_t GetEntityID()   const { return m_EntityID;  }
 
 	// Editor use only
-	inline PlanetaryObject* GetRelative() const { return m_EditorRelative; }
+	inline Planet* GetRelative() const { return m_EditorRelative; }
 	
 	inline static constexpr uint32_t MAX_PLANETS = 254;
 
-private:
+protected:
 	std::string m_Tag;
 	
 	Transform m_Transform;
@@ -51,5 +49,5 @@ private:
 	uint32_t m_EntityID = 0;
 
 	// Editor use only
-	PlanetaryObject* m_EditorRelative = nullptr;
+	Planet* m_EditorRelative = nullptr;
 };
