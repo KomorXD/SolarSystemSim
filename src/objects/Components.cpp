@@ -83,3 +83,14 @@ void Material::OnImGuiRender()
 		ImGui::Unindent(16.0f);
 	}
 }
+
+void PointLight::OnImGuiRender()
+{
+	if (ImGui::CollapsingHeader("Point light", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent(16.0f);
+		ImGui::ColorEdit4("Light color", glm::value_ptr(Color));
+		ImGui::DragFloat("Intensity", &Intensity, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::Unindent(16.0f);
+	}
+}

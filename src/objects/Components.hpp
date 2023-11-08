@@ -29,3 +29,11 @@ struct Material
 
 	void OnImGuiRender();
 };
+
+struct PointLight
+{
+	glm::vec4 Color;
+	float Intensity = 1.0f;
+
+	void OnImGuiRender();
+};
