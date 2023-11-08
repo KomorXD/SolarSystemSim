@@ -175,6 +175,11 @@ void EditorScene::OnUpdate(float ts)
 	{
 		planet.OnUpdate(ts);
 	}
+
+	for (auto& sun : m_Suns)
+	{
+		sun.OnUpdate(ts);
+	}
 }
 
 void EditorScene::OnTick()
@@ -189,7 +194,7 @@ void EditorScene::OnTick()
 		return;
 	}
 
-	SimPhysics::ProgressAllOneStep(m_Planets);
+	SimPhysics::ProgressAllOneStep(m_Planets, m_Suns);
 }
 
 void EditorScene::OnRender()

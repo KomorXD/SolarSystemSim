@@ -281,6 +281,25 @@ void EditorLayer::RenderPlanetsCombo()
 			ImGui::PopID();
 		}
 
+		for (size_t i = 0; i < m_Scene->m_Suns.size(); i++)
+		{
+			Planet& sun = m_Scene->m_Suns[i];
+
+			if (&sun == selectedPlanet)
+			{
+				continue;
+			}
+
+			ImGui::PushID(i);
+
+			if (ImGui::Selectable(sun.GetTag().c_str(), &sun == selectedPlanet->GetRelative()))
+			{
+				selectedPlanet->SetRelative(&sun);
+			}
+
+			ImGui::PopID();
+		}
+
 		ImGui::EndCombo();
 	}
 }

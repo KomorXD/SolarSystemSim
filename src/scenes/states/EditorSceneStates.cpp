@@ -107,7 +107,7 @@ void SettingVelocityState::OnEvent(Event& ev)
 	{
 		m_PathFuture = std::async(std::launch::async, 
 			m_TargetPlanet->GetRelative() == nullptr ? SimPhysics::ApproximateNextNPoints : SimPhysics::ApproximateRelativeNextNPoints, 
-			std::ref(m_ParentScene->GetPlanetsRef()), m_TargetPlanet, 1024);
+			std::ref(m_ParentScene->GetPlanetsRef()), std::ref(m_ParentScene->GetSunsRef()), m_TargetPlanet, 1024);
 	}
 }
 

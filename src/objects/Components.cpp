@@ -77,8 +77,11 @@ void Material::OnImGuiRender()
 			ImGuiFileDialog::Instance()->Close();
 		}
 
-		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
-			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+		if (TextureID != 1)
+		{
+			ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
+				ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+		}
 
 		ImGui::Unindent(16.0f);
 	}

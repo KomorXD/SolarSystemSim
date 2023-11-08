@@ -6,56 +6,117 @@
 #include <algorithm>
 #include <glm/gtx/norm.hpp>
 
-void SimPhysics::ProgressAllOneStep(std::vector<Planet>& planets)
+void SimPhysics::ProgressAllOneStep(std::vector<Planet>& planets, std::vector<SunPlanet>& suns)
 {
 	for (auto& planet : planets)
 	{
-		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](Planet& other)
-		{
-			if (&other == &planet)
+			std::for_each(std::execution::par, planets.begin(), planets.end(), [&](Planet& other)
 			{
-				return;
-			}
+				if (&other == &planet)
+				{
+					return;
+				}
 
-			float distanceSquared = glm::distance2(planet.GetTransform().Position, other.GetTransform().Position);
-			glm::vec3 dir = glm::normalize(other.GetTransform().Position - planet.GetTransform().Position);
-			glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
+				float distanceSquared = glm::distance2(planet.GetTransform().Position, other.GetTransform().Position);
+				glm::vec3 dir = glm::normalize(other.GetTransform().Position - planet.GetTransform().Position);
+				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
 
-			planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetPhysics().Mass);
-		});
+				planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetPhysics().Mass);
+			});
+
+		std::for_each(std::execution::par, suns.begin(), suns.end(), [&](SunPlanet& other)
+			{
+				if (&other == &planet)
+				{
+					return;
+				}
+
+				float distanceSquared = glm::distance2(planet.GetTransform().Position, other.GetTransform().Position);
+				glm::vec3 dir = glm::normalize(other.GetTransform().Position - planet.GetTransform().Position);
+				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
+
+				planet.AddVelocity(Application::TPS_STEP * addAccel / planet.GetPhysics().Mass);
+			});
 	}
-}
 
-std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<Planet>& planets, Planet* target, uint32_t N)
+	for (auto& sun : suns)
+	{				  
+		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](Planet& other)
+			{		  
+				if (&other == &sun)
+				{	  
+					return;
+				}	  
+					  
+				float distanceSquared = glm::distance2(sun.GetTransform().Position, other.GetTransform().Position);
+				glm::vec3 dir = glm::normalize(other.GetTransform().Position - sun.GetTransform().Position);
+				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * sun.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
+					  
+				sun.AddVelocity(Application::TPS_STEP * addAccel / sun.GetPhysics().Mass);
+			});		  
+					  
+		std::for_each(std::execution::par, suns.begin(), suns.end(), [&](SunPlanet& other)
+			{		  
+				if (&other == &sun)
+				{	  
+					return;
+				}	  
+					  
+				float distanceSquared = glm::distance2(sun.GetTransform().Position, other.GetTransform().Position);
+				glm::vec3 dir = glm::normalize(other.GetTransform().Position - sun.GetTransform().Position);
+				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * sun.GetPhysics().Mass * other.GetPhysics().Mass / distanceSquared;
+					  
+				sun.AddVelocity(Application::TPS_STEP * addAccel / sun.GetPhysics().Mass);
+			});		  
+	}				  
+}					  
+
+std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<Planet>& planets, std::vector<SunPlanet>& suns, Planet* target, uint32_t N)
 {
 	std::vector<glm::vec3> points;
 	std::vector<Planet> planetsCopy = planets;
+	std::vector<SunPlanet> sunsCopy = suns;
+	Planet* targetCopy = nullptr;
 	
-	size_t copiedPlanetIdx{};
 	for (size_t i = 0; i < planets.size(); i++)
 	{
 		if (&planets[i] == target)
 		{
-			copiedPlanetIdx = i;
+			targetCopy = &planetsCopy[i];
 			break;
 		}
 	}
 
-	Planet* targetCopy = &planetsCopy[copiedPlanetIdx];
+	if (targetCopy == nullptr)
+	{
+		for (size_t i = 0; i < suns.size(); i++)
+		{
+			if (&suns[i] == target)
+			{
+				targetCopy = &sunsCopy[i];
+				break;
+			}
+		}
+	}
 	
 	points.reserve(N);
 	points.emplace_back(targetCopy->GetTransform().Position);
 
 	for (uint32_t i = 0; i < N * 10; i++)
 	{
-		ProgressAllOneStep(planetsCopy);
+		ProgressAllOneStep(planetsCopy, sunsCopy);
 
 		for (auto& planet : planetsCopy)
 		{
 			planet.OnUpdate(Application::TPS_STEP);
 		}
 
-		if (i % 10)
+		for (auto& sun : sunsCopy)
+		{
+			sun.OnUpdate(Application::TPS_STEP);
+		}
+
+		if (i % 2 == 0)
 		{
 			points.emplace_back(targetCopy->GetTransform().Position);
 		}
@@ -64,7 +125,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<Planet>& p
 	return points;
 }
 
-std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Planet>& planets, Planet* target, uint32_t N)
+std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Planet>& planets, std::vector<SunPlanet>& suns, Planet* target, uint32_t N)
 {
 	Planet* parent = target->GetRelative();
 
@@ -75,37 +136,56 @@ std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<Pl
 
 	std::vector<glm::vec3> relToPlanetVectors;
 	std::vector<Planet> planetsCopy = planets;
-			 
-	size_t copiedPlanetIdx{};
-	size_t copiedParentIdx{};
+	std::vector<SunPlanet> sunsCopy = suns;
+
+	Planet* targetCopy = nullptr;
+	Planet* targetRelCopy = nullptr;
+
 	for (size_t i = 0; i < planets.size(); i++)
-	{		 
+	{
 		if (&planets[i] == target)
 		{
-			copiedPlanetIdx = i;
+			targetCopy = &planetsCopy[i];
 		}
 		else if (&planets[i] == parent)
 		{
-			copiedParentIdx = i;
+			targetRelCopy = &planetsCopy[i];
 		}
-	}		 
-			 
-	Planet* targetCopy = &planetsCopy[copiedPlanetIdx];
-	Planet* targetRelCopy = &planetsCopy[copiedParentIdx];
-			 
+	}
+	
+	if (targetCopy == nullptr || targetRelCopy == nullptr)
+	{
+		for (size_t i = 0; i < suns.size(); i++)
+		{
+			if (&suns[i] == target)
+			{
+				targetCopy = &sunsCopy[i];
+			}
+			else if (&suns[i] == parent)
+			{
+				targetRelCopy = &sunsCopy[i];
+			}
+		}
+	}
+	
 	relToPlanetVectors.reserve(N);
 	relToPlanetVectors.emplace_back(targetCopy->GetTransform().Position - targetRelCopy->GetTransform().Position);
 			 
 	for (uint32_t i = 0; i < N * 10; i++)
 	{
-		ProgressAllOneStep(planetsCopy);
+		ProgressAllOneStep(planetsCopy, sunsCopy);
 
 		for (auto& planet : planetsCopy)
 		{
 			planet.OnUpdate(Application::TPS_STEP);
 		}
 
-		if (i % 10)
+		for (auto& sun : sunsCopy)
+		{
+			sun.OnUpdate(Application::TPS_STEP);
+		}
+
+		if (i % 2 == 0)
 		{
 			relToPlanetVectors.emplace_back(targetCopy->GetTransform().Position - targetRelCopy->GetTransform().Position);
 		}
