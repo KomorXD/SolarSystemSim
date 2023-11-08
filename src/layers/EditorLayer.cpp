@@ -176,7 +176,13 @@ void EditorLayer::RenderControlPanel()
 	if (ImGui::Button("New planet"))
 	{
 		m_Scene->m_SelectedPlanet = &m_Scene->m_Planets.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
+		// m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
+	}
+	
+	if (ImGui::Button("New sun"))
+	{
+		m_Scene->m_SelectedPlanet = &m_Scene->m_Suns.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
+		// m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
 	}
 	
 	ImGui::Checkbox("Show grid", &m_Scene->m_RenderGrid);

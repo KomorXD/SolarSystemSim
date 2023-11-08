@@ -14,7 +14,7 @@ class EditorScene;
 class NewPlanetState : public SceneState
 {
 public:
-	NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet);
+	NewPlanetState(EditorScene* scene, Planet* newPlanet);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
@@ -22,7 +22,7 @@ public:
 	virtual void OnRender()			override;
 
 private:
-	PlanetaryObject* m_NewPlanet = nullptr;
+	Planet* m_NewPlanet = nullptr;
 	float m_Depth = 0.97f;
 
 	EditorScene* m_ParentScene = nullptr;
@@ -49,7 +49,7 @@ private:
 class SettingVelocityState : public SceneState
 {
 public:
-	SettingVelocityState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet);
+	SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
@@ -61,7 +61,7 @@ private:
 	std::vector<glm::vec3> m_ApproximatedPath;
 	std::future<std::vector<glm::vec3>> m_PathFuture;
 
-	PlanetaryObject* m_TargetPlanet = nullptr;
+	Planet* m_TargetPlanet = nullptr;
 
 	Camera* m_EditorCamera = nullptr;
 	EditorScene* m_ParentScene = nullptr;
@@ -70,7 +70,7 @@ private:
 class PanderingState : public SceneState
 {
 public:
-	PanderingState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet);
+	PanderingState(EditorScene* scene, Camera* camera, Planet* targetPlanet);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;

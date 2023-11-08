@@ -1,7 +1,7 @@
 #include "Scene.hpp"
 #include "../OpenGL.hpp"
 #include "../renderer/Camera.hpp"
-#include "../objects/Planet.hpp"
+#include "../objects/SunPlanet.hpp"
 #include "states/SceneState.hpp"
 
 #include <memory>
@@ -22,8 +22,8 @@ public:
 	
 	virtual uint32_t GetFramebufferTextureID() const override;
 
-	inline std::vector<PlanetaryObject>& GetPlanetsRef() { return m_Planets; }
-	inline std::vector<PlanetaryObject> GetPlanetsCopy() const { return m_Planets; }
+	inline std::vector<Planet>& GetPlanetsRef() { return m_Planets; }
+	inline std::vector<Planet> GetPlanetsCopy() const { return m_Planets; }
 
 	void CancelState();
 
@@ -33,8 +33,9 @@ private:
 
 	std::unique_ptr<SceneState> m_ActiveState;
 
-	std::vector<PlanetaryObject> m_Planets;
-	PlanetaryObject* m_SelectedPlanet = nullptr;
+	std::vector<Planet> m_Planets;
+	std::vector<SunPlanet> m_Suns;
+	Planet* m_SelectedPlanet = nullptr;
 
 	Camera m_Camera;
 

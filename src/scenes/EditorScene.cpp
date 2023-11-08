@@ -54,7 +54,6 @@ EditorScene::EditorScene()
 
 	m_Planets.emplace_back(glm::vec3(30.0f, 0.0f, 0.0f));
 	m_Planets[1].SetMass(10000.0f);
-	
 	m_Planets[1].SetTextureID(ti.TextureID);
 
 	LOG_INFO("EditorScene initialized.");
@@ -237,6 +236,18 @@ void EditorScene::OnRender()
 		Renderer::SubmitSphereInstanced(planet.GetTransform().Matrix() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, planet.GetMaterial().Color.a));
 	}
 
+	for (auto& sun : m_Suns)
+	{
+		if (glm::distance(sun.GetTransform().Position, m_Camera.GetPosition()) <= sun.GetMinRadius() * 1.06f)
+		{
+			continue;
+		}
+
+		glm::vec3 color = &sun == m_SelectedPlanet ? glm::vec3(0.98f, 0.24f, 0.0f) : glm::vec3(0.0f);
+
+		Renderer::SubmitSphereInstanced(sun.GetTransform().Matrix() * glm::scale(glm::mat4(1.0f), glm::vec3(1.05f)), glm::vec4(color, sun.GetMaterial().Color.a));
+	}
+
 	Renderer::SceneEnd();
 	
 	// Draw shaded spheres
@@ -247,6 +258,11 @@ void EditorScene::OnRender()
 	for (auto& planet : m_Planets)
 	{
 		Renderer::SubmitSphereInstanced(planet.GetTransform().Matrix(), planet.GetMaterial());
+	}
+
+	for (auto& sun : m_Suns)
+	{
+		Renderer::SubmitSphereInstanced(sun.GetTransform().Matrix(), sun.GetMaterial());
 	}
 
 	Renderer::SceneEnd();
@@ -283,7 +299,7 @@ void EditorScene::CheckForPlanetSelect()
 	m_FB->BindBuffer();
 	m_FB->BindRenderBuffer();
 
-	PlanetaryObject* hoveredPlanet = nullptr;
+	Planet* hoveredPlanet = nullptr;
 
 	Renderer::ClearColor(glm::vec4(1.0f));
 	Renderer::Clear();
@@ -297,6 +313,11 @@ void EditorScene::CheckForPlanetSelect()
 		Renderer::SubmitSphereInstanced(planet.GetTransform().Matrix(), glm::vec4(glm::vec3((float)planet.GetEntityID() / 255.0f), 1.0f));
 	}
 
+	for (auto& sun : m_Suns)
+	{
+		Renderer::SubmitSphereInstanced(sun.GetTransform().Matrix(), glm::vec4(glm::vec3((float)sun.GetEntityID() / 255.0f), 1.0f));
+	}
+
 	Renderer::SceneEnd();
 
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
@@ -307,6 +328,16 @@ void EditorScene::CheckForPlanetSelect()
 		if (planet.GetEntityID() == pixelColor)
 		{
 			hoveredPlanet = &planet;
+
+			break;
+		}
+	}
+
+	for (auto& sun : m_Suns)
+	{
+		if (sun.GetEntityID() == pixelColor)
+		{
+			hoveredPlanet = &sun;
 
 			break;
 		}

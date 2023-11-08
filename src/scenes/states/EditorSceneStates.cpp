@@ -9,7 +9,7 @@
 
 #include <glm/gtx/compatibility.hpp>
 
-NewPlanetState::NewPlanetState(EditorScene* scene, PlanetaryObject* newPlanet)
+NewPlanetState::NewPlanetState(EditorScene* scene, Planet* newPlanet)
 	: m_NewPlanet(newPlanet)
 	, m_ParentScene(scene)
 {
@@ -89,7 +89,7 @@ void InterpolateViewState::OnRender()
 {
 }
 
-SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet)
+SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet)
 	: m_TargetPlanet(targetPlanet), m_EditorCamera(camera), m_ParentScene(scene)
 {
 }
@@ -144,7 +144,7 @@ void SettingVelocityState::OnRender()
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetTransform().Position, m_TargetPlanet->GetTransform().Position - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	if (PlanetaryObject* parent = m_TargetPlanet->GetRelative())
+	if (Planet* parent = m_TargetPlanet->GetRelative())
 	{
 		glm::vec3 parentPos = parent->GetTransform().Position;
 
@@ -164,7 +164,7 @@ void SettingVelocityState::OnRender()
 	Renderer::SceneEnd();
 }
 
-PanderingState::PanderingState(EditorScene* scene, Camera* camera, PlanetaryObject* targetPlanet)
+PanderingState::PanderingState(EditorScene* scene, Camera* camera, Planet* targetPlanet)
 	: m_ParentScene(scene), m_EditorCamera(camera)
 {
 	glm::vec3 normalizedCameraForward = glm::normalize(camera->GetForwardDirection());
