@@ -36,7 +36,7 @@ void NewPlanetState::OnUpdate(float ts)
 {
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
-	m_NewPlanet->SetPosition(Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth));
+	m_NewPlanet->GetTransform().Position = Renderer::ScreenToWorldCoords(Input::GetMousePosition(), m_Depth);
 }
 
 void NewPlanetState::OnTick()
@@ -106,8 +106,8 @@ void SettingVelocityState::OnEvent(Event& ev)
 	if (ev.Type == Event::MouseMoved && !m_PathFuture.valid())
 	{
 		m_PathFuture = std::async(std::launch::async, 
-			m_TargetPlanet->GetRelative() == nullptr ? SimPhysics::ApproximateNextNPoints : SimPhysics::ApproximateRelativeNextNPoints, 
-			std::ref(m_ParentScene->GetPlanetsRef()), std::ref(m_ParentScene->GetSunsRef()), m_TargetPlanet, 1024);
+			m_TargetPlanet->GetRelativePlanet() == nullptr ? SimPhysics::ApproximateNextNPoints : SimPhysics::ApproximateRelativeNextNPoints,
+			std::ref(m_ParentScene->GetPlanetsRef()), m_TargetPlanet, 1024);
 	}
 }
 
@@ -125,7 +125,7 @@ void SettingVelocityState::OnUpdate(float ts)
 	glm::vec3 mouseWorldPos = Renderer::ScreenToWorldCoords(mouseScreenPos, planetScreenPos.z);
 
 	m_Velocity = m_TargetPlanet->GetTransform().Position - mouseWorldPos;
-	m_TargetPlanet->SetVelocity(m_Velocity);
+	m_TargetPlanet->GetPhysics().LinearVelocity = m_Velocity;
 }
 
 void SettingVelocityState::OnTick()
@@ -144,21 +144,9 @@ void SettingVelocityState::OnRender()
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetTransform().Position, m_TargetPlanet->GetTransform().Position - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	if (Planet* parent = m_TargetPlanet->GetRelative())
+	for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
 	{
-		glm::vec3 parentPos = parent->GetTransform().Position;
-
-		for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
-		{
-			Renderer::DrawLine(parentPos + m_ApproximatedPath[i - 1], parentPos + m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
-		}
-	}
-	else
-	{
-		for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
-		{
-			Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
-		}
+		Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
 	}
 
 	Renderer::SceneEnd();

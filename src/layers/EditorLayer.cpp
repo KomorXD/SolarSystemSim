@@ -4,6 +4,7 @@
 #include "../Logger.hpp"
 #include "../math/Math.hpp"
 #include "../renderer/Renderer.hpp"
+#include "../objects/Sun.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/ImGuizmo.h>
@@ -137,9 +138,9 @@ void EditorLayer::RenderImGuizmo()
 
 		glm::vec3 deltaRotation = rotation - selectedPlanet->GetTransform().Rotation;
 
-		selectedPlanet->SetPosition(translation);
-		selectedPlanet->SetRotation(selectedPlanet->GetTransform().Rotation + deltaRotation);
-		selectedPlanet->SetScale(scale);
+		selectedPlanet->GetTransform().Position = translation;
+		selectedPlanet->GetTransform().Rotation = selectedPlanet->GetTransform().Rotation + deltaRotation;
+		selectedPlanet->GetTransform().Scale	= scale;
 	}
 }
 
@@ -175,14 +176,12 @@ void EditorLayer::RenderControlPanel()
 	
 	if (ImGui::Button("New planet"))
 	{
-		m_Scene->m_SelectedPlanet = &m_Scene->m_Planets.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		// m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
+		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Planet>()).get();
 	}
 	
 	if (ImGui::Button("New sun"))
 	{
-		m_Scene->m_SelectedPlanet = &m_Scene->m_Suns.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f));
-		// m_Scene->SetState(std::make_unique<NewPlanetState>(m_Scene.get(), m_Scene->m_SelectedPlanet));
+		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
 	}
 	
 	ImGui::Checkbox("Show grid", &m_Scene->m_RenderGrid);
@@ -254,17 +253,17 @@ void EditorLayer::RenderPlanetsCombo()
 	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
 
 	if (ImGui::BeginCombo("Relative planet",
-		selectedPlanet->GetRelative() != nullptr ? selectedPlanet->GetRelative()->GetTag().c_str() : "None"))
+		selectedPlanet->GetRelativePlanet() != nullptr ? selectedPlanet->GetRelativePlanet()->GetTag().c_str() : "None"))
 	{
 
-		if (ImGui::Selectable("None", selectedPlanet->GetRelative() == nullptr))
+		if (ImGui::Selectable("None", selectedPlanet->GetRelativePlanet() == nullptr))
 		{
-			selectedPlanet->SetRelative(nullptr);
+			selectedPlanet->SetRelativePlanet(nullptr);
 		}
 
 		for (size_t i = 0; i < m_Scene->m_Planets.size(); i++)
 		{
-			Planet& planet = m_Scene->m_Planets[i];
+			Planet& planet = *m_Scene->m_Planets[i];
 
 			if (&planet == selectedPlanet)
 			{
@@ -273,28 +272,9 @@ void EditorLayer::RenderPlanetsCombo()
 
 			ImGui::PushID(i);
 
-			if (ImGui::Selectable(planet.GetTag().c_str(), &planet == selectedPlanet->GetRelative()))
+			if (ImGui::Selectable(planet.GetTag().c_str(), &planet == selectedPlanet->GetRelativePlanet()))
 			{
-				selectedPlanet->SetRelative(&planet);
-			}
-
-			ImGui::PopID();
-		}
-
-		for (size_t i = 0; i < m_Scene->m_Suns.size(); i++)
-		{
-			Planet& sun = m_Scene->m_Suns[i];
-
-			if (&sun == selectedPlanet)
-			{
-				continue;
-			}
-
-			ImGui::PushID(i);
-
-			if (ImGui::Selectable(sun.GetTag().c_str(), &sun == selectedPlanet->GetRelative()))
-			{
-				selectedPlanet->SetRelative(&sun);
+				selectedPlanet->SetRelativePlanet(&planet);
 			}
 
 			ImGui::PopID();
