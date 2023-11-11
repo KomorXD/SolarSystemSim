@@ -14,17 +14,20 @@ layout(location = 5) in Material a_Material;
 
 uniform mat4 u_ViewProjection;
 
-out vec3 worldPos;
-out vec3 vertexNormal;
-out vec3 staticNormal;
-out Material material;
+out VS_OUT
+{
+	out vec3 worldPos;
+	out vec3 vertexNormal;
+	out vec3 staticNormal;
+	out Material material;
+} vs_out;
 
 void main()
 {
-	worldPos = (a_Transform * vec4(a_Position, 1.0)).xyz;
-	vertexNormal = normalize(worldPos - (a_Transform * vec4(vec3(0.0), 1.0)).xyz);
-	staticNormal = normalize(a_Position - vec3(0.0));
-	material = a_Material;
+	vs_out.worldPos = (a_Transform * vec4(a_Position, 1.0)).xyz;
+	vs_out.vertexNormal = normalize(vs_out.worldPos - (a_Transform * vec4(vec3(0.0), 1.0)).xyz);
+	vs_out.staticNormal = normalize(a_Position - vec3(0.0));
+	vs_out.material = a_Material;
 
 	gl_Position = u_ViewProjection * a_Transform * vec4(a_Position, 1.0);
 }

@@ -8,10 +8,13 @@ struct Material
 	vec2 uvEnd;
 };
 
-in vec3 worldPos;
-in vec3 vertexNormal;
-in vec3 staticNormal;
-in Material material;
+in VS_OUT
+{
+	vec3 worldPos;
+	vec3 vertexNormal;
+	vec3 staticNormal;
+	Material material;
+} fs_in;
 
 out vec4 fragColor;
 
@@ -24,23 +27,23 @@ void main()
 	float gamma = 2.2;
 	float pi = 3.14159265358979323846;
 	vec2 uv;
-	uv.x = 0.5 + atan(staticNormal.z, staticNormal.x) / (2.0 * pi);
-	uv.y = 0.5 - asin(staticNormal.y) / pi;
-	uv = material.uvStart + (material.uvEnd - material.uvStart) * uv;
+	uv.x = 0.5 + atan(fs_in.staticNormal.z, fs_in.staticNormal.x) / (2.0 * pi);
+	uv.y = 0.5 - asin(fs_in.staticNormal.y) / pi;
+	uv = fs_in.material.uvStart + (fs_in.material.uvEnd - fs_in.material.uvStart) * uv;
 
-	vec4 matColor = material.color;
-	float matShininess = material.shininess;
+	vec4 matColor = fs_in.material.color;
+	float matShininess = fs_in.material.shininess;
 
 	vec3 dirLightVec = normalize(vec3(-0.3, -0.5, -0.6));
 	vec3 lightPos = vec3(6.0, 10.0, 7.0);
 	vec3 lightColor = vec3(1.0, 1.0, 1.0);
 
-	float fragToLightLen = length(lightPos - worldPos);
-	vec3 lightDir = normalize(lightPos - worldPos);
+	float fragToLightLen = length(lightPos - fs_in.worldPos);
+	vec3 lightDir = normalize(lightPos - fs_in.worldPos);
 
-	float directionalStrength = max(dot(vertexNormal, -dirLightVec), 0.0);
+	float directionalStrength = max(dot(fs_in.vertexNormal, -dirLightVec), 0.0);
 	float ambientStrength = 0.1;
-	float diffuseStrength = max(dot(normalize(vertexNormal), lightDir), 0.0);
+	float diffuseStrength = max(dot(normalize(fs_in.vertexNormal), lightDir), 0.0);
 	float attenuation = 1.0 / (fragToLightLen * fragToLightLen);
 	
 	float diffuseLevel = floor(diffuseStrength * SHADING_LEVELS);
