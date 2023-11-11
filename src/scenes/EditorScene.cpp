@@ -253,10 +253,10 @@ void EditorScene::OnRender()
 
 		Material lightMat = planet->GetMaterial();
 		PointLight light = ((Sun*)planet.get())->GetLight();
-		lightMat.Color *= light.Color * light.Intensity;
+		lightMat.Color *= glm::vec4(light.Color * light.Intensity, 1.0f);
 
 		Renderer::SubmitSphereInstanced(planet->GetTransform().Matrix(), lightMat);
-		Renderer::SetPointLightUniform(lightIdx, light);
+		Renderer::SetPointLightUniform(lightIdx, light, planet->GetTransform().Position);
 		lightIdx++;
 	}
 
