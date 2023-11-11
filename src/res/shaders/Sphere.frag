@@ -25,6 +25,7 @@ in VS_OUT
 
 out vec4 fragColor;
 
+uniform vec3 u_ViewPos;
 uniform sampler2D u_TextureAtlas;
 uniform PointLight u_Lights[16];
 uniform int u_ActiveLights = 0;
@@ -65,18 +66,30 @@ vec3 lightDiffuseImpact(PointLight light)
 	return diffuseStrength * light.color * light.intensity;
 }
 
+vec3 lightSpecularImpact(PointLight light)
+{
+	vec3 viewDir = normalize(u_ViewPos - fs_in.worldPos);
+	vec3 lightDir = normalize(light.position - fs_in.worldPos);
+	vec3 reflectDir = reflect(-lightDir, fs_in.vertexNormal);
+	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+
+	return fs_in.material.shininess * specularStrength * light.color;
+}
+
 void main()
 {
 	float ambientStrength = 0.1;
 	vec3 diffuse = vec3(0.0);
+	vec3 specular = vec3(0.0);
 
 	for(int i = 0; i < u_ActiveLights; i++)
 	{
 		diffuse += lightDiffuseImpact(u_Lights[i]);
+		specular += lightSpecularImpact(u_Lights[i]);
 	}
 
 	// vec3 directional = directionalLightImpact();
-	vec3 result = (ambientStrength + diffuse) * fs_in.material.color.rgb;
+	vec3 result = (ambientStrength + diffuse + specular) * fs_in.material.color.rgb;
 	
 	float gamma = 2.2;
 	vec2 uv = calcTextureUV();
