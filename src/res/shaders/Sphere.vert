@@ -12,8 +12,6 @@ layout(location = 0) in vec3 a_Position;
 layout(location = 1) in mat4 a_Transform;
 layout(location = 5) in Material a_Material;
 
-uniform mat4 u_ViewProjection;
-
 out VS_OUT
 {
 	out vec3 worldPos;
@@ -21,6 +19,8 @@ out VS_OUT
 	out vec3 staticNormal;
 	out Material material;
 } vs_out;
+
+uniform mat4 u_ViewProjection;
 
 void main()
 {

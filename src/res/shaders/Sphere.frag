@@ -8,6 +8,12 @@ struct Material
 	vec2 uvEnd;
 };
 
+struct PointLight
+{
+	vec4 color;
+	float intensity;
+};
+
 in VS_OUT
 {
 	vec3 worldPos;
@@ -19,6 +25,8 @@ in VS_OUT
 out vec4 fragColor;
 
 uniform sampler2D u_TextureAtlas;
+uniform PointLight u_Lights[16];
+uniform int u_ActiveLights = 0;
 
 const int SHADING_LEVELS = 3;
 

@@ -44,6 +44,9 @@ public:
 	static void SubmitSphereInstanced(const glm::mat4& transform, Material material);
 	static void DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t instances);
 
+	static void SetPointLightUniform(int32_t lightIdx, PointLight light);
+	static void SetLightsNum(int32_t lightCount);
+
 	static void DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count = 0);
 	static void DrawLines(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t vertexCount);
 	static void SubmitIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, const glm::mat4& transform = glm::mat4(1.0f));

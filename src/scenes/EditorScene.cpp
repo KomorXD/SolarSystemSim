@@ -242,6 +242,8 @@ void EditorScene::OnRender()
 	Renderer::SceneBegin(m_Camera);
 	Renderer::SetBackCull();
 
+	int32_t lightIdx = 0;
+
 	for (auto& planet : m_Planets)
 	{
 		if (planet->GetType() != ObjectType::Sun)
@@ -254,8 +256,11 @@ void EditorScene::OnRender()
 		lightMat.Color *= light.Color * light.Intensity;
 
 		Renderer::SubmitSphereInstanced(planet->GetTransform().Matrix(), lightMat);
+		Renderer::SetPointLightUniform(lightIdx, light);
+		lightIdx++;
 	}
 
+	Renderer::SetLightsNum(lightIdx);
 	Renderer::SceneEnd();
 	
 	// Draw shaded spheres

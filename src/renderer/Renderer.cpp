@@ -459,6 +459,19 @@ void Renderer::DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const
 	GLCall(glDrawElementsInstanced(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, instances));
 }
 
+void Renderer::SetPointLightUniform(int32_t lightIdx, PointLight light)
+{
+	s_Data.PlanetShader->Bind();
+	s_Data.PlanetShader->SetUniform4f("u_Lights[" + std::to_string(lightIdx) + "].color", light.Color);
+	s_Data.PlanetShader->SetUniform1f("u_Lights[" + std::to_string(lightIdx) + "].intensity", light.Intensity);
+}
+
+void Renderer::SetLightsNum(int32_t lightCount)
+{
+	s_Data.PlanetShader->Bind();
+	s_Data.PlanetShader->SetUniform1i("u_ActiveLights", lightCount);
+}
+
 void Renderer::DrawIndexed(const std::shared_ptr<Shader>& shader, const std::shared_ptr<VertexArray>& vao, uint32_t count)
 {
 	uint32_t indices = count ? count : vao->GetIndexBuffer()->GetCount();
