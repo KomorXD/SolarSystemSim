@@ -18,7 +18,7 @@ EditorLayer::EditorLayer()
 	Event dummyEv{};
 
 	dummyEv.Type = Event::WindowResized;
-	dummyEv.Size.Width = (uint32_t)(spec.Width * 0.8f);
+	dummyEv.Size.Width = (uint32_t)(spec.Width * 0.6f);
 	dummyEv.Size.Height = spec.Height;
 	
 	m_Scene->OnEvent(dummyEv);
@@ -28,9 +28,9 @@ void EditorLayer::OnEvent(Event& ev)
 {
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
-	if (ev.Type == Event::WindowResized)
+	if (ev.Type == Event::WindowResized && ev.Size.Width != 0 && ev.Size.Height != 0)
 	{
-		ev.Size.Width = (uint32_t)(ev.Size.Width * 0.8f);
+		ev.Size.Width = (uint32_t)(ev.Size.Width * 0.6f);
 		m_Scene->OnEvent(ev);
 
 		return;
@@ -74,8 +74,21 @@ void EditorLayer::OnTick()
 
 void EditorLayer::OnImGuiRender()
 {
+	RenderScenePanel();
 	RenderViewport();
 	RenderControlPanel();
+}
+
+void EditorLayer::RenderScenePanel()
+{
+	WindowSpec windowSpec = Application::GetInstance()->GetWindowSpec();
+						
+	ImGui::SetNextWindowPos({ 0.0f, 0.0f });
+	ImGui::SetNextWindowSize({ windowSpec.Width * 0.2f, windowSpec.Height * 1.0f });
+
+	ImGui::Begin("Scene panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	ImGui::Text("elo");
+	ImGui::End();
 }
 
 void EditorLayer::RenderViewport()
@@ -84,8 +97,8 @@ void EditorLayer::RenderViewport()
 
 	m_Scene->OnRender();
 
-	ImGui::SetNextWindowPos({ 0.0f, 0.0f });
-	ImGui::SetNextWindowSize({ windowSpec.Width * 0.8f, windowSpec.Height * 1.0f });
+	ImGui::SetNextWindowPos({ windowSpec.Width * 0.2f, 0.0f });
+	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, windowSpec.Height * 1.0f });
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
@@ -112,7 +125,7 @@ void EditorLayer::RenderImGuizmo()
 
 	ImGuizmo::SetOrthographic(false);
 	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetRect(0.0f, 0.0f, spec.Width * 0.8f, spec.Height * 1.0f);
+	ImGuizmo::SetRect(spec.Width * 0.2f, 0.0f, spec.Width * 0.6f, spec.Height * 1.0f);
 
 	const glm::mat4& cameraProj = editorCamera.GetProjection();
 	glm::mat4 cameraView = editorCamera.GetViewMatrix();

@@ -17,6 +17,7 @@ public:
 	virtual void OnImGuiRender()	override;
 
 private:
+	void RenderScenePanel();
 	void RenderViewport();
 	void RenderImGuizmo();
 	void RenderControlPanel();

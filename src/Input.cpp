@@ -26,7 +26,7 @@ glm::vec2 Input::GetMousePosition()
 
 	glfwGetCursorPos(app->GetWindow(), &xPos, &yPos);
 
-	return { (float)xPos, (float)app->GetWindowSpec().Height - (float)yPos };
+	return { (float)xPos - app->GetWindowSpec().Width * 0.2f, (float)app->GetWindowSpec().Height - (float)yPos};
 }
 
 void Input::HideCursor()

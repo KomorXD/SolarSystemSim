@@ -8,6 +8,7 @@
 #include "states/EditorSceneStates.hpp"
 #include "../Simulator.hpp"
 #include "../TextureManager.hpp"
+#include "../TriggerClock.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,20 +20,19 @@ EditorScene::EditorScene()
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 
 	m_FB = std::make_unique<Framebuffer>();
-	m_FB->AttachTexture((uint32_t)(spec.Width * 0.8f), spec.Height);
-	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.8f), spec.Height);
+	m_FB->AttachTexture((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.6f), spec.Height);
 	m_FB->UnbindBuffer();
 
 	m_MFB = std::make_unique<MultisampledFramebuffer>(16);
-	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.8f), spec.Height);
-	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.8f), spec.Height);
+	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.6f), spec.Height);
 	m_MFB->UnbindBuffer();
 
 	Renderer::Init();
 
-	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 0.0f));
-	m_Camera.MoveYaw(glm::radians(90.0f));
-	m_Camera.SetViewportSize({ (float)spec.Width * 0.8f, (float)spec.Height });
+	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 40.0f));
+	m_Camera.SetViewportSize({ (float)spec.Width * 0.6f, (float)spec.Height });
 
 	std::array<std::string, 6> faces =
 	{
