@@ -68,7 +68,9 @@ struct RendererData
 	std::shared_ptr<VertexArray>  SphereVertexArray;
 	std::shared_ptr<VertexBuffer> SphereVertexBuffer;
 	std::shared_ptr<VertexBuffer> SphereTransformsVertexBuffer;
-	std::shared_ptr<Shader>		  SphereShader;
+	std::shared_ptr<Shader>		  PlanetShader;
+	std::shared_ptr<Shader>		  SunShader;
+	std::shared_ptr<Shader>		  ActiveSphereShader;
 
 	std::shared_ptr<VertexArray>  SkyboxVertexArray;
 	std::shared_ptr<VertexBuffer> SkyboxVertexBuffer;
@@ -207,7 +209,9 @@ void Renderer::Init()
 		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 1);
 
 		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
-		s_Data.SphereShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
+		s_Data.PlanetShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
+		s_Data.SunShader = std::make_shared<Shader>("res/shaders/Sun.vert", "res/shaders/Sun.frag");
+		s_Data.ActiveSphereShader = s_Data.PlanetShader;
 		
 		s_Data.SphereVertexArray->Unbind();
 	}
@@ -285,7 +289,8 @@ void Renderer::ReloadShaders()
 
 	s_Data.QuadShader->ReloadShader();
 	s_Data.LineShader->ReloadShader();
-	s_Data.SphereShader->ReloadShader();
+	s_Data.PlanetShader->ReloadShader();
+	s_Data.SunShader->ReloadShader();
 	s_Data.SkyboxShader->ReloadShader();
 }
 
@@ -340,7 +345,7 @@ void Renderer::Flush()
 
 		s_Data.SphereTransformsVertexBuffer->SetData(s_Data.SpheresTransformsBufferBase, dataSize);
 
-		DrawIndexedInstanced(s_Data.SphereShader, s_Data.SphereVertexArray, s_Data.SpheresInstanceCount);
+		DrawIndexedInstanced(s_Data.ActiveSphereShader, s_Data.SphereVertexArray, s_Data.SpheresInstanceCount);
 	}
 }
 
@@ -550,16 +555,23 @@ void Renderer::SetBackCull()
 	GLCall(glCullFace(GL_BACK));
 }
 
-void Renderer::SetSphereLightning(bool flag)
+void Renderer::EnableSphereLightning()
 {
-	s_Data.SphereShader->Bind();
-	s_Data.SphereShader->SetUniform1i("u_Lightning", (int32_t)flag);
+	s_Data.ActiveSphereShader = s_Data.PlanetShader;
+}
+
+void Renderer::DisableSphereLightning()
+{
+	s_Data.ActiveSphereShader = s_Data.SunShader;
 }
 
 void Renderer::SetViewPosition(const glm::vec3& pos)
 {
-	s_Data.SphereShader->Bind();
-	s_Data.SphereShader->SetUniform3f("u_ViewPos", pos);
+	s_Data.PlanetShader->Bind();
+	s_Data.PlanetShader->SetUniform3f("u_ViewPos", pos);
+
+	s_Data.SunShader->Bind();
+	s_Data.SunShader->SetUniform3f("u_ViewPos", pos);
 }
 
 void Renderer::ToggleWireframe()

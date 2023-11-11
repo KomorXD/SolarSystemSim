@@ -60,7 +60,8 @@ public:
 	static void SetFrontCull();
 	static void SetBackCull();
 
-	static void SetSphereLightning(bool flag);
+	static void EnableSphereLightning();
+	static void DisableSphereLightning();
 
 	static void SetViewPosition(const glm::vec3& pos);
 
