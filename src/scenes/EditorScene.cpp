@@ -206,7 +206,7 @@ void EditorScene::OnRender()
 	
 	Renderer::SceneBegin(m_Camera);
 	Renderer::EnableDepth();
-	Renderer::EnableSphereLightning();
+	Renderer::BindPlanetShader();
 
 	if (m_RenderGrid)
 	{
@@ -222,7 +222,7 @@ void EditorScene::OnRender()
 
 	// Draw spheres' outlines
 	Renderer::SceneBegin(m_Camera);
-	Renderer::DisableSphereLightning();
+	Renderer::BindSunShader();
 	Renderer::SetFrontCull();
 
 	for (auto& planet : m_Planets)
@@ -249,15 +249,19 @@ void EditorScene::OnRender()
 			continue;
 		}
 
-		Renderer::SubmitSphereInstanced(planet->GetTransform().Matrix(), planet->GetMaterial());
+		Material lightMat = planet->GetMaterial();
+		PointLight light = ((Sun*)planet.get())->GetLight();
+		lightMat.Color *= light.Color * light.Intensity;
+
+		Renderer::SubmitSphereInstanced(planet->GetTransform().Matrix(), lightMat);
 	}
 
 	Renderer::SceneEnd();
 	
 	// Draw shaded spheres
 	Renderer::SceneBegin(m_Camera);
+	Renderer::BindPlanetShader();
 	Renderer::SetBackCull();
-	Renderer::EnableSphereLightning();
 
 	for (auto& planet : m_Planets)
 	{
@@ -310,7 +314,7 @@ void EditorScene::CheckForPlanetSelect()
 	
 	Renderer::SceneBegin(m_Camera);
 	Renderer::EnableDepth();
-	Renderer::DisableSphereLightning();
+	Renderer::BindPickerShader();
 
 	for (auto& planet : m_Planets)
 	{

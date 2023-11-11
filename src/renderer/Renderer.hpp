@@ -60,8 +60,9 @@ public:
 	static void SetFrontCull();
 	static void SetBackCull();
 
-	static void EnableSphereLightning();
-	static void DisableSphereLightning();
+	static void BindPlanetShader();
+	static void BindSunShader();
+	static void BindPickerShader();
 
 	static void SetViewPosition(const glm::vec3& pos);
 

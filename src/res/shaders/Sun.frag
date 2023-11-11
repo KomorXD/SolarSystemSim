@@ -10,8 +10,6 @@ struct Material
 
 in VS_OUT
 {
-	vec3 worldPos;
-	vec3 vertexNormal;
 	vec3 staticNormal;
 	Material material;
 } fs_in;
@@ -30,5 +28,5 @@ void main()
 	uv = fs_in.material.uvStart + (fs_in.material.uvEnd - fs_in.material.uvStart) * uv;
 
 	fragColor = texture(u_TextureAtlas, uv) * fs_in.material.color;
-	// fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / gamma));
+	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / gamma));
 }

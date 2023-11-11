@@ -70,6 +70,7 @@ struct RendererData
 	std::shared_ptr<VertexBuffer> SphereTransformsVertexBuffer;
 	std::shared_ptr<Shader>		  PlanetShader;
 	std::shared_ptr<Shader>		  SunShader;
+	std::shared_ptr<Shader>		  PickerShader;
 	std::shared_ptr<Shader>		  ActiveSphereShader;
 
 	std::shared_ptr<VertexArray>  SkyboxVertexArray;
@@ -211,6 +212,7 @@ void Renderer::Init()
 		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
 		s_Data.PlanetShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");
 		s_Data.SunShader = std::make_shared<Shader>("res/shaders/Sun.vert", "res/shaders/Sun.frag");
+		s_Data.PickerShader = std::make_shared<Shader>("res/shaders/Picker.vert", "res/shaders/Picker.frag");
 		s_Data.ActiveSphereShader = s_Data.PlanetShader;
 		
 		s_Data.SphereVertexArray->Unbind();
@@ -444,7 +446,12 @@ void Renderer::DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const
 {
 	shader->Bind();
 	shader->SetUniformMat4("u_ViewProjection", s_ViewProjection);
-	shader->SetUniform1i("u_TextureAtlas", 1);
+
+	if (s_Data.ActiveSphereShader != s_Data.PickerShader)
+	{
+		shader->SetUniform1i("u_TextureAtlas", 1);
+	}
+	
 	TextureManager::BindAtlas(1);
 
 	vao->Bind();
@@ -555,14 +562,19 @@ void Renderer::SetBackCull()
 	GLCall(glCullFace(GL_BACK));
 }
 
-void Renderer::EnableSphereLightning()
+void Renderer::BindPlanetShader()
 {
 	s_Data.ActiveSphereShader = s_Data.PlanetShader;
 }
 
-void Renderer::DisableSphereLightning()
+void Renderer::BindSunShader()
 {
 	s_Data.ActiveSphereShader = s_Data.SunShader;
+}
+
+void Renderer::BindPickerShader()
+{
+	s_Data.ActiveSphereShader = s_Data.PickerShader;
 }
 
 void Renderer::SetViewPosition(const glm::vec3& pos)

@@ -1,7 +1,7 @@
 #include "Scene.hpp"
 #include "../OpenGL.hpp"
 #include "../renderer/Camera.hpp"
-#include "../objects/Planet.hpp"
+#include "../objects/Sun.hpp"
 #include "states/SceneState.hpp"
 
 #include <memory>

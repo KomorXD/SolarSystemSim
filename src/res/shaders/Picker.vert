@@ -16,14 +16,12 @@ uniform mat4 u_ViewProjection;
 
 out VS_OUT
 {
-	vec3 staticNormal;
-	Material material;
+	vec4 color;
 } vs_out;
 
 void main()
 {
-	vs_out.staticNormal = normalize(a_Position - vec3(0.0));
-	vs_out.material = a_Material;
+	vs_out.color = a_Material.color;
 
 	gl_Position = u_ViewProjection * a_Transform * vec4(a_Position, 1.0);
 }
