@@ -459,10 +459,11 @@ void Renderer::DrawIndexedInstanced(const std::shared_ptr<Shader>& shader, const
 	GLCall(glDrawElementsInstanced(GL_TRIANGLES, vao->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr, instances));
 }
 
-void Renderer::SetPointLightUniform(int32_t lightIdx, PointLight light)
+void Renderer::SetPointLightUniform(int32_t lightIdx, PointLight light, const glm::vec3& position)
 {
 	s_Data.PlanetShader->Bind();
-	s_Data.PlanetShader->SetUniform4f("u_Lights[" + std::to_string(lightIdx) + "].color", light.Color);
+	s_Data.PlanetShader->SetUniform3f("u_Lights[" + std::to_string(lightIdx) + "].position", position);
+	s_Data.PlanetShader->SetUniform3f("u_Lights[" + std::to_string(lightIdx) + "].color", light.Color);
 	s_Data.PlanetShader->SetUniform1f("u_Lights[" + std::to_string(lightIdx) + "].intensity", light.Intensity);
 }
 
