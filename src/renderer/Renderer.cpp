@@ -595,9 +595,6 @@ void Renderer::SetViewPosition(const glm::vec3& pos)
 {
 	s_Data.PlanetShader->Bind();
 	s_Data.PlanetShader->SetUniform3f("u_ViewPos", pos);
-
-	s_Data.SunShader->Bind();
-	s_Data.SunShader->SetUniform3f("u_ViewPos", pos);
 }
 
 void Renderer::ToggleWireframe()
