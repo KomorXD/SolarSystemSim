@@ -32,7 +32,7 @@ struct Material
 
 struct PointLight
 {
-	glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec3 Color = { 1.0f, 1.0f, 1.0f };
 	float Intensity = 1.0f;
 
 	void OnImGuiRender();

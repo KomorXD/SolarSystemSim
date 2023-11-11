@@ -93,7 +93,7 @@ void PointLight::OnImGuiRender()
 	{
 		ImGui::Indent(16.0f);
 		ImGui::ColorEdit4("Light color", glm::value_ptr(Color));
-		ImGui::DragFloat("Intensity", &Intensity, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::DragFloat("Intensity", &Intensity, 0.01f, 0.0f, FLT_MAX, "%.2f");
 		ImGui::Unindent(16.0f);
 	}
 }
