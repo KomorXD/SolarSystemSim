@@ -430,7 +430,7 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, Material materi
 		NextBatch();
 	}
 
-	std::optional<TextureInfo> textureInfo = TextureManager::GetTexture(material.TextureID);
+	std::optional<TextureInfo> textureInfo = TextureManager::GetTexture(material.TextureInUse ? material.TextureID : 1);
 	TextureInfo tex = textureInfo.value_or(TextureManager::GetTexture(1).value());
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
