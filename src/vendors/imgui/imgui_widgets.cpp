@@ -2507,6 +2507,79 @@ bool ImGui::DragScalarN(const char* label, ImGuiDataType data_type, void* p_data
     return value_changed;
 }
 
+IMGUI_API void ImGui::PrettyDragFloat(const char* label, float* v, float min, float max, float labelWidth)
+{
+	ImGui::PushID(label);
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, labelWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(ImGui::CalcItemWidth());
+	ImGui::DragFloat("##Value", v, 0.5f, min, max, "%.2f");
+	ImGui::Columns(1);
+	ImGui::PopItemWidth();
+	ImGui::PopID();
+}
+
+IMGUI_API void ImGui::PrettyDragFloat3(const char* label, float v[3], float resetValue, float labelWidth)
+{
+	ImGui::PushID(label);
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, labelWidth);
+	ImGui::Text(label);
+	ImGui::NextColumn();
+
+	ImGui::PushItemWidth(ImGui::CalcItemWidth() / 3.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 4.0f));
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.25f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
+
+	ImVec2 buttonSize(22.0f, 22.0f);
+
+	if (ImGui::Button("X", buttonSize))
+	{
+		v[0] = resetValue;
+	}
+
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &v[0], 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
+
+	if (ImGui::Button("Y", buttonSize))
+	{
+		v[1] = resetValue;
+	}
+
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &v[1], 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
+
+	if (ImGui::Button("Z", buttonSize))
+	{
+		v[2] = resetValue;
+	}
+
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &v[2], 0.1f, 0.0f, 0.0f, "%.2f");
+
+	ImGui::PopItemWidth();
+	ImGui::PopStyleVar();
+	ImGui::Columns(1);
+	ImGui::PopID();
+}
+
 bool ImGui::DragFloat(const char* label, float* v, float v_speed, float v_min, float v_max, const char* format, ImGuiSliderFlags flags)
 {
     return DragScalar(label, ImGuiDataType_Float, v, v_speed, &v_min, &v_max, format, flags);
