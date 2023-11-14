@@ -23,7 +23,15 @@ void Planet::OnConfigRender()
 	
 	ImGui::Text("Planet #%d", m_ObjectID);
 	ImGui::Indent(16.0f);
+	
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 100.0f);
+	ImGui::Text("Tag");
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(ImGui::CalcItemWidth());
 	ImGui::InputText("##Planet tag", m_Tag.data(), m_Tag.capacity());
+	ImGui::Columns(1);
+	ImGui::PopItemWidth();
 	ImGui::Unindent(16.0f);
 	ImGui::NewLine();
 	

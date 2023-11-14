@@ -21,9 +21,9 @@ void Transform::OnImGuiRender()
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent(16.0f);
-		ImGui::DragFloat3("Position", glm::value_ptr(Position), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::DragFloat3("Rotation", glm::value_ptr(Rotation), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::DragFloat3("Scale", glm::value_ptr(Scale), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::PrettyDragFloat3("Position", glm::value_ptr(Position));
+		ImGui::PrettyDragFloat3("Rotation", glm::value_ptr(Rotation));
+		ImGui::PrettyDragFloat3("Scale", glm::value_ptr(Scale), 1.0f);
 		ImGui::Unindent(16.0f);
 	}
 }
@@ -33,9 +33,9 @@ void Physics::OnImGuiRender()
 	if (ImGui::CollapsingHeader("Physics properties", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		ImGui::Indent(16.0f);
-		ImGui::DragFloat3("Linear velocity", glm::value_ptr(LinearVelocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::DragFloat3("Angular velocity", glm::value_ptr(AngularVelocity), 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
-		ImGui::DragFloat("Mass", &Mass, 0.01f, -FLT_MAX, FLT_MAX, "%.2f");
+		ImGui::PrettyDragFloat3("Lin velocity", glm::value_ptr(LinearVelocity));
+		ImGui::PrettyDragFloat3("Ang velocity", glm::value_ptr(AngularVelocity));
+		ImGui::PrettyDragFloat("Mass", &Mass, 0.0f, FLT_MAX);
 		ImGui::Unindent(16.0f);
 	}
 }
@@ -44,44 +44,49 @@ void Material::OnImGuiRender()
 {
 	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Indent(16.0f);
-		ImGui::ColorEdit4("Color", glm::value_ptr(Color));
-		ImGui::DragFloat("Shininess", &Shininess, 0.1f, 0.0f, 128.0f, "%.2f");
-
 		TextureInfo tex = TextureManager::GetTexture(TextureID).value();
-		float ratio = tex.Size.y / tex.Size.x;
 
-		ImGui::InputText("Texture", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
-		float sizeY = ImGui::GetItemRectSize().y;
+		ImGui::Indent(16.0f);
+		ImGui::Text("Albedo");
+		ImGui::NewLine();
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 100.0f);
+		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+		ImGui::NextColumn();
+		ImGui::InputText("##Path", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 
-		if (ImGui::Button("...", ImVec2(sizeY, sizeY)))
+		if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
 		{
 			ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
 				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 		}
 
 		if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
-		{
+		{			   
 			if (ImGuiFileDialog::Instance()->IsOk())
-			{
+			{		   
 				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
 				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
-
+					   
 				if (res.has_value())
-				{
+				{	   
 					TextureID = res.value().TextureID;
-				}
-			}
-
+				}	   
+			}		   
+					   
 			ImGuiFileDialog::Instance()->Close();
 		}
 
-		if (TextureID != 1)
-		{
-			ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(256.0f, 256.0f * ratio),
-				ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
-		}
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(16.0f, 0.0f));
+		ImGui::Checkbox("Use", &TextureInUse);
+		ImGui::SameLine();
+		ImGui::ColorEdit4("Color", glm::value_ptr(Color), ImGuiColorEditFlags_NoInputs);
+		ImGui::Columns(1);
+		ImGui::PopStyleVar();
+		ImGui::NewLine();
+		ImGui::PrettyDragFloat("Shininess", &Shininess, 0.0f, 128.0f);
 
 		ImGui::Unindent(16.0f);
 	}
@@ -93,7 +98,7 @@ void PointLight::OnImGuiRender()
 	{
 		ImGui::Indent(16.0f);
 		ImGui::ColorEdit4("Light color", glm::value_ptr(Color));
-		ImGui::DragFloat("Intensity", &Intensity, 0.01f, 0.0f, FLT_MAX, "%.2f");
+		ImGui::PrettyDragFloat("Intensity", &Intensity, 0.0f, FLT_MAX);
 		ImGui::Unindent(16.0f);
 	}
 }

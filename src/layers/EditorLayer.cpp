@@ -3,7 +3,6 @@
 #include "../Application.hpp"
 #include "../Logger.hpp"
 #include "../random_utils/Math.hpp"
-#include "../random_utils/UI.hpp"
 #include "../renderer/Renderer.hpp"
 #include "../objects/Sun.hpp"
 
@@ -94,6 +93,7 @@ void EditorLayer::RenderScenePanel()
 	ImVec2 avSpace = ImGui::GetContentRegionAvail();
 	Planet*& selectedPlanet = m_Scene->m_SelectedPlanet;
 	ImGui::Text("Spawned objects");
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
 	ImGui::BeginChild("Spawned objects", ImVec2(avSpace.x, avSpace.y / 3.0f), true);
 	
 	for (size_t i = 0; i < m_Scene->m_Planets.size(); i++)
@@ -109,22 +109,25 @@ void EditorLayer::RenderScenePanel()
 	}
 
 	ImGui::EndChild();
+	ImGui::PopStyleColor();
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
 
-	glm::vec3 lol(3.0f);
-	ColorfulDragFloat3("I.E. Transform", glm::value_ptr(lol));
+	if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		Camera& cam = m_Scene->m_Camera;
 
-	Camera& cam = m_Scene->m_Camera;
-	ImGui::Text("Camera");
-	ImGui::DragFloat3("Position", glm::value_ptr(cam.m_Position));
-	ImGui::DragFloat("Near clip", &cam.m_NearClip, 0.5f, 0.0f, cam.m_FarClip);
-	ImGui::DragFloat("Far clip", &cam.m_FarClip, 0.5f, cam.m_NearClip, 1000.0f);
-	ImGui::DragFloat("FOV", &cam.m_FOV, 1.0f, 0.0f, 113.0f);
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
+		ImGui::Indent(16.0f);
+		ImGui::PrettyDragFloat3("Position", glm::value_ptr(cam.m_Position));
+		ImGui::PrettyDragFloat("Near clip", &cam.m_NearClip, 0.0f, cam.m_FarClip);
+		ImGui::PrettyDragFloat("Far clip", &cam.m_FarClip, cam.m_NearClip, 1000.0f);
+		ImGui::PrettyDragFloat("FOV", &cam.m_FOV, 0.0f, 113.0f);
+		ImGui::Unindent(16.0f);
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+	}
 
 	if (ImGui::Button("Start simulation"))
 	{
