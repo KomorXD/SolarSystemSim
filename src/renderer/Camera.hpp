@@ -34,9 +34,10 @@ public:
 	glm::vec3 GetForwardDirection() const;
 	glm::quat GetOrientation()		const;
 
-	inline const glm::mat4& GetProjection() const { return m_Projection; }
-	inline const glm::mat4& GetViewMatrix() const { return m_View; }
-	inline glm::mat4 GetViewProjection()	const { return m_Projection * m_View; }
+	inline const glm::mat4& GetProjection() { UpdateProjection(); return m_Projection; }
+	inline const glm::mat4& GetViewMatrix() { UpdateView();		  return m_View; }
+	inline glm::mat4 GetViewProjection()	{ return GetProjection() * GetViewMatrix(); }
+
 	inline glm::vec3 GetPosition()			const { return m_Position; }
 	inline float GetPitch()					const { return m_Pitch; }
 	inline float GetYaw()					const { return m_Yaw; }
@@ -67,4 +68,6 @@ private:
 	float m_Yaw	  = 0.0f;
 
 	glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
+
+	friend class EditorLayer;
 };
