@@ -2,7 +2,8 @@
 #include "../scenes/states/EditorSceneStates.hpp"
 #include "../Application.hpp"
 #include "../Logger.hpp"
-#include "../math/Math.hpp"
+#include "../random_utils/Math.hpp"
+#include "../random_utils/UI.hpp"
 #include "../renderer/Renderer.hpp"
 #include "../objects/Sun.hpp"
 
@@ -111,6 +112,9 @@ void EditorLayer::RenderScenePanel()
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
+
+	glm::vec3 lol(3.0f);
+	ColorfulDragFloat3("I.E. Transform", glm::value_ptr(lol));
 
 	Camera& cam = m_Scene->m_Camera;
 	ImGui::Text("Camera");
