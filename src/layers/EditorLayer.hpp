@@ -20,13 +20,17 @@ private:
 	void RenderScenePanel();
 	void RenderViewport();
 	void RenderImGuizmo();
+	void RenderTopbar();
 	void RenderControlPanel();
 	void RenderPlanetsCombo();
 	void RenderEntityData();
 
 	std::unique_ptr<EditorScene> m_Scene;
 
-	int32_t m_GizmoMode = -1;
+	int32_t m_GizmoMode = -1; // None
+	int32_t m_GizmoCoords = 1; // World
+
+	float m_TopbarHeight = 40.0f;
 
 	bool m_IsViewportFocused = true;
 };

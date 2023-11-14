@@ -19,7 +19,7 @@ EditorLayer::EditorLayer()
 
 	dummyEv.Type = Event::WindowResized;
 	dummyEv.Size.Width = (uint32_t)(spec.Width * 0.6f);
-	dummyEv.Size.Height = spec.Height;
+	dummyEv.Size.Height = spec.Height - m_TopbarHeight;
 	
 	m_Scene->OnEvent(dummyEv);
 }
@@ -31,6 +31,7 @@ void EditorLayer::OnEvent(Event& ev)
 	if (ev.Type == Event::WindowResized && ev.Size.Width != 0 && ev.Size.Height != 0)
 	{
 		ev.Size.Width = (uint32_t)(ev.Size.Width * 0.6f);
+		ev.Size.Height -= m_TopbarHeight;
 		m_Scene->OnEvent(ev);
 
 		return;
@@ -76,6 +77,7 @@ void EditorLayer::OnImGuiRender()
 {
 	RenderScenePanel();
 	RenderViewport();
+	RenderTopbar();
 	RenderControlPanel();
 }
 
@@ -133,75 +135,14 @@ void EditorLayer::RenderScenePanel()
 	}
 
 	ImGui::NewLine();
-
-	if (ImGui::Button("New planet"))
-	{
-		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Planet>()).get();
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("New sun"))
-	{
-		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
-	}
-
-	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
-
-	glm::vec3 cameraPos = m_Scene->m_Camera.GetPosition();
-	
-	ImGui::Text("Camera position: [%.2f %.2f %.2f]", cameraPos.x, cameraPos.y, cameraPos.z);
-	ImGui::NewLine();
-	ImGui::Text("Camera rotation: [%.2f %.2f %.2f]", m_Scene->m_Camera.GetPitch(), m_Scene->m_Camera.GetYaw(), 0.0f);
-	ImGui::NewLine();
-	ImGui::Separator();
-	
-	ImGui::NewLine();
-	ImGui::Checkbox("Show grid", &m_Scene->m_RenderGrid);
-	ImGui::SameLine();
-	ImGui::Checkbox("Show skybox", &m_Scene->m_RenderSkybox);
-	ImGui::SameLine();
 	ImGui::Checkbox("Simulate", &m_Scene->m_Simulate);
 
 	ImGui::DragFloat("TS Scalar", &EditorScene::TS_MULTIPLIER);
 	ImGui::NewLine();
 	ImGui::Separator();
 	ImGui::NewLine();
-
-	Camera& editorCam = m_Scene->m_Camera;
-
-	if (ImGui::Button("X view"))
-	{
-		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
-		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
-		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			rotatePoint + glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Y view"))
-	{
-		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
-		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
-		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			rotatePoint + glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
-	}
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Z view"))
-	{
-		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
-		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
-		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
-			rotatePoint + glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
-	}
 
 	ImGui::End();
 }
@@ -212,8 +153,8 @@ void EditorLayer::RenderViewport()
 
 	m_Scene->OnRender();
 
-	ImGui::SetNextWindowPos({ windowSpec.Width * 0.2f, 0.0f });
-	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, windowSpec.Height * 1.0f });
+	ImGui::SetNextWindowPos({ windowSpec.Width * 0.2f, m_TopbarHeight });
+	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, windowSpec.Height * 1.0f - m_TopbarHeight });
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
@@ -251,7 +192,7 @@ void EditorLayer::RenderImGuizmo()
 	float snapArr[3]{ snapStep, snapStep, snapStep };
 	
 	ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProj),
-		ImGuizmo::OPERATION(m_GizmoMode), ImGuizmo::WORLD, glm::value_ptr(planetTransform),
+		ImGuizmo::OPERATION(m_GizmoMode), ImGuizmo::MODE(m_GizmoCoords), glm::value_ptr(planetTransform),
 		nullptr, doSnap ? snapArr : nullptr);
 	
 	m_Scene->m_LockFocusOnPlanet = ImGuizmo::IsOver();
@@ -270,6 +211,91 @@ void EditorLayer::RenderImGuizmo()
 		selectedPlanet->GetTransform().Rotation = selectedPlanet->GetTransform().Rotation + deltaRotation;
 		selectedPlanet->GetTransform().Scale	= scale;
 	}
+}
+
+void EditorLayer::RenderTopbar()
+{
+	WindowSpec windowSpec = Application::GetInstance()->GetWindowSpec();
+
+	ImGui::SetNextWindowPos({ windowSpec.Width * 0.2f, 0.0f });
+	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, m_TopbarHeight });
+	
+	ImGui::Begin("Topbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+
+	Camera& editorCam = m_Scene->m_Camera;
+	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
+
+	if (ImGui::Button("New planet"))
+	{
+		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Planet>()).get();
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("New sun"))
+	{
+		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("X view"))
+	{
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
+
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
+			rotatePoint + glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Y view"))
+	{
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
+
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
+			rotatePoint + glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Z view"))
+	{
+		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
+		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
+
+		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
+			rotatePoint + glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
+	}
+
+	ImGui::SameLine();
+
+	ImGui::SetNextItemWidth(128.0f);
+	if (ImGui::BeginCombo("##Coordinate space", 
+		(std::string("Space: ") + (m_GizmoCoords == ImGuizmo::WORLD ? "World" : "Local")).c_str()))
+	{
+		if (ImGui::Selectable("Local", m_GizmoCoords == ImGuizmo::LOCAL))
+		{
+			m_GizmoCoords = ImGuizmo::LOCAL;
+		}
+
+		if (ImGui::Selectable("World", m_GizmoCoords == ImGuizmo::WORLD))
+		{
+			m_GizmoCoords = ImGuizmo::WORLD;
+		}
+
+		ImGui::EndCombo();
+	}
+
+	ImGui::SameLine();
+	ImGui::Checkbox("Grid", &m_Scene->m_RenderGrid);
+	ImGui::SameLine();
+	ImGui::Checkbox("Skybox", &m_Scene->m_RenderSkybox);
+	ImGui::SameLine();
+
+	ImGui::End();
 }
 
 void EditorLayer::RenderControlPanel()
