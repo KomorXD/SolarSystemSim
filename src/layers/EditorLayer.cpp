@@ -110,6 +110,16 @@ void EditorLayer::RenderScenePanel()
 	ImGui::Separator();
 	ImGui::NewLine();
 
+	Camera& cam = m_Scene->m_Camera;
+	ImGui::Text("Camera");
+	ImGui::DragFloat3("Position", glm::value_ptr(cam.m_Position));
+	ImGui::DragFloat("Near clip", &cam.m_NearClip, 0.5f, 0.0f, cam.m_FarClip);
+	ImGui::DragFloat("Far clip", &cam.m_FarClip, 0.5f, cam.m_NearClip, 1000.0f);
+	ImGui::DragFloat("FOV", &cam.m_FOV, 1.0f, 0.0f, 113.0f);
+	ImGui::NewLine();
+	ImGui::Separator();
+	ImGui::NewLine();
+
 	if (ImGui::Button("Start simulation"))
 	{
 		LOG_WARN("Not implemented yet");
