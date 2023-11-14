@@ -360,8 +360,7 @@ void EditorScene::DrawGridPlane()
 	glm::vec3 cameraPos = m_Camera.GetPosition();
 	int32_t xOffset = cameraPos.x / 4;
 	int32_t zOffset = cameraPos.z / 4;
-
-	Renderer::SetLineWidth(1.0f);
+	
 	Renderer::LoadLineUniform3f("u_CameraPos", cameraPos);
 
 	for (float x = -distance + xOffset * 4.0f; x <= distance + xOffset * 4.0f; x += 4.0f)
