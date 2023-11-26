@@ -29,7 +29,7 @@ void Camera::OnEvent(Event& ev)
 
 	if (ev.Type == Event::MouseWheelScrolled)
 	{
-		m_Position += GetForwardDirection() * ev.MouseWheel.OffsetY;
+		m_Position += GetForwardDirection() * ev.MouseWheel.OffsetY * 2.0f;
 
 		return;
 	}
@@ -183,13 +183,13 @@ void Camera::CheckForMouseMovement(float ts)
 		return;
 	}
 
-	// if (Input::IsMouseButtonPressed(MouseButton::Middle))
-	if (Input::IsKeyPressed(Key::LeftControl))
+	if (Input::IsMouseButtonPressed(MouseButton::Middle))
+	// if (Input::IsKeyPressed(Key::LeftControl))
 	{
 		Input::DisableCursor();
 
-		m_Position -= GetRightDirection() * delta.x * 0.01f;
-		m_Position -= GetUpDirection()	  * delta.y * 0.01f;
+		m_Position -= GetRightDirection() * delta.x * 0.05f;
+		m_Position -= GetUpDirection()	  * delta.y * 0.05f;
 
 		return;
 	}
