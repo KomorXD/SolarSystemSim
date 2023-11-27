@@ -43,6 +43,9 @@ void TextureManager::Init()
 	s_Atlas->SetSubtexture(whitePixelData, { whitePixelRect.x, whitePixelRect.y }, { whitePixelRect.w, whitePixelRect.h });
 	s_Textures.push_back({ whitePixelRect.id, "", { whitePixelRect.x / 4096.0f, whitePixelRect.y / 4096.0f }, 
 		{ whitePixelRect.w / 4096.0f, whitePixelRect.h / 4096.0f } });
+
+	AddTexture("res/textures/icons/new-planet.png");
+	AddTexture("res/textures/icons/new-sun.png");
 }
 
 void TextureManager::BindAtlas(uint32_t slot)

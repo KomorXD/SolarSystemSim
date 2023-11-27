@@ -5,6 +5,7 @@
 #include "../random_utils/Math.hpp"
 #include "../renderer/Renderer.hpp"
 #include "../objects/Sun.hpp"
+#include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/ImGuizmo.h>
@@ -232,14 +233,22 @@ void EditorLayer::RenderTopbar()
 	Camera& editorCam = m_Scene->m_Camera;
 	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
 
-	if (ImGui::Button("New planet"))
+	std::optional<TextureInfo> texture = TextureManager::GetTexture(TextureManager::NEW_PLANET_ICON);
+	TextureInfo texInfo = texture.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value());
+
+	if (ImGui::ImageButton((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(16.0f, 16.0f),
+		ImVec2(texInfo.UV.x, texInfo.UV.y), ImVec2(texInfo.UV.x + texInfo.Size.x, texInfo.UV.y + texInfo.Size.y)))
 	{
 		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Planet>()).get();
 	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("New sun"))
+	texture = TextureManager::GetTexture(TextureManager::NEW_SUN_ICON);
+	texInfo = texture.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value());
+
+	if (ImGui::ImageButton((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(16.0f, 16.0f),
+		ImVec2(texInfo.UV.x, texInfo.UV.y), ImVec2(texInfo.UV.x + texInfo.Size.x, texInfo.UV.y + texInfo.Size.y)))
 	{
 		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
 	}
