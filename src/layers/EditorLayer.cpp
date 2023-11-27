@@ -235,59 +235,71 @@ void EditorLayer::RenderTopbar()
 
 	std::optional<TextureInfo> texture = TextureManager::GetTexture(TextureManager::NEW_PLANET_ICON);
 	TextureInfo texInfo = texture.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value());
-
+	ImGui::PushID(1);
 	if (ImGui::ImageButton((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(16.0f, 16.0f),
 		ImVec2(texInfo.UV.x, texInfo.UV.y), ImVec2(texInfo.UV.x + texInfo.Size.x, texInfo.UV.y + texInfo.Size.y)))
 	{
 		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Planet>()).get();
 	}
-
+	ImGui::PopID();
 	ImGui::SameLine();
 
 	texture = TextureManager::GetTexture(TextureManager::NEW_SUN_ICON);
 	texInfo = texture.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value());
-
+	ImGui::PushID(2);
 	if (ImGui::ImageButton((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(16.0f, 16.0f),
 		ImVec2(texInfo.UV.x, texInfo.UV.y), ImVec2(texInfo.UV.x + texInfo.Size.x, texInfo.UV.y + texInfo.Size.y)))
 	{
 		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
 	}
-
+	ImGui::PopID();
 	ImGui::SameLine();
-
-	if (ImGui::Button("X view"))
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.25f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
+	if (ImGui::Button("X", ImVec2(22.0f, 22.0f)))
 	{
 		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
+	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			rotatePoint + glm::vec3(distance, 0.0f, 0.0f), glm::radians(0.0f), glm::radians(-90.0f)));
 	}
-
+	
+	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-
-	if (ImGui::Button("Y view"))
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.8f, 0.3f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
+	if (ImGui::Button("Y", ImVec2(22.0f, 22.0f)))
 	{
 		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
+	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			rotatePoint + glm::vec3(0.0f, distance, 0.0f), glm::radians(90.0f), glm::radians(0.0f)));
 	}
-
+	
+	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-
-	if (ImGui::Button("Z view"))
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.35f, 0.9f, 1.0f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
+	if (ImGui::Button("Z", ImVec2(22.0f, 22.0f)))
 	{
 		glm::vec3 rotatePoint = selectedPlanet ? selectedPlanet->GetTransform().Position : glm::vec3(0.0f);
 		float distance = glm::distance(editorCam.GetPosition(), rotatePoint);
-
+	
 		m_Scene->SetState(std::make_unique<InterpolateViewState>(m_Scene.get(), &m_Scene->m_Camera,
 			rotatePoint + glm::vec3(0.0f, 0.0f, distance), glm::radians(0.0f), glm::radians(0.0f)));
 	}
-
+	
+	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-
+	
 	ImGui::SetNextItemWidth(128.0f);
 	if (ImGui::BeginCombo("##Coordinate space", 
 		(std::string("Space: ") + (m_GizmoCoords == ImGuizmo::WORLD ? "World" : "Local")).c_str()))
@@ -296,15 +308,15 @@ void EditorLayer::RenderTopbar()
 		{
 			m_GizmoCoords = ImGuizmo::LOCAL;
 		}
-
+	
 		if (ImGui::Selectable("World", m_GizmoCoords == ImGuizmo::WORLD))
 		{
 			m_GizmoCoords = ImGuizmo::WORLD;
 		}
-
+	
 		ImGui::EndCombo();
 	}
-
+	
 	ImGui::SameLine();
 	ImGui::Checkbox("Grid", &m_Scene->m_RenderGrid);
 	ImGui::SameLine();
