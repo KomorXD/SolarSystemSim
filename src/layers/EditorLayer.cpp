@@ -229,6 +229,10 @@ void EditorLayer::RenderTopbar()
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, m_TopbarHeight });
 	
 	ImGui::Begin("Topbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+	ImGui::Columns(3);
+	ImGui::SetColumnWidth(0, 72.0f);
+	ImGui::SetColumnWidth(1, 96.0f);
+	ImGui::SetColumnWidth(2, 136.0f);
 
 	Camera& editorCam = m_Scene->m_Camera;
 	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
@@ -253,7 +257,7 @@ void EditorLayer::RenderTopbar()
 		m_Scene->m_SelectedPlanet = m_Scene->m_Planets.emplace_back(std::make_unique<Sun>()).get();
 	}
 	ImGui::PopID();
-	ImGui::SameLine();
+	ImGui::NextColumn();
 	
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.1f, 0.15f, 1.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.2f, 0.25f, 1.0f));
@@ -298,7 +302,7 @@ void EditorLayer::RenderTopbar()
 	}
 	
 	ImGui::PopStyleColor(3);
-	ImGui::SameLine();
+	ImGui::NextColumn();
 	
 	ImGui::SetNextItemWidth(128.0f);
 	if (ImGui::BeginCombo("##Coordinate space", 
@@ -321,7 +325,7 @@ void EditorLayer::RenderTopbar()
 	ImGui::Checkbox("Grid", &m_Scene->m_RenderGrid);
 	ImGui::SameLine();
 	ImGui::Checkbox("Skybox", &m_Scene->m_RenderSkybox);
-	ImGui::SameLine();
+	ImGui::Columns(1);
 
 	ImGui::End();
 }

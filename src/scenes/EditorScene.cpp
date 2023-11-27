@@ -362,6 +362,7 @@ void EditorScene::DrawGridPlane()
 	int32_t zOffset = cameraPos.z / 4;
 	
 	Renderer::LoadLineUniform3f("u_CameraPos", cameraPos);
+	Renderer::SetLineWidth(1.0f);
 
 	for (float x = -distance + xOffset * 4.0f; x <= distance + xOffset * 4.0f; x += 4.0f)
 	{
