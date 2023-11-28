@@ -229,10 +229,12 @@ void EditorLayer::RenderTopbar()
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.6f, m_TopbarHeight });
 	
 	ImGui::Begin("Topbar", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-	ImGui::Columns(3);
+	ImGui::Columns(5);
 	ImGui::SetColumnWidth(0, 72.0f);
 	ImGui::SetColumnWidth(1, 96.0f);
-	ImGui::SetColumnWidth(2, 136.0f);
+	ImGui::SetColumnWidth(2, 144.0f);
+	ImGui::SetColumnWidth(3, 86.0f);
+	ImGui::SetColumnWidth(4, 86.0f);
 
 	Camera& editorCam = m_Scene->m_Camera;
 	Planet* selectedPlanet = m_Scene->m_SelectedPlanet;
@@ -320,13 +322,14 @@ void EditorLayer::RenderTopbar()
 	
 		ImGui::EndCombo();
 	}
-	
-	ImGui::SameLine();
-	ImGui::Checkbox("Grid", &m_Scene->m_RenderGrid);
-	ImGui::SameLine();
-	ImGui::Checkbox("Skybox", &m_Scene->m_RenderSkybox);
-	ImGui::Columns(1);
 
+	ImGui::NextColumn();
+	ImGui::Checkbox("Grid", &m_Scene->m_RenderGrid);
+
+	ImGui::NextColumn();
+	ImGui::Checkbox("Skybox", &m_Scene->m_RenderSkybox);
+	
+	ImGui::Columns(1);
 	ImGui::End();
 }
 
