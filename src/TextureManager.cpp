@@ -159,7 +159,7 @@ void TextureManager::AddDefaults()
 	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
 		{ rect.w / 4096.0f, rect.h / 4096.0f } });
 
-	std::vector<glm::u8vec4> normalMapPixelData(256 * 256, { 0, 0, 255, 255 });
+	std::vector<glm::u8vec4> normalMapPixelData(256 * 256, { 127, 127, 255, 255 });
 	rect = s_Rects[1];
 	s_Atlas->SetSubtexture((const uint8_t*)normalMapPixelData.data(), { rect.x, rect.y }, { rect.w, rect.h });
 	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
