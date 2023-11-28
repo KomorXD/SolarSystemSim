@@ -1,4 +1,5 @@
 #include "IcosahedronSphere.hpp"
+#include <glm/gtc/constants.hpp>
 
 static std::vector<glm::vec3> GenerateIcosahedronVertices()
 {
@@ -39,27 +40,14 @@ static std::vector<uint32_t> s_IcosahedronIndices =
 	 4, 9,  5, 2, 4,  11, 6,  2,  10, 8,  6, 7,  9, 8,  1
 };
 
-static std::pair<glm::vec3, glm::vec3> CalcualteTangentBasis(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
+static std::pair<glm::vec3, glm::vec3> CalcualteTangentBasis(const glm::vec3& a)
 {
-	glm::vec2 uv1(0.0f, 1.0f);
-	glm::vec2 uv2(0.0f, 0.0f);
-	glm::vec2 uv3(1.0f, 0.0f);
-	glm::vec2 deltaUV1 = uv2 - uv1;
-	glm::vec2 deltaUV2 = uv3 - uv1;
-	glm::vec3 edge1 = b - a;
-	glm::vec3 edge2 = c - a;
-
-	float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-	glm::vec3 tangent(
-		f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-		f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-		f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z)
-	);
-	glm::vec3 bitangent(
-		f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-		f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-		f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z)
-	);
+	float phi = std::acosf(a.z / std::sqrtf(a.x * a.x + a.y * a.y + a.z * a.z));
+	float theta = std::atan2f(a.y, a.x);
+	
+	glm::vec2 uv(theta / (2.0f * glm::pi<float>()), phi / glm::pi<float>());
+	glm::vec3 tangent(-std::sinf(theta), std::cosf(theta), 0.0f);
+	glm::vec3 bitangent(-std::sinf(phi) * std::cosf(theta), -std::sinf(phi) * std::sinf(theta), std::cosf(phi));
 
 	return { glm::normalize(tangent), glm::normalize(bitangent) };
 }
@@ -76,10 +64,12 @@ static void Subdivide(IcosahedronSphereData& target, const glm::vec3& a, const g
 		glm::vec3 normB = glm::normalize(b);
 		glm::vec3 normC = glm::normalize(c);
 
-		auto[tangent, bitangent] = CalcualteTangentBasis(normA, normB, normC);
-		target.Vertices.push_back({ normA, tangent, bitangent });
-		target.Vertices.push_back({ normB, tangent, bitangent });
-		target.Vertices.push_back({ normC, tangent, bitangent });
+		auto[tangentA, bitangentA] = CalcualteTangentBasis(normA);
+		auto[tangentB, bitangentB] = CalcualteTangentBasis(normB);
+		auto[tangentC, bitangentC] = CalcualteTangentBasis(normC);
+		target.Vertices.push_back({ normA, tangentA, bitangentA });
+		target.Vertices.push_back({ normB, tangentB, bitangentB });
+		target.Vertices.push_back({ normC, tangentC, bitangentC });
 
 		return;
 	}

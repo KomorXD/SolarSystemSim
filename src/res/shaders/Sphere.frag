@@ -48,6 +48,17 @@ vec2 calcTextureUV()
 	return uv;
 }
 
+vec2 calcNormalUV()
+{
+	float pi = 3.14159265358979323846;
+	vec2 uv;
+	uv.x = 0.5 + atan(fs_in.staticNormal.z, fs_in.staticNormal.x) / (2.0 * pi);
+	uv.y = 0.5 - asin(fs_in.staticNormal.y) / pi;
+	uv = fs_in.material.normalUvStart + (fs_in.material.normalUvEnd - fs_in.material.normalUvStart) * uv;
+
+	return uv;
+}
+
 vec3 directionalLightImpact()
 {
 	float directionalStrength = max(dot(fs_in.vertexNormal, -DIRECTIONAL_DIR), 0.0);
@@ -57,23 +68,23 @@ vec3 directionalLightImpact()
 	return directionalStrength * DIRECTIONAL_COLOR;
 }
 
-vec3 lightDiffuseImpact(PointLight light)
+vec3 lightDiffuseImpact(PointLight light, vec3 normal)
 {
 	float fragToLightLen = length(light.position - fs_in.worldPos);
 	// float attenuation = 1.0 / fragToLightLen;
 	vec3 lightDir = normalize(light.position - fs_in.worldPos);
-	float diffuseStrength = max(dot(normalize(fs_in.vertexNormal), lightDir), 0.0);
+	float diffuseStrength = max(dot(normalize(normal), lightDir), 0.0);
 	float diffuseLevel = floor(diffuseStrength * SHADING_LEVELS);
 	diffuseStrength = diffuseLevel / SHADING_LEVELS;
 
 	return diffuseStrength * light.color * light.intensity;
 }
 
-vec3 lightSpecularImpact(PointLight light)
+vec3 lightSpecularImpact(PointLight light, vec3 normal)
 {
 	vec3 viewDir = normalize(u_ViewPos - fs_in.worldPos);
 	vec3 lightDir = normalize(light.position - fs_in.worldPos);
-	vec3 reflectDir = reflect(-lightDir, fs_in.vertexNormal);
+	vec3 reflectDir = reflect(-lightDir, normal);
 	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 
 	return fs_in.material.shininess * specularStrength * light.color;
@@ -84,11 +95,13 @@ void main()
 	float ambientStrength = 0.1;
 	vec3 diffuse = vec3(0.0);
 	vec3 specular = vec3(0.0);
+	vec3 normal = texture(u_TextureAtlas, calcNormalUV()).rgb;
+	normal = normal * 2.0 - 1.0;
 
 	for(int i = 0; i < u_ActiveLights; i++)
 	{
-		diffuse += lightDiffuseImpact(u_Lights[i]);
-		specular += lightSpecularImpact(u_Lights[i]);
+		diffuse += lightDiffuseImpact(u_Lights[i], normal);
+		specular += lightSpecularImpact(u_Lights[i], normal);
 	}
 
 	// vec3 directional = directionalLightImpact();
