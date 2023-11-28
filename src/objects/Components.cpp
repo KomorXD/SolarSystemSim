@@ -124,7 +124,7 @@ void Material::OnImGuiRender()
 
 				if (res.has_value())
 				{
-					TextureID = res.value().TextureID;
+					NormalMapTextureID = res.value().TextureID;
 				}
 			}
 

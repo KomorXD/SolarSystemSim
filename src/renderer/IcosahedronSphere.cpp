@@ -40,14 +40,13 @@ static std::vector<uint32_t> s_IcosahedronIndices =
 	 4, 9,  5, 2, 4,  11, 6,  2,  10, 8,  6, 7,  9, 8,  1
 };
 
-static std::pair<glm::vec3, glm::vec3> CalcualteTangentBasis(const glm::vec3& a)
+static std::pair<glm::vec3, glm::vec3> CalcualteTangentBasis(const glm::vec3& vertex)
 {
-	float phi = std::acosf(a.z / std::sqrtf(a.x * a.x + a.y * a.y + a.z * a.z));
-	float theta = std::atan2f(a.y, a.x);
+	float phi = std::acosf(vertex.z / std::sqrtf(vertex.x * vertex.x + vertex.y * vertex.y + vertex.z * vertex.z));
+	float theta = std::atan2f(vertex.y, vertex.x);
 	
-	glm::vec2 uv(theta / (2.0f * glm::pi<float>()), phi / glm::pi<float>());
 	glm::vec3 tangent(-std::sinf(theta), std::cosf(theta), 0.0f);
-	glm::vec3 bitangent(-std::sinf(phi) * std::cosf(theta), -std::sinf(phi) * std::sinf(theta), std::cosf(phi));
+	glm::vec3 bitangent = glm::cross(glm::normalize(vertex), tangent);
 
 	return { glm::normalize(tangent), glm::normalize(bitangent) };
 }

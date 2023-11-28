@@ -33,7 +33,6 @@ uniform sampler2D u_TextureAtlas;
 uniform PointLight u_Lights[16];
 uniform int u_ActiveLights = 0;
 
-const int SHADING_LEVELS = 3;
 const vec3 DIRECTIONAL_COLOR = vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 const vec3 DIRECTIONAL_DIR = normalize(vec3(-0.3, -0.5, -0.6));
 
@@ -62,8 +61,6 @@ vec2 calcNormalUV()
 vec3 directionalLightImpact()
 {
 	float directionalStrength = max(dot(fs_in.vertexNormal, -DIRECTIONAL_DIR), 0.0);
-	float directionalLevel = floor(directionalStrength * SHADING_LEVELS);
-	directionalStrength = directionalLevel / SHADING_LEVELS;
 
 	return directionalStrength * DIRECTIONAL_COLOR;
 }
@@ -71,11 +68,8 @@ vec3 directionalLightImpact()
 vec3 lightDiffuseImpact(PointLight light, vec3 normal)
 {
 	float fragToLightLen = length(light.position - fs_in.worldPos);
-	// float attenuation = 1.0 / fragToLightLen;
 	vec3 lightDir = normalize(light.position - fs_in.worldPos);
-	float diffuseStrength = max(dot(normalize(normal), lightDir), 0.0);
-	float diffuseLevel = floor(diffuseStrength * SHADING_LEVELS);
-	diffuseStrength = diffuseLevel / SHADING_LEVELS;
+	float diffuseStrength = max(dot(normal, lightDir), 0.0) * step(0.0, dot(fs_in.vertexNormal, lightDir));
 
 	return diffuseStrength * light.color * light.intensity;
 }
@@ -85,7 +79,7 @@ vec3 lightSpecularImpact(PointLight light, vec3 normal)
 	vec3 viewDir = normalize(u_ViewPos - fs_in.worldPos);
 	vec3 lightDir = normalize(light.position - fs_in.worldPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
-	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32) * step(0.0, dot(fs_in.vertexNormal, lightDir));
 
 	return fs_in.material.shininess * specularStrength * light.color;
 }
@@ -97,6 +91,7 @@ void main()
 	vec3 specular = vec3(0.0);
 	vec3 normal = texture(u_TextureAtlas, calcNormalUV()).rgb;
 	normal = normal * 2.0 - 1.0;
+	normal = fs_in.TBN * normal;
 
 	for(int i = 0; i < u_ActiveLights; i++)
 	{
@@ -104,7 +99,6 @@ void main()
 		specular += lightSpecularImpact(u_Lights[i], normal);
 	}
 
-	// vec3 directional = directionalLightImpact();
 	vec3 result = (ambientStrength + diffuse + specular) * fs_in.material.color.rgb;
 	
 	float gamma = 2.2;
