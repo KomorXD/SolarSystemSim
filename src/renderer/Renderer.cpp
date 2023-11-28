@@ -185,29 +185,29 @@ void Renderer::Init()
 		auto [sphereVertices, sphereIndices] = GenerateIcosahedronSphere(4);
 
 		s_Data.SphereVertexArray = std::make_shared<VertexArray>();
-		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(glm::vec3));
-		s_Data.SphereVertexBuffer->SetData(sphereVertices.data(), (uint32_t)(sphereVertices.size() * sizeof(glm::vec3)));
+		s_Data.SphereVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(IcosahedronVertex));
+		s_Data.SphereVertexBuffer->SetData(sphereVertices.data(), (uint32_t)(sphereVertices.size() * sizeof(IcosahedronVertex)));
 
 		VertexBufferLayout layout;
-
-		layout.Push<float>(3); // Position
+		layout.Push<float>(3); // 0 Position
+		layout.Push<float>(3); // 1 Tangent
+		layout.Push<float>(3); // 2 Bitangent
 		
 		std::unique_ptr<IndexBuffer> ibo = std::make_unique<IndexBuffer>(sphereIndices.data(), (uint32_t)sphereIndices.size());
-
 		s_Data.SphereVertexArray->AddBuffers(s_Data.SphereVertexBuffer, ibo, layout);
 
 		layout.Clear();
-		layout.Push<float>(4); // Transform
-		layout.Push<float>(4); // Transform
-		layout.Push<float>(4); // Transform
-		layout.Push<float>(4); // Transform
-		layout.Push<float>(4); // Material color
-		layout.Push<float>(1); // Material shininess
-		layout.Push<float>(2); // UV Start
-		layout.Push<float>(2); // UV End
+		layout.Push<float>(4); // 3  Transform
+		layout.Push<float>(4); // 4  Transform
+		layout.Push<float>(4); // 5  Transform
+		layout.Push<float>(4); // 6  Transform
+		layout.Push<float>(4); // 7  Material color
+		layout.Push<float>(1); // 8  Material shininess
+		layout.Push<float>(2); // 9  UV Start
+		layout.Push<float>(2); // 10 UV End
 
 		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereInstance));
-		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 1);
+		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 3);
 
 		s_Data.SpheresTransformsBufferBase = new SphereInstance[254];
 		s_Data.PlanetShader = std::make_shared<Shader>("res/shaders/Sphere.vert", "res/shaders/Sphere.frag");

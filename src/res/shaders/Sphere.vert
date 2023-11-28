@@ -8,19 +8,21 @@ struct Material
 	vec2 uvEnd;
 };
 
-layout(location = 0) in vec3 a_Position;
-layout(location = 1) in mat4 a_Transform;
-layout(location = 5) in vec4 a_MaterialColor;
-layout(location = 6) in float a_MaterialShininess;
-layout(location = 7) in vec2 a_MaterialUvStart;
-layout(location = 8) in vec2 a_MaterialUvEnd;
+layout(location = 0)  in vec3  a_Position;
+layout(location = 1)  in vec3  a_Tangent;
+layout(location = 2)  in vec3  a_Bitangent;
+layout(location = 3)  in mat4  a_Transform;
+layout(location = 7)  in vec4  a_MaterialColor;
+layout(location = 8)  in float a_MaterialShininess;
+layout(location = 9)  in vec2  a_MaterialUvStart;
+layout(location = 10) in vec2  a_MaterialUvEnd;
 
 out VS_OUT
 {
-	out vec3 worldPos;
-	out vec3 vertexNormal;
-	out vec3 staticNormal;
-	out Material material;
+	vec3 worldPos;
+	vec3 vertexNormal;
+	vec3 staticNormal;
+	Material material;
 } vs_out;
 
 uniform mat4 u_ViewProjection;

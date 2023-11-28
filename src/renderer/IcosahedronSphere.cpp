@@ -39,6 +39,31 @@ static std::vector<uint32_t> s_IcosahedronIndices =
 	 4, 9,  5, 2, 4,  11, 6,  2,  10, 8,  6, 7,  9, 8,  1
 };
 
+static std::pair<glm::vec3, glm::vec3> CalcualteTangentBasis(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
+{
+	glm::vec2 uv1(0.0f, 1.0f);
+	glm::vec2 uv2(0.0f, 0.0f);
+	glm::vec2 uv3(1.0f, 0.0f);
+	glm::vec2 deltaUV1 = uv2 - uv1;
+	glm::vec2 deltaUV2 = uv3 - uv1;
+	glm::vec3 edge1 = b - a;
+	glm::vec3 edge2 = c - a;
+
+	float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+	glm::vec3 tangent(
+		f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
+		f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
+		f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z)
+	);
+	glm::vec3 bitangent(
+		f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
+		f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
+		f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z)
+	);
+
+	return { glm::normalize(tangent), glm::normalize(bitangent) };
+}
+
 static void Subdivide(IcosahedronSphereData& target, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, int32_t depth)
 {
 	if (depth == 0)
@@ -47,9 +72,14 @@ static void Subdivide(IcosahedronSphereData& target, const glm::vec3& a, const g
 		target.Indices.push_back(target.Vertices.size() + 1);
 		target.Indices.push_back(target.Vertices.size() + 2);
 
-		target.Vertices.push_back(glm::normalize(a));
-		target.Vertices.push_back(glm::normalize(b));
-		target.Vertices.push_back(glm::normalize(c));
+		glm::vec3 normA = glm::normalize(a);
+		glm::vec3 normB = glm::normalize(b);
+		glm::vec3 normC = glm::normalize(c);
+
+		auto[tangent, bitangent] = CalcualteTangentBasis(normA, normB, normC);
+		target.Vertices.push_back({ normA, tangent, bitangent });
+		target.Vertices.push_back({ normB, tangent, bitangent });
+		target.Vertices.push_back({ normC, tangent, bitangent });
 
 		return;
 	}

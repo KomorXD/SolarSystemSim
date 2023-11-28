@@ -3,9 +3,16 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+struct IcosahedronVertex
+{
+	glm::vec3 Position;
+	glm::vec3 Tangent;
+	glm::vec3 Bitangent;
+};
+
 struct IcosahedronSphereData
 {
-	std::vector<glm::vec3> Vertices;
+	std::vector<IcosahedronVertex> Vertices;
 	std::vector<uint32_t> Indices;
 };
 
