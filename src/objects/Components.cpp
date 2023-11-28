@@ -54,14 +54,16 @@ void Material::OnImGuiRender()
 		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
 			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
 		ImGui::NextColumn();
-		ImGui::InputText("##Path", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputText("##TexturePath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
 		ImGui::SameLine();
 
+		ImGui::PushID(1);
 		if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
 		{
 			ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
 				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 		}
+		ImGui::PopID();
 
 		if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
 		{			   
@@ -87,6 +89,49 @@ void Material::OnImGuiRender()
 		ImGui::PopStyleVar();
 		ImGui::NewLine();
 		ImGui::PrettyDragFloat("Shininess", &Shininess, 0.0f, 128.0f);
+		ImGui::Columns(1);
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+		
+		tex = TextureManager::GetTexture(NormalMapTextureID).value();
+
+		ImGui::Text("Normal map");
+		ImGui::NewLine();
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 100.0f);
+		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+		ImGui::NextColumn();
+		ImGui::InputText("##NormalMapPath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+		ImGui::SameLine();
+
+		ImGui::PushID(2);
+		if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
+		{
+			ImGuiFileDialog::Instance()->OpenDialog("ChooseNormalTextureKey", "Choose normal map file",
+				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+		}
+		ImGui::PopID();
+
+		if (ImGuiFileDialog::Instance()->Display("ChooseNormalTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+		{
+			if (ImGuiFileDialog::Instance()->IsOk())
+			{
+				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
+
+				if (res.has_value())
+				{
+					TextureID = res.value().TextureID;
+				}
+			}
+
+			ImGuiFileDialog::Instance()->Close();
+		}
+
+		ImGui::Columns(1);
 
 		ImGui::Unindent(16.0f);
 	}

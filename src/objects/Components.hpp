@@ -28,6 +28,8 @@ struct Material
 	int32_t TextureID = 1;
 	bool TextureInUse = true;
 
+	int32_t NormalMapTextureID = 2;
+
 	void OnImGuiRender();
 };
 
