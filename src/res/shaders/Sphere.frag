@@ -20,6 +20,7 @@ in VS_OUT
 	vec3 worldPos;
 	vec3 vertexNormal;
 	vec3 staticNormal;
+	mat3 TBN;
 	Material material;
 } fs_in;
 
