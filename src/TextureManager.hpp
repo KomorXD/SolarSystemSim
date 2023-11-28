@@ -32,11 +32,14 @@ public:
 	static bool RemoveTexture(uint32_t id);
 
 	constexpr static uint32_t DEFAULT_ALBEDO  = 1;
-	constexpr static uint32_t NEW_PLANET_ICON = 2;
-	constexpr static uint32_t NEW_SUN_ICON    = 3;
+	constexpr static uint32_t DEFAULT_NORMAL  = 2;
+	constexpr static uint32_t NEW_PLANET_ICON = 3;
+	constexpr static uint32_t NEW_SUN_ICON    = 4;
 
 private:
 	TextureManager() = default;
+
+	static void AddDefaults();
 
 	static std::unique_ptr<Texture> s_Atlas;
 	static std::vector<TextureInfo> s_Textures;

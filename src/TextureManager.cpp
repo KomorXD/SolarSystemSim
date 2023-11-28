@@ -19,30 +19,8 @@ void TextureManager::Init()
 	s_Atlas = std::make_unique<Texture>(4096, 4096);
 	s_Nodes.resize(256);
 
-	stbrp_rect whitePixelRect{};
-	whitePixelRect.id = s_IndexCounter;
-	whitePixelRect.w = 1;
-	whitePixelRect.h = 1;
-	s_Rects.push_back(whitePixelRect);
-	s_IndexCounter++;
-
-	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
-
-	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
-	{
-		LOG_INFO("Initialized stbrp_rect_pack.");
-	}
-	else
-	{
-		LOG_ERROR("A 1x1 pixel somehow didn't fit xd");
-	}
-
-	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
-	whitePixelRect = s_Rects[0];
-
-	s_Atlas->SetSubtexture(whitePixelData, { whitePixelRect.x, whitePixelRect.y }, { whitePixelRect.w, whitePixelRect.h });
-	s_Textures.push_back({ whitePixelRect.id, "", { whitePixelRect.x / 4096.0f, whitePixelRect.y / 4096.0f }, 
-		{ whitePixelRect.w / 4096.0f, whitePixelRect.h / 4096.0f } });
+	AddDefaults();
+	s_IndexCounter = DEFAULT_NORMAL + 1;
 
 	AddTexture("res/textures/icons/new-planet.png");
 	AddTexture("res/textures/icons/new-sun.png");
@@ -148,4 +126,42 @@ bool TextureManager::RemoveTexture(uint32_t id)
 	s_Textures.erase(texItr);
 
 	return true;
+}
+
+void TextureManager::AddDefaults()
+{
+	stbrp_rect rect{};
+	rect.id = DEFAULT_ALBEDO;
+	rect.w = 1;
+	rect.h = 1;
+	s_Rects.push_back(rect);
+	
+	rect.id = DEFAULT_NORMAL;
+	rect.w = 256;
+	rect.h = 256;
+	s_Rects.push_back(rect);
+
+	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
+
+	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
+	{
+		LOG_INFO("Initialized stbrp_rect_pack.");
+	}
+	else
+	{
+		LOG_ERROR("A 1x1 pixel somehow didn't fit xd");
+	}
+
+	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
+	rect = s_Rects[0];
+
+	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
+		{ rect.w / 4096.0f, rect.h / 4096.0f } });
+
+	std::vector<glm::vec4> normalMapPixelData(256 * 256, { 0.0f, 0.0f, 255.0f, 255.0f });
+	rect = s_Rects[1];
+	s_Atlas->SetSubtexture((const uint8_t*)normalMapPixelData.data(), { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
+		{ rect.w / 4096.0f, rect.h / 4096.0f } });
 }
