@@ -6,6 +6,8 @@ struct Material
 	float shininess;
 	vec2 uvStart;
 	vec2 uvEnd;
+	vec2 normalUvStart;
+	vec2 normalUvEnd;
 };
 
 layout(location = 0)  in vec3  a_Position;
@@ -16,6 +18,8 @@ layout(location = 7)  in vec4  a_MaterialColor;
 layout(location = 8)  in float a_MaterialShininess;
 layout(location = 9)  in vec2  a_MaterialUvStart;
 layout(location = 10) in vec2  a_MaterialUvEnd;
+layout(location = 11) in vec2  a_MaterialNormalUvStart;
+layout(location = 12) in vec2  a_MaterialNormalUvEnd;
 
 uniform mat4 u_ViewProjection;
 
@@ -32,6 +36,8 @@ void main()
 	vs_out.material.shininess = a_MaterialShininess;
 	vs_out.material.uvStart = a_MaterialUvStart;
 	vs_out.material.uvEnd = a_MaterialUvEnd;
+	vs_out.material.normalUvStart = a_MaterialNormalUvStart;
+	vs_out.material.normalUvEnd = a_MaterialNormalUvEnd;
 
 	gl_Position = u_ViewProjection * a_Transform * vec4(a_Position, 1.0);
 }

@@ -35,8 +35,10 @@ struct SphereInstance
 	glm::mat4 Transform;
 	glm::vec4 Color;
 	float Shininess;
-	glm::vec2 StartUV;
-	glm::vec2 EndUV;
+	glm::vec2 TextureStartUV;
+	glm::vec2 TextureEndUV;
+	glm::vec2 NormalStartUV;
+	glm::vec2 NormalEndUV;
 };
 
 struct QuadVertex
@@ -203,8 +205,10 @@ void Renderer::Init()
 		layout.Push<float>(4); // 6  Transform
 		layout.Push<float>(4); // 7  Material color
 		layout.Push<float>(1); // 8  Material shininess
-		layout.Push<float>(2); // 9  UV Start
-		layout.Push<float>(2); // 10 UV End
+		layout.Push<float>(2); // 9  Texture UV Start
+		layout.Push<float>(2); // 10 Texture UV End
+		layout.Push<float>(2); // 11 Normal UV Start
+		layout.Push<float>(2); // 12 Normal UV End
 
 		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereInstance));
 		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 3);
@@ -412,13 +416,16 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4
 		NextBatch();
 	}
 
-	TextureInfo defaultTex = TextureManager::GetTexture(1).value();
+	TextureInfo defaultTex  = TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value();
+	TextureInfo defaultNorm = TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value();
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
 	s_Data.SpheresTransformsBufferPtr->Color = color;
 	s_Data.SpheresTransformsBufferPtr->Shininess = 1.0f;
-	s_Data.SpheresTransformsBufferPtr->StartUV = defaultTex.UV;
-	s_Data.SpheresTransformsBufferPtr->EndUV = defaultTex.UV + defaultTex.Size;
+	s_Data.SpheresTransformsBufferPtr->TextureStartUV = defaultTex.UV;
+	s_Data.SpheresTransformsBufferPtr->TextureEndUV = defaultTex.UV + defaultTex.Size;
+	s_Data.SpheresTransformsBufferPtr->NormalStartUV = defaultNorm.UV;
+	s_Data.SpheresTransformsBufferPtr->NormalEndUV = defaultNorm.UV + defaultNorm.Size;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }
@@ -430,14 +437,19 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, Material materi
 		NextBatch();
 	}
 
-	std::optional<TextureInfo> textureInfo = TextureManager::GetTexture(material.TextureInUse ? material.TextureID : 1);
-	TextureInfo tex = textureInfo.value_or(TextureManager::GetTexture(1).value());
+	std::optional<TextureInfo> textureInfo = TextureManager::GetTexture(material.TextureInUse ? material.TextureID : TextureManager::DEFAULT_ALBEDO);
+	TextureInfo tex = textureInfo.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value());
+	
+	std::optional<TextureInfo> normalInfo = TextureManager::GetTexture(material.NormalMapTextureID);
+	TextureInfo norm = normalInfo.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value());
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
 	s_Data.SpheresTransformsBufferPtr->Color = material.Color;
 	s_Data.SpheresTransformsBufferPtr->Shininess = material.Shininess;
-	s_Data.SpheresTransformsBufferPtr->StartUV = tex.UV;
-	s_Data.SpheresTransformsBufferPtr->EndUV = tex.UV + tex.Size;
+	s_Data.SpheresTransformsBufferPtr->TextureStartUV = tex.UV;
+	s_Data.SpheresTransformsBufferPtr->TextureEndUV = tex.UV + tex.Size;
+	s_Data.SpheresTransformsBufferPtr->NormalStartUV = norm.UV;
+	s_Data.SpheresTransformsBufferPtr->NormalEndUV = norm.UV + norm.Size;
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }

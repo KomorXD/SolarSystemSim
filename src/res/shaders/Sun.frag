@@ -6,6 +6,8 @@ struct Material
 	float shininess;
 	vec2 uvStart;
 	vec2 uvEnd;
+	vec2 normalUvStart;
+	vec2 normalUvEnd;
 };
 
 in VS_OUT
