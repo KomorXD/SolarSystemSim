@@ -20,7 +20,7 @@ void TextureManager::Init()
 	s_Nodes.resize(256);
 
 	AddDefaults();
-	s_IndexCounter = DEFAULT_NORMAL + 1;
+	s_IndexCounter = DEFAULT_SPECULAR + 1;
 
 	AddTexture("res/textures/icons/new-planet.png");
 	AddTexture("res/textures/icons/new-sun.png");
@@ -49,7 +49,6 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 		return {};
 	}
 
-	// ===
 	stbrp_rect texRect{};
 	texRect.id = s_IndexCounter;
 	texRect.w = width;
@@ -71,7 +70,6 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 	s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
 	s_Textures.push_back({ texRect.id, path, { texRect.x / 4096.0f, texRect.y / 4096.0f },
 		{ texRect.w / 4096.0f, texRect.h / 4096.0f } });
-	// ===
 
 	return s_Textures.back();
 }
