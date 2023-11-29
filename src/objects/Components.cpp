@@ -108,8 +108,6 @@ void Material::RenderAlbedo()
 	ImGui::ColorEdit4("Color", glm::value_ptr(Color), ImGuiColorEditFlags_NoInputs);
 	ImGui::Columns(1);
 	ImGui::PopStyleVar();
-	ImGui::NewLine();
-	ImGui::PrettyDragFloat("Shininess", &Shininess, 0.0f, 128.0f);
 }					 
 					 
 void Material::RenderNormal()
@@ -148,8 +146,10 @@ void Material::RenderNormal()
 		}			  
 					  
 		ImGuiFileDialog::Instance()->Close();
-	}				  
-					  
+	}				
+
+	ImGui::NewLine();
+	ImGui::DragFloat("Roughness", &Roughness, 0.1f, 0.0f, 1.0f, "%.2f");
 	ImGui::Columns(1);
 }
 
@@ -191,6 +191,8 @@ void Material::RenderSpecular()
 		ImGuiFileDialog::Instance()->Close();
 	}
 
+	ImGui::NewLine();
+	ImGui::DragFloat("Shininess", &Shininess, 0.1f, 0.0f, 128.0f);
 	ImGui::Columns(1);
 }
 
