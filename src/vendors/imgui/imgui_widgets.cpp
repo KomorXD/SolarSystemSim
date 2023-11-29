@@ -2515,7 +2515,7 @@ IMGUI_API void ImGui::PrettyDragFloat(const char* label, float* v, float min, fl
 	ImGui::Text(label);
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(ImGui::CalcItemWidth());
-	ImGui::DragFloat("##Value", v, 0.5f, min, max, "%.2f");
+	ImGui::DragFloat("##Value", v, 0.1f, min, max, "%.2f");
 	ImGui::Columns(1);
 	ImGui::PopItemWidth();
 	ImGui::PopID();
