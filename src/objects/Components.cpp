@@ -44,97 +44,154 @@ void Material::OnImGuiRender()
 {
 	if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		TextureInfo tex = TextureManager::GetTexture(TextureID).value();
-
 		ImGui::Indent(16.0f);
-		ImGui::Text("Albedo");
-		ImGui::NewLine();
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, 100.0f);
-		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
-			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
-		ImGui::NextColumn();
-		ImGui::InputText("##TexturePath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
-		ImGui::SameLine();
-
-		ImGui::PushID(1);
-		if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
-		{
-			ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
-				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
-		}
-		ImGui::PopID();
-
-		if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
-		{			   
-			if (ImGuiFileDialog::Instance()->IsOk())
-			{		   
-				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
-					   
-				if (res.has_value())
-				{	   
-					TextureID = res.value().TextureID;
-				}	   
-			}		   
-					   
-			ImGuiFileDialog::Instance()->Close();
-		}
-
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(16.0f, 0.0f));
-		ImGui::Checkbox("Use", &TextureInUse);
-		ImGui::SameLine();
-		ImGui::ColorEdit4("Color", glm::value_ptr(Color), ImGuiColorEditFlags_NoInputs);
-		ImGui::Columns(1);
-		ImGui::PopStyleVar();
-		ImGui::NewLine();
-		ImGui::PrettyDragFloat("Shininess", &Shininess, 0.0f, 128.0f);
-		ImGui::Columns(1);
+		
+		RenderAlbedo();
 
 		ImGui::NewLine();
 		ImGui::Separator();
 		ImGui::NewLine();
 		
-		tex = TextureManager::GetTexture(NormalMapTextureID).value();
+		RenderNormal();
 
-		ImGui::Text("Normal map");
 		ImGui::NewLine();
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, 100.0f);
-		ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
-			ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
-		ImGui::NextColumn();
-		ImGui::InputText("##NormalMapPath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
-		ImGui::SameLine();
-
-		ImGui::PushID(2);
-		if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
-		{
-			ImGuiFileDialog::Instance()->OpenDialog("ChooseNormalTextureKey", "Choose normal map file",
-				".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
-		}
-		ImGui::PopID();
-
-		if (ImGuiFileDialog::Instance()->Display("ChooseNormalTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
-		{
-			if (ImGuiFileDialog::Instance()->IsOk())
-			{
-				std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-				std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
-
-				if (res.has_value())
-				{
-					NormalMapTextureID = res.value().TextureID;
-				}
-			}
-
-			ImGuiFileDialog::Instance()->Close();
-		}
-
-		ImGui::Columns(1);
+		ImGui::Separator();
+		ImGui::NewLine();
+		
+		RenderSpecular();
 
 		ImGui::Unindent(16.0f);
 	}
+}
+
+void Material::RenderAlbedo()
+{
+	TextureInfo tex = TextureManager::GetTexture(TextureID).value();
+					 
+	ImGui::Text("Albedo");
+	ImGui::NewLine();
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 100.0f);
+	ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+		ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+	ImGui::NextColumn();
+	ImGui::InputText("##TexturePath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+	ImGui::SameLine();
+					 
+	ImGui::PushID(1);
+	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
+	{				 
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
+			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+	}				 
+	ImGui::PopID();	 
+					 
+	if (ImGuiFileDialog::Instance()->Display("ChooseTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+	{				 
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{			 
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
+					 
+			if (res.has_value())
+			{		 
+				TextureID = res.value().TextureID;
+			}		 
+		}			 
+					 
+		ImGuiFileDialog::Instance()->Close();
+	}				 
+					 
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(16.0f, 0.0f));
+	ImGui::Checkbox("Use", &TextureInUse);
+	ImGui::SameLine();
+	ImGui::ColorEdit4("Color", glm::value_ptr(Color), ImGuiColorEditFlags_NoInputs);
+	ImGui::Columns(1);
+	ImGui::PopStyleVar();
+	ImGui::NewLine();
+	ImGui::PrettyDragFloat("Shininess", &Shininess, 0.0f, 128.0f);
+}					 
+					 
+void Material::RenderNormal()
+{
+	TextureInfo tex = TextureManager::GetTexture(NormalMapTextureID).value();
+					  
+	ImGui::Text("Normal map");
+	ImGui::NewLine(); 
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 100.0f);
+	ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+		ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+	ImGui::NextColumn();
+	ImGui::InputText("##NormalMapPath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+	ImGui::SameLine();
+					  
+	ImGui::PushID(2); 
+	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
+	{				  
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseNormalTextureKey", "Choose normal map file",
+			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+	}				  
+	ImGui::PopID();	  
+					  
+	if (ImGuiFileDialog::Instance()->Display("ChooseNormalTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+	{				  
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{			  
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
+					  
+			if (res.has_value())
+			{		  
+				NormalMapTextureID = res.value().TextureID;
+			}		  
+		}			  
+					  
+		ImGuiFileDialog::Instance()->Close();
+	}				  
+					  
+	ImGui::Columns(1);
+}
+
+void Material::RenderSpecular()
+{
+	TextureInfo tex = TextureManager::GetTexture(SpecularMapTextureID).value();
+
+	ImGui::Text("Specular map");
+	ImGui::NewLine();
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, 100.0f);
+	ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+		ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+	ImGui::NextColumn();
+	ImGui::InputText("##SpecularMapPath", tex.Path.data(), tex.Path.capacity(), ImGuiInputTextFlags_ReadOnly);
+	ImGui::SameLine();
+
+	ImGui::PushID(3);
+	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
+	{
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseSpecularTextureKey", "Choose specular map file",
+			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+	}
+	ImGui::PopID();
+
+	if (ImGuiFileDialog::Instance()->Display("ChooseSpecularTextureKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			std::optional<TextureInfo> res = TextureManager::AddTexture(filePathName);
+
+			if (res.has_value())
+			{
+				SpecularMapTextureID = res.value().TextureID;
+			}
+		}
+
+		ImGuiFileDialog::Instance()->Close();
+	}
+
+	ImGui::Columns(1);
 }
 
 void PointLight::OnImGuiRender()

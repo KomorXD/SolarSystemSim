@@ -25,12 +25,17 @@ struct Material
 {
 	glm::vec4 Color = { 0.44f, 0.44f, 0.44f, 1.0f };
 	float Shininess = 1.0f;
-	int32_t TextureID = 1;
 	bool TextureInUse = true;
 
+	int32_t TextureID = 1;
 	int32_t NormalMapTextureID = 2;
+	int32_t SpecularMapTextureID = 3;
 
 	void OnImGuiRender();
+
+	void RenderAlbedo();
+	void RenderNormal();
+	void RenderSpecular();
 };
 
 struct PointLight
