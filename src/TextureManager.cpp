@@ -16,7 +16,7 @@ void TextureManager::Init()
 {
 	FUNC_PROFILE();
 
-	s_Atlas = std::make_unique<Texture>(4096, 4096);
+	s_Atlas = std::make_unique<Texture>(8192, 8192);
 	s_Nodes.resize(256);
 
 	AddDefaults();
@@ -68,8 +68,9 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 	texRect = s_Rects.back();
 
 	s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
-	s_Textures.push_back({ texRect.id, path, { texRect.x / 4096.0f, texRect.y / 4096.0f },
-		{ texRect.w / 4096.0f, texRect.h / 4096.0f } });
+	s_Textures.push_back({ texRect.id, path, 
+		{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
+		{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
 
 	return s_Textures.back();
 }
@@ -144,7 +145,7 @@ void TextureManager::AddDefaults()
 	rect.h = 1;
 	s_Rects.push_back(rect);
 
-	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
+	stbrp_init_target(&s_Context, (uint32_t)s_Atlas->GetWidth(), (uint32_t)s_Atlas->GetHeight(), s_Nodes.data(), s_Nodes.size());
 
 	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
 	{
@@ -158,17 +159,20 @@ void TextureManager::AddDefaults()
 	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
 	rect = s_Rects[0];
 	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
-		{ rect.w / 4096.0f, rect.h / 4096.0f } });
+	s_Textures.push_back({ rect.id, "", 
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 
 	uint8_t normalMapPixelData[4] = { 127, 127, 255, 255 };
 	rect = s_Rects[1];
 	s_Atlas->SetSubtexture(normalMapPixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
-		{ rect.w / 4096.0f, rect.h / 4096.0f } });
+	s_Textures.push_back({ rect.id, "", 
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 	
 	rect = s_Rects[2];
 	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
-		{ rect.w / 4096.0f, rect.h / 4096.0f } });
+	s_Textures.push_back({ rect.id, "", 
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 }
