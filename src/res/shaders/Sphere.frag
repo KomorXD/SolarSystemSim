@@ -69,10 +69,10 @@ vec3 lightSpecularImpact(PointLight light, vec3 normal)
 {
 	vec3 viewDir = normalize(u_ViewPos - fs_in.worldPos);
 	vec3 lightDir = normalize(light.position - fs_in.worldPos);
-	vec3 reflectDir = reflect(-lightDir, normal);
-	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32) * step(0.0, dot(fs_in.vertexNormal, lightDir));
+	vec3 halfwayDir = normalize(lightDir + viewDir);
+	float specularStrength = pow(max(dot(normal, halfwayDir), 0.0), fs_in.material.shininess);
 
-	return fs_in.material.shininess * specularStrength * light.color;
+	return specularStrength * light.color;
 }
 
 void main()
