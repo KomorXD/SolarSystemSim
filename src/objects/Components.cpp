@@ -192,7 +192,7 @@ void Material::RenderSpecular()
 	}
 
 	ImGui::NewLine();
-	ImGui::DragFloat("Shininess", &Shininess, 0.1f, 0.0f, 128.0f);
+	ImGui::DragFloat("Shininess", &Shininess, 0.1f, 1.0f, 128.0f);
 	ImGui::Columns(1);
 }
 
