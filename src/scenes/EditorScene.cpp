@@ -45,17 +45,10 @@ EditorScene::EditorScene()
 	};
 
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
-	TextureInfo ti = TextureManager::AddTexture("res/textures/earf.jpg").value();
 
 	m_Planets.emplace_back(std::make_unique<Planet>());
 	m_Planets[0]->SetMass(1000000.0f);
 	m_Planets[0]->SetRadius(10.0f);
-	m_Planets[0]->GetMaterial().TextureID = ti.TextureID;
-
-	m_Planets.emplace_back(std::make_unique<Planet>());
-	m_Planets[1]->GetTransform().Position = glm::vec3(30.0f, 0.0f, 0.0f);
-	m_Planets[1]->SetMass(10000.0f);
-	m_Planets[1]->GetMaterial().TextureID = ti.TextureID;
 
 	LOG_INFO("EditorScene initialized.");
 }
