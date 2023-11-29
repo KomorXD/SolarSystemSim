@@ -8,6 +8,8 @@ struct Material
 	vec2 uvEnd;
 	vec2 normalUvStart;
 	vec2 normalUvEnd;
+	vec2 specularUvStart;
+	vec2 specularUvEnd;
 };
 
 layout(location = 0)  in vec3  a_Position;
@@ -20,6 +22,8 @@ layout(location = 9)  in vec2  a_MaterialUvStart;
 layout(location = 10) in vec2  a_MaterialUvEnd;
 layout(location = 11) in vec2  a_MaterialNormalUvStart;
 layout(location = 12) in vec2  a_MaterialNormalUvEnd;
+layout(location = 13) in vec2  a_MaterialSpecularUvStart;
+layout(location = 14) in vec2  a_MaterialSpecularUvEnd;
 
 out VS_OUT
 {
@@ -43,6 +47,8 @@ void main()
 	vs_out.material.uvEnd = a_MaterialUvEnd;
 	vs_out.material.normalUvStart = a_MaterialNormalUvStart;
 	vs_out.material.normalUvEnd = a_MaterialNormalUvEnd;
+	vs_out.material.specularUvStart = a_MaterialSpecularUvStart;
+	vs_out.material.specularUvEnd = a_MaterialSpecularUvEnd;
 
 	vec3 T = normalize(vec3(a_Transform * vec4(a_Tangent,	0.0)));
 	vec3 B = normalize(vec3(a_Transform * vec4(a_Bitangent, 0.0)));

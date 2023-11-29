@@ -8,6 +8,8 @@ struct Material
 	vec2 uvEnd;
 	vec2 normalUvStart;
 	vec2 normalUvEnd;
+	vec2 specularUvStart;
+	vec2 specularUvEnd;
 };
 
 struct PointLight
@@ -36,24 +38,13 @@ uniform int u_ActiveLights = 0;
 const vec3 DIRECTIONAL_COLOR = vec3(48.0 / 255.0, 16.0 / 255.0, 76.0 / 255.0);
 const vec3 DIRECTIONAL_DIR = normalize(vec3(-0.3, -0.5, -0.6));
 
-vec2 calcTextureUV()
+vec2 calcTextureUV(vec2 uvStart, vec2 uvEnd)
 {
 	float pi = 3.14159265358979323846;
 	vec2 uv;
 	uv.x = 0.5 + atan(fs_in.staticNormal.z, fs_in.staticNormal.x) / (2.0 * pi);
 	uv.y = 0.5 - asin(fs_in.staticNormal.y) / pi;
-	uv = fs_in.material.uvStart + (fs_in.material.uvEnd - fs_in.material.uvStart) * uv;
-
-	return uv;
-}
-
-vec2 calcNormalUV()
-{
-	float pi = 3.14159265358979323846;
-	vec2 uv;
-	uv.x = 0.5 + atan(fs_in.staticNormal.z, fs_in.staticNormal.x) / (2.0 * pi);
-	uv.y = 0.5 - asin(fs_in.staticNormal.y) / pi;
-	uv = fs_in.material.normalUvStart + (fs_in.material.normalUvEnd - fs_in.material.normalUvStart) * uv;
+	uv = uvStart + (uvEnd - uvStart) * uv;
 
 	return uv;
 }
@@ -89,20 +80,25 @@ void main()
 	float ambientStrength = 0.1;
 	vec3 diffuse = vec3(0.0);
 	vec3 specular = vec3(0.0);
-	vec3 normal = texture(u_TextureAtlas, calcNormalUV()).rgb;
+	vec3 normal = texture(u_TextureAtlas, calcTextureUV(
+		fs_in.material.normalUvStart, fs_in.material.normalUvEnd
+	)).rgb;
 	normal = normal * 2.0 - 1.0;
 	normal = fs_in.TBN * normal;
-
+	float specularFactor = texture(u_TextureAtlas, calcTextureUV(
+		fs_in.material.specularUvStart, fs_in.material.specularUvEnd
+	)).r;
+	
 	for(int i = 0; i < u_ActiveLights; i++)
 	{
 		diffuse += lightDiffuseImpact(u_Lights[i], normal);
-		specular += lightSpecularImpact(u_Lights[i], normal);
+		specular += lightSpecularImpact(u_Lights[i], normal) * specularFactor;
 	}
 
 	vec3 result = (ambientStrength + diffuse + specular) * fs_in.material.color.rgb;
 	
 	float gamma = 2.2;
-	vec2 uv = calcTextureUV();
+	vec2 uv = calcTextureUV(fs_in.material.uvStart, fs_in.material.uvEnd);
 	fragColor = vec4(result, fs_in.material.color.a);
 	fragColor = texture(u_TextureAtlas, uv) * fragColor;
 	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / gamma));

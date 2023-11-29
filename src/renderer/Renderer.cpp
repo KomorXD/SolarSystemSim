@@ -35,10 +35,15 @@ struct SphereInstance
 	glm::mat4 Transform;
 	glm::vec4 Color;
 	float Shininess;
+
 	glm::vec2 TextureStartUV;
 	glm::vec2 TextureEndUV;
+
 	glm::vec2 NormalStartUV;
 	glm::vec2 NormalEndUV;
+	
+	glm::vec2 SpecularStartUV;
+	glm::vec2 SpecularEndUV;
 };
 
 struct QuadVertex
@@ -209,6 +214,8 @@ void Renderer::Init()
 		layout.Push<float>(2); // 10 Texture UV End
 		layout.Push<float>(2); // 11 Normal UV Start
 		layout.Push<float>(2); // 12 Normal UV End
+		layout.Push<float>(2); // 13 Specular UV Start
+		layout.Push<float>(2); // 14 Specular UV End
 
 		s_Data.SphereTransformsVertexBuffer = std::make_shared<VertexBuffer>(nullptr, s_Data.MaxVertices * sizeof(SphereInstance));
 		s_Data.SphereVertexArray->AddInstancedVertexBuffer(s_Data.SphereTransformsVertexBuffer, layout, 3);
@@ -418,14 +425,21 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, const glm::vec4
 
 	TextureInfo defaultTex  = TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value();
 	TextureInfo defaultNorm = TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value();
+	TextureInfo defaultSpec = TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value();
 
 	s_Data.SpheresTransformsBufferPtr->Transform = transform;
 	s_Data.SpheresTransformsBufferPtr->Color = color;
 	s_Data.SpheresTransformsBufferPtr->Shininess = 1.0f;
+
 	s_Data.SpheresTransformsBufferPtr->TextureStartUV = defaultTex.UV;
 	s_Data.SpheresTransformsBufferPtr->TextureEndUV = defaultTex.UV + defaultTex.Size;
+
 	s_Data.SpheresTransformsBufferPtr->NormalStartUV = defaultNorm.UV;
 	s_Data.SpheresTransformsBufferPtr->NormalEndUV = defaultNorm.UV + defaultNorm.Size;
+
+	s_Data.SpheresTransformsBufferPtr->SpecularStartUV = defaultSpec.UV;
+	s_Data.SpheresTransformsBufferPtr->SpecularEndUV = defaultSpec.UV + defaultSpec.Size;
+
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }
@@ -442,14 +456,23 @@ void Renderer::SubmitSphereInstanced(const glm::mat4& transform, Material materi
 	
 	std::optional<TextureInfo> normalInfo = TextureManager::GetTexture(material.NormalMapTextureID);
 	TextureInfo norm = normalInfo.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value());
+	
+	std::optional<TextureInfo> specularInfo = TextureManager::GetTexture(material.SpecularMapTextureID);
+	TextureInfo spec = specularInfo.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value());
 
-	s_Data.SpheresTransformsBufferPtr->Transform = transform;
-	s_Data.SpheresTransformsBufferPtr->Color = material.Color;
+	s_Data.SpheresTransformsBufferPtr->Transform = transform;		  
+	s_Data.SpheresTransformsBufferPtr->Color = material.Color;		  
 	s_Data.SpheresTransformsBufferPtr->Shininess = material.Shininess;
+
 	s_Data.SpheresTransformsBufferPtr->TextureStartUV = tex.UV;
 	s_Data.SpheresTransformsBufferPtr->TextureEndUV = tex.UV + tex.Size;
+
 	s_Data.SpheresTransformsBufferPtr->NormalStartUV = norm.UV;
 	s_Data.SpheresTransformsBufferPtr->NormalEndUV = norm.UV + norm.Size;
+
+	s_Data.SpheresTransformsBufferPtr->SpecularStartUV = spec.UV;
+	s_Data.SpheresTransformsBufferPtr->SpecularEndUV = spec.UV + spec.Size;
+
 	++s_Data.SpheresTransformsBufferPtr;
 	++s_Data.SpheresInstanceCount;
 }

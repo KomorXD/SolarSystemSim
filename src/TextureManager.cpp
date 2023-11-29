@@ -137,8 +137,13 @@ void TextureManager::AddDefaults()
 	s_Rects.push_back(rect);
 	
 	rect.id = DEFAULT_NORMAL;
-	rect.w = 256;
-	rect.h = 256;
+	rect.w = 1;
+	rect.h = 1;
+	s_Rects.push_back(rect);
+	
+	rect.id = DEFAULT_SPECULAR;
+	rect.w = 1;
+	rect.h = 1;
 	s_Rects.push_back(rect);
 
 	stbrp_init_target(&s_Context, 4096, 4096, s_Nodes.data(), s_Nodes.size());
@@ -154,14 +159,18 @@ void TextureManager::AddDefaults()
 
 	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
 	rect = s_Rects[0];
-
 	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
 	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
 		{ rect.w / 4096.0f, rect.h / 4096.0f } });
 
-	std::vector<glm::u8vec4> normalMapPixelData(256 * 256, { 127, 127, 255, 255 });
+	uint8_t normalMapPixelData[4] = { 127, 127, 255, 255 };
 	rect = s_Rects[1];
-	s_Atlas->SetSubtexture((const uint8_t*)normalMapPixelData.data(), { rect.x, rect.y }, { rect.w, rect.h });
+	s_Atlas->SetSubtexture(normalMapPixelData, { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
+		{ rect.w / 4096.0f, rect.h / 4096.0f } });
+	
+	rect = s_Rects[2];
+	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
 	s_Textures.push_back({ rect.id, "", { rect.x / 4096.0f, rect.y / 4096.0f },
 		{ rect.w / 4096.0f, rect.h / 4096.0f } });
 }
