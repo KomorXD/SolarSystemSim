@@ -491,7 +491,7 @@ Framebuffer::~Framebuffer()
 
 	if (m_TextureID != 0)
 	{
-		GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 		GLCall(glDeleteTextures(1, &m_TextureID));
 	}
 
@@ -608,7 +608,7 @@ MultisampledFramebuffer::~MultisampledFramebuffer()
 
 	if (m_TextureID != 0)
 	{
-		GLCall(glBindTexture(GL_TEXTURE_2D, m_TextureID));
+		GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 		GLCall(glDeleteTextures(1, &m_TextureID));
 	}
 
