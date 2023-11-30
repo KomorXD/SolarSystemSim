@@ -148,8 +148,8 @@ void Material::RenderNormal()
 		ImGuiFileDialog::Instance()->Close();
 	}				
 
-	ImGui::NewLine();
-	ImGui::DragFloat("Roughness", &Roughness, 0.1f, 0.0f, 1.0f, "%.2f");
+	//ImGui::NewLine();
+	//ImGui::DragFloat("Roughness", &Roughness, 0.1f, 0.0f, 1.0f, "%.2f");
 	ImGui::Columns(1);
 }
 
