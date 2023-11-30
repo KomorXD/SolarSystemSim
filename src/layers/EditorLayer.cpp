@@ -9,20 +9,19 @@
 #include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
+#include <imgui_dialog/ImGuiFileDialog.h>
 #include <imgui/ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
 EditorLayer::EditorLayer()
 {
-	m_Scene = std::make_unique<EditorScene>();
-
 	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
 	Event dummyEv{};
-
 	dummyEv.Type = Event::WindowResized;
 	dummyEv.Size.Width = (uint32_t)(spec.Width * 0.6f);
 	dummyEv.Size.Height = spec.Height - m_TopbarHeight;
 	
+	m_Scene = std::make_unique<EditorScene>();
 	m_Scene->OnEvent(dummyEv);
 }
 
@@ -96,6 +95,43 @@ void EditorLayer::RenderScenePanel()
 	if (ImGui::Button("Save scene"))
 	{
 		SceneSerializer::SaveScene(*m_Scene);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Load scene"))
+	{
+		ImGuiFileDialog::Instance()->OpenDialog("ChooseSceneKey", "Choose scene file",
+			".sscene", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+	}
+
+	if (ImGuiFileDialog::Instance()->Display("ChooseSceneKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			std::optional<EditorScene> newScene = SceneSerializer::LoadScene(filePathName);
+
+			if (newScene.has_value())
+			{
+				WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+				Event dummyEv{};
+				dummyEv.Type = Event::WindowResized;
+				dummyEv.Size.Width = (uint32_t)(spec.Width * 0.6f);
+				dummyEv.Size.Height = spec.Height - m_TopbarHeight;
+
+				m_Scene = std::make_unique<EditorScene>(std::move(newScene.value()));
+				m_Scene->OnEvent(dummyEv);
+
+				LOG_INFO("Loaded new scene");
+			}
+			else
+			{
+				LOG_ERROR("Could not fetch scene");
+			}
+		}
+
+		ImGuiFileDialog::Instance()->Close();
 	}
 
 	ImVec2 avSpace = ImGui::GetContentRegionAvail();
