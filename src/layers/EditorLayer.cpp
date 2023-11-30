@@ -189,7 +189,7 @@ void EditorLayer::RenderImGuizmo()
 
 	ImGuizmo::SetOrthographic(false);
 	ImGuizmo::SetDrawlist();
-	ImGuizmo::SetRect(spec.Width * 0.2f, 0.0f, spec.Width * 0.6f, spec.Height * 1.0f);
+	ImGuizmo::SetRect(spec.Width * 0.2f, m_TopbarHeight, spec.Width * 0.6f, spec.Height - m_TopbarHeight);
 
 	const glm::mat4& cameraProj = editorCamera.GetProjection();
 	glm::mat4 cameraView = editorCamera.GetViewMatrix();
