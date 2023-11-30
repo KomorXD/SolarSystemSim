@@ -82,7 +82,7 @@ void Material::RenderAlbedo()
 	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
 	{				 
 		ImGuiFileDialog::Instance()->OpenDialog("ChooseTextureKey", "Choose texture file",
-			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+			"Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 	}				 
 	ImGui::PopID();	 
 					 
@@ -128,7 +128,7 @@ void Material::RenderNormal()
 	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
 	{				  
 		ImGuiFileDialog::Instance()->OpenDialog("ChooseNormalTextureKey", "Choose normal map file",
-			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+			"Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 	}				  
 	ImGui::PopID();	  
 					  
@@ -171,7 +171,7 @@ void Material::RenderSpecular()
 	if (ImGui::Button("...", ImVec2(22.0f, 22.0f)))
 	{
 		ImGuiFileDialog::Instance()->OpenDialog("ChooseSpecularTextureKey", "Choose specular map file",
-			".png,.jpg,.jpeg,.bmp", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+			"Image files (*.png *.gif *.jpg *.jpeg){.png,.gif,.jpg,.jpeg}", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 	}
 	ImGui::PopID();
 
