@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../scenes/EditorScene.hpp"
+#include <string>
+
+class EditorScene;
 
 class SceneSerializer
 {

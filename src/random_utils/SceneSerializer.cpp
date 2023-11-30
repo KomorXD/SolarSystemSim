@@ -1,6 +1,7 @@
 #include "SceneSerializer.hpp"
 #include "../Logger.hpp"
 #include "../TextureManager.hpp"
+#include "../scenes/EditorScene.hpp"
 
 #include <filesystem>
 #include <fstream>
@@ -22,17 +23,10 @@ bool SceneSerializer::SaveScene(const EditorScene& scene)
 
 	writePath.append(scene.m_SceneName + ".sscene");
 
-	int32_t copies = 0;
-	while (std::filesystem::exists(writePath))
-	{
-		copies++;
-		writePath.remove_filename().append(scene.m_SceneName + " (" + std::to_string(copies) + ").sscene");
-	}
-
 	file.open(writePath, std::ios::out | std::ios::binary);
 	if (!file.good())
 	{
-		LOG_ERROR("Saving scene {} failed: file {} could not be created/opened.", scene.m_SceneName, std::filesystem::absolute(writePath));
+		LOG_ERROR("Saving scene {} failed: file {} could not be created/opened.", scene.m_SceneName, std::filesystem::absolute(writePath).string());
 
 		file.close();
 		return false;
@@ -88,19 +82,19 @@ bool SceneSerializer::SaveScene(const EditorScene& scene)
 		
 		// Textures
 		std::string albedoPath = TextureManager::GetTexture(material.TextureID)
-			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO)).Path;
+			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value()).Path;
 		int32_t albedoPathLen = albedoPath.length();
 		file.write((char*)&albedoPathLen, sizeof(int32_t));
 		file.write(albedoPath.c_str(), albedoPathLen);
 
 		std::string normalPath = TextureManager::GetTexture(material.NormalMapTextureID)
-			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL)).Path;
+			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value()).Path;
 		int32_t normalPathLen = normalPath.length();
 		file.write((char*)&normalPathLen, sizeof(int32_t));
 		file.write(normalPath.c_str(), normalPathLen);
 
 		std::string specularPath = TextureManager::GetTexture(material.SpecularMapTextureID)
-			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR)).Path;
+			.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value()).Path;
 		int32_t specularPathLen = specularPath.length();
 		file.write((char*)&specularPathLen, sizeof(int32_t));
 		file.write(specularPath.c_str(), specularPathLen);
@@ -116,7 +110,7 @@ bool SceneSerializer::SaveScene(const EditorScene& scene)
 	}
 
 	file.close();
-	LOG_INFO("Saved scene {} to: {}", scene.m_SceneName, std::filesystem::absolute(writePath));
+	LOG_INFO("Saved scene {} to: {}", scene.m_SceneName, std::filesystem::absolute(writePath).string());
 
 	return true;
 }
