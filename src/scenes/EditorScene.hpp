@@ -10,7 +10,13 @@ class EditorScene : public Scene
 {
 public:
 	EditorScene();
+	EditorScene(EditorScene&& other) noexcept;
 	~EditorScene();
+
+	EditorScene& operator= (EditorScene&& other) noexcept
+	{
+		return Assign(std::move(other));
+	}
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnInput()			override;
@@ -27,6 +33,7 @@ public:
 	void CancelState();
 
 private:
+	EditorScene& Assign(EditorScene&& other) noexcept;
 	void CheckForPlanetSelect();
 	void DrawGridPlane();
 
@@ -42,7 +49,6 @@ private:
 
 	std::unique_ptr<Framebuffer> m_FB;
 	std::unique_ptr<MultisampledFramebuffer> m_MFB;
-	
 	std::shared_ptr<Cubemap> m_SkyboxTex;
 
 	float m_TS = 0.0f;

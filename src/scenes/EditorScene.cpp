@@ -29,8 +29,6 @@ EditorScene::EditorScene()
 	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.6f), spec.Height);
 	m_MFB->UnbindBuffer();
 
-	Renderer::Init();
-
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 40.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.6f, (float)spec.Height });
 
@@ -43,20 +41,18 @@ EditorScene::EditorScene()
 		"res/textures/skybox/front.png",
 		"res/textures/skybox/back.png"
 	};
-
 	m_SkyboxTex = std::make_shared<Cubemap>(faces);
-
-	m_Planets.emplace_back(std::make_unique<Planet>());
-	m_Planets[0]->SetMass(1000000.0f);
-	m_Planets[0]->SetRadius(10.0f);
 
 	LOG_INFO("EditorScene initialized.");
 }
 
+EditorScene::EditorScene(EditorScene&& other) noexcept
+{
+	*this = std::move(other);
+}
+
 EditorScene::~EditorScene()
 {
-	Renderer::Shutdown();
-
 	LOG_INFO("EditorScene destroyed.");
 }
 
@@ -298,6 +294,23 @@ uint32_t EditorScene::GetFramebufferTextureID() const
 void EditorScene::CancelState()
 {
 	m_ActiveState.reset();
+}
+
+EditorScene& EditorScene::Assign(EditorScene&& other) noexcept
+{
+	m_SceneName = std::move(other.m_SceneName);
+	m_ScenePath = std::move(other.m_ScenePath);
+	m_Planets = std::move(other.m_Planets);
+	m_Camera = std::move(other.m_Camera);
+
+	m_FB = std::move(other.m_FB);
+	m_MFB = std::move(other.m_MFB);
+	m_SkyboxTex = std::move(other.m_SkyboxTex);
+
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+	m_Camera.SetViewportSize({ (float)spec.Width * 0.6f, (float)spec.Height });
+
+	return *this;
 }
 
 void EditorScene::CheckForPlanetSelect()
