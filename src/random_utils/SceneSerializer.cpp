@@ -60,6 +60,8 @@ std::optional<EditorScene> SceneSerializer::LoadScene(const std::string& path)
 	scene.m_Camera.UpdateProjection();
 	scene.m_Camera.UpdateView();
 
+	TextureManager::ReInit();
+	
 	// Objects
 	int32_t objectsCount{};
 	file.read((char*)&objectsCount, sizeof(int32_t));
@@ -107,9 +109,35 @@ std::optional<EditorScene> SceneSerializer::LoadScene(const std::string& path)
 		file.read(buf, specularPathLen);
 		std::string specularPath = buf;
 
-		// TODO: Textures
+		if (albedoPath == "Default Albedo")
+		{
+			planet->m_Material.TextureID = TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value().TextureID;
+		}
+		else
+		{
+			planet->m_Material.TextureID = TextureManager::AddTexture(albedoPath)
+				.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value()).TextureID;
+		}
 
-		LOG_INFO("Read paths for planet \"{}\": {}, {}, {}", planet->m_Tag, albedoPath, normalPath, specularPath);
+		if (normalPath == "Default Normal")
+		{
+			planet->m_Material.NormalMapTextureID = TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value().TextureID;
+		}
+		else
+		{
+			planet->m_Material.NormalMapTextureID = TextureManager::AddTexture(normalPath)
+				.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value()).TextureID;
+		}
+
+		if (specularPath == "Default Specular")
+		{
+			planet->m_Material.SpecularMapTextureID = TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value().TextureID;
+		}
+		else
+		{
+			planet->m_Material.SpecularMapTextureID = TextureManager::AddTexture(specularPath)
+				.value_or(TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value()).TextureID;
+		}
 		
 		// If it's a star, point light info
 		if (planet->m_Type == ObjectType::Sun)
