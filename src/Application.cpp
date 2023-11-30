@@ -4,6 +4,7 @@
 #include "OpenGL.hpp"
 #include "TriggerClock.hpp"
 #include "TextureManager.hpp"
+#include "renderer/Renderer.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -74,6 +75,7 @@ Application::Application(const WindowSpec& spec)
 
 	LOG_INFO("GLAD loaded");
 
+	Renderer::Init();
 	TextureManager::Init();
 
 	s_Instance = this;
@@ -87,6 +89,7 @@ Application::~Application()
 	}
 	
 	glfwTerminate();
+	Renderer::Shutdown();
 }
 
 void Application::Run()
