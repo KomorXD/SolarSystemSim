@@ -35,4 +35,6 @@ protected:
 	Material m_Material;
 
 	Planet* m_RelativePathPlanet = nullptr;
+
+	friend class SceneSerializer;
 };

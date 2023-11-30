@@ -47,4 +47,6 @@ protected:
 	ObjectType m_Type = ObjectType::Empty;
 
 	static inline uint32_t s_IdCounter = 1;
+
+	friend class SceneSerializer;
 };

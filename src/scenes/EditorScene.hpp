@@ -30,6 +30,9 @@ private:
 	void CheckForPlanetSelect();
 	void DrawGridPlane();
 
+	std::string m_SceneName = "New scene";
+	std::string m_ScenePath = "";
+
 	std::unique_ptr<SceneState> m_ActiveState;
 
 	std::vector<std::unique_ptr<Planet>> m_Planets;
@@ -51,4 +54,5 @@ private:
 	static inline float TS_MULTIPLIER = 1.0f;
 
 	friend class EditorLayer;
+	friend class SceneSerializer;
 };

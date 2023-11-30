@@ -159,20 +159,20 @@ void TextureManager::AddDefaults()
 	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
 	rect = s_Rects[0];
 	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", 
+	s_Textures.push_back({ rect.id, "Default Albedo", 
 		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
 		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 
 	uint8_t normalMapPixelData[4] = { 127, 127, 255, 255 };
 	rect = s_Rects[1];
 	s_Atlas->SetSubtexture(normalMapPixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", 
+	s_Textures.push_back({ rect.id, "Default Normal", 
 		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
 		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 	
 	rect = s_Rects[2];
 	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
-	s_Textures.push_back({ rect.id, "", 
+	s_Textures.push_back({ rect.id, "Default Specular", 
 		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
 		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
 }

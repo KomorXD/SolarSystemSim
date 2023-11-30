@@ -15,4 +15,6 @@ public:
 
 private:
 	PointLight m_Light;
+
+	friend class SceneSerializer;
 };
