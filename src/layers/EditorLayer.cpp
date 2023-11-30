@@ -102,7 +102,7 @@ void EditorLayer::RenderScenePanel()
 	if (ImGui::Button("Load scene"))
 	{
 		ImGuiFileDialog::Instance()->OpenDialog("ChooseSceneKey", "Choose scene file",
-			".sscene", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
+			".sscene, All files (*.*){.*}", ".", 1, nullptr, ImGuiFileDialogFlags_CaseInsensitiveExtention);
 	}
 
 	if (ImGuiFileDialog::Instance()->Display("ChooseSceneKey", ImGuiWindowFlags_NoCollapse, ImVec2(600.0f, 500.0f)))
