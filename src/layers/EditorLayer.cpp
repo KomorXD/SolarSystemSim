@@ -90,6 +90,7 @@ void EditorLayer::RenderScenePanel()
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.2f, windowSpec.Height * 1.0f });
 
 	ImGui::Begin("Scene panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+	ImGui::InputText("##SceneName", m_Scene->m_SceneName.data(), m_Scene->m_SceneName.length());
 
 	ImVec2 avSpace = ImGui::GetContentRegionAvail();
 	Planet*& selectedPlanet = m_Scene->m_SelectedPlanet;
