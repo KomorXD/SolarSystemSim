@@ -28,6 +28,15 @@ void TextureManager::Init()
 	AddTexture("res/textures/icons/new-sun.png");
 }
 
+void TextureManager::ReInit()
+{
+	s_Rects.clear();
+	s_Nodes.clear();
+	s_Textures.clear();
+
+	Init();
+}
+
 void TextureManager::BindAtlas(uint32_t slot)
 {
 	s_Atlas->Bind(slot);
