@@ -4,6 +4,8 @@
 #include "Logger.hpp"
 #include "Timer.hpp"
 
+#include <filesystem>
+
 std::unique_ptr<Texture> TextureManager::s_Atlas;
 std::vector<TextureInfo> TextureManager::s_Textures;
 int32_t TextureManager::s_IndexCounter = 1;
@@ -68,7 +70,7 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 	texRect = s_Rects.back();
 
 	s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
-	s_Textures.push_back({ texRect.id, path, 
+	s_Textures.push_back({ texRect.id, std::filesystem::relative(path).string(),
 		{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
 		{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
 
