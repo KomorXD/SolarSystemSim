@@ -3,6 +3,7 @@
 #include "../Application.hpp"
 #include "../Logger.hpp"
 #include "../random_utils/Math.hpp"
+#include "../random_utils/SceneSerializer.hpp"
 #include "../renderer/Renderer.hpp"
 #include "../objects/Sun.hpp"
 #include "../TextureManager.hpp"
@@ -91,6 +92,11 @@ void EditorLayer::RenderScenePanel()
 
 	ImGui::Begin("Scene panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 	ImGui::InputText("##SceneName", m_Scene->m_SceneName.data(), m_Scene->m_SceneName.length());
+
+	if (ImGui::Button("Save scene"))
+	{
+		SceneSerializer::SaveScene(*m_Scene);
+	}
 
 	ImVec2 avSpace = ImGui::GetContentRegionAvail();
 	Planet*& selectedPlanet = m_Scene->m_SelectedPlanet;
