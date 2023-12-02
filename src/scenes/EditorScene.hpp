@@ -10,6 +10,7 @@ class EditorScene : public Scene
 {
 public:
 	EditorScene();
+	EditorScene(const EditorScene& other);
 	EditorScene(EditorScene&& other) noexcept;
 	~EditorScene();
 
@@ -25,7 +26,6 @@ public:
 	virtual void OnRender()			override;
 
 	virtual void SetState(std::unique_ptr<SceneState>&& state) override;
-	
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 	inline std::vector<std::unique_ptr<Planet>>& GetPlanetsRef() { return m_Planets; }

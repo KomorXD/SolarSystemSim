@@ -101,7 +101,7 @@ void Application::Run()
 		return;
 	}
 
-	m_CurrentLayer = std::make_unique<EditorLayer>();
+	m_Layers.push(std::make_unique<EditorLayer>());
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -127,7 +127,7 @@ void Application::Run()
 
 	TriggerClock tickClock([&]() { 
 		std::lock_guard<std::mutex> lg(layerMtx);
-		m_CurrentLayer->OnTick(); tpsFired++;
+		m_Layers.top()->OnTick(); tpsFired++;
 	});
 	tickClock.SetInterval(TPS_STEP * 1000);
 	tickClock.Start();
@@ -161,13 +161,13 @@ void Application::Run()
 			std::lock_guard<std::mutex> lg(layerMtx);
 			while (m_EventQueue.PollEvents(ev))
 			{
-				m_CurrentLayer->OnEvent(ev);
+				m_Layers.top()->OnEvent(ev);
 			}
 
-			m_CurrentLayer->OnInput();
-			m_CurrentLayer->OnUpdate((float)timestep);
+			m_Layers.top()->OnInput();
+			m_Layers.top()->OnUpdate((float)timestep);
 
-			m_CurrentLayer->OnImGuiRender();
+			m_Layers.top()->OnImGuiRender();
 		}
 
 		ImGui::PopFont();
@@ -185,6 +185,27 @@ void Application::Run()
 void Application::CloseApplication()
 {
 	glfwSetWindowShouldClose(m_Window, (int)true);
+}
+
+void Application::PushLayer(std::unique_ptr<Layer>&& layer)
+{
+	m_Layers.push(std::move(layer));
+	m_Layers.top()->OnAttach();
+}
+
+void Application::PopLayer()
+{
+	if (m_Layers.empty())
+	{
+		return;
+	}
+
+	m_Layers.pop();
+
+	if (!m_Layers.empty())
+	{
+		m_Layers.top()->OnAttach();
+	}
 }
 
 void Application::SetWindowCallbacks()

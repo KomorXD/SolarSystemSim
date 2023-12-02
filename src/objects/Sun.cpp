@@ -8,6 +8,17 @@ Sun::Sun()
 	m_Type = ObjectType::Sun;
 }
 
+Sun::Sun(const Sun& other)
+{
+	m_Tag		= other.m_Tag;
+	m_ObjectID	= other.m_ObjectID;
+	m_Type		= other.m_Type;
+	m_Transform = other.m_Transform;
+	m_Physics	= other.m_Physics;
+	m_Material	= other.m_Material;
+	m_Light		= other.m_Light;
+}
+
 void Sun::OnConfigRender()
 {
 	ImGui::BeginChild("Sun settings");

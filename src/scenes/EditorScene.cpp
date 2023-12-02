@@ -46,6 +46,45 @@ EditorScene::EditorScene()
 	LOG_INFO("EditorScene initialized.");
 }
 
+EditorScene::EditorScene(const EditorScene& other)
+{
+	FUNC_PROFILE();
+
+	m_Camera = other.m_Camera;
+	m_Camera.SetCameraControlType(CameraControlType::WorldControl);
+	m_Planets.reserve(other.m_Planets.size());
+				   
+	for (auto& planetPtr : other.m_Planets)
+	{			   
+		if (planetPtr->GetType() == ObjectType::Planet)
+		{		   
+			m_Planets.push_back(std::make_unique<Planet>(*planetPtr));
+		}		   
+		else	   
+		{		   
+			m_Planets.push_back(std::make_unique<Sun>(*(Sun*)planetPtr.get()));
+		}		   
+	}			   
+				   
+	m_SceneName = other.m_SceneName;
+	m_ScenePath = other.m_ScenePath;
+	m_SkyboxTex = other.m_SkyboxTex;
+
+	m_RenderGrid   = false;
+	m_RenderSkybox = true;
+
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+	m_FB = std::make_unique<Framebuffer>();
+	m_FB->AttachTexture((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_FB->AttachRenderBuffer((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_FB->UnbindBuffer();
+	
+	m_MFB = std::make_unique<MultisampledFramebuffer>(16);
+	m_MFB->AttachTexture((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_MFB->AttachRenderBuffer((uint32_t)(spec.Width * 0.6f), spec.Height);
+	m_MFB->UnbindBuffer();
+}
+
 EditorScene::EditorScene(EditorScene&& other) noexcept
 {
 	*this = std::move(other);

@@ -6,6 +6,7 @@ class Sun : public Planet
 {
 public:
 	Sun();
+	Sun(const Sun& other);
 	virtual ~Sun() = default;
 
 	virtual void OnConfigRender() override;

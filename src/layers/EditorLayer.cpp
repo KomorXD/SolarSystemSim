@@ -1,4 +1,5 @@
 #include "EditorLayer.hpp"
+#include "SimulationLayer.hpp"
 #include "../scenes/states/EditorSceneStates.hpp"
 #include "../Application.hpp"
 #include "../Logger.hpp"
@@ -80,6 +81,17 @@ void EditorLayer::OnImGuiRender()
 	RenderViewport();
 	RenderTopbar();
 	RenderControlPanel();
+}
+
+void EditorLayer::OnAttach()
+{
+	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
+	Event dummyEv{};
+	dummyEv.Type = Event::WindowResized;
+	dummyEv.Size.Width = (uint32_t)(spec.Width * 0.6f);
+	dummyEv.Size.Height = spec.Height - m_TopbarHeight;
+
+	m_Scene->OnEvent(dummyEv);
 }
 
 void EditorLayer::RenderScenePanel()
@@ -175,7 +187,10 @@ void EditorLayer::RenderScenePanel()
 
 	if (ImGui::Button("Start simulation"))
 	{
-		LOG_WARN("Not implemented yet");
+		Application::GetInstance()->PushLayer(std::make_unique<SimulationLayer>(m_Scene));
+		ImGui::End();
+
+		return;
 	}
 
 	ImGui::SameLine();

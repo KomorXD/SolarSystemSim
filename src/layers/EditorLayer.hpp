@@ -15,6 +15,7 @@ public:
 	virtual void OnUpdate(float ts) override;
 	virtual void OnTick()			override;
 	virtual void OnImGuiRender()	override;
+	virtual void OnAttach()			override;
 
 private:
 	void RenderScenePanel();

@@ -8,6 +8,16 @@ Planet::Planet()
 	m_Type = ObjectType::Planet;
 }
 
+Planet::Planet(const Planet& other)
+{
+	m_Tag		= other.m_Tag;
+	m_ObjectID	= other.m_ObjectID;
+	m_Type		= other.m_Type;
+	m_Transform = other.m_Transform;
+	m_Physics	= other.m_Physics;
+	m_Material	= other.m_Material;
+}
+
 void Planet::OnUpdate(float ts)
 {
 	m_Transform.Position += m_Physics.LinearVelocity * ts;

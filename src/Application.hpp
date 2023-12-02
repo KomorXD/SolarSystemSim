@@ -4,6 +4,7 @@
 
 #include <string>
 #include <memory>
+#include <stack>
 
 struct GLFWwindow;
 class Layer;
@@ -24,6 +25,9 @@ public:
 	void Run();
 	void CloseApplication();
 
+	void PushLayer(std::unique_ptr<Layer>&& layer);
+	void PopLayer();
+
 	inline GLFWwindow* GetWindow()	  const { return m_Window; }
 	inline WindowSpec GetWindowSpec() const { return m_WindowSpec; }
 
@@ -37,7 +41,7 @@ private:
 	void UpdateClocksWorker();
 	void ApplyImGuiStyles();
 
-	std::unique_ptr<Layer> m_CurrentLayer;
+	std::stack<std::unique_ptr<Layer>> m_Layers;;
 
 	GLFWwindow* m_Window = nullptr;
 	WindowSpec  m_WindowSpec;

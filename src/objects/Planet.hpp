@@ -8,6 +8,7 @@ class Planet : public SceneObject
 {
 public:
 	Planet();
+	Planet(const Planet& other);
 	virtual ~Planet() = default;
 
 	virtual void OnUpdate(float ts) override;
@@ -19,8 +20,8 @@ public:
 	inline Physics&  GetPhysics()  { return m_Physics;  }
 	inline Material& GetMaterial() { return m_Material; }
 
-	inline float GetMinRadius() const { return glm::min(glm::min(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
-	inline float GetMaxRadius() const { return glm::max(glm::max(m_Transform.Scale.x, m_Transform.Scale.y), m_Transform.Scale.z); }
+	inline float GetMinRadius() const { return m_Transform.Scale.x; }
+	inline float GetMaxRadius() const { return m_Transform.Scale.x; }
 
 	void SetRelativePlanet(Planet* planet);
 	inline Planet* GetRelativePlanet() const { return m_RelativePathPlanet; }
