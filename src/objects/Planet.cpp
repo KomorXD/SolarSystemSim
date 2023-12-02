@@ -25,7 +25,7 @@ void Planet::OnUpdate(float ts)
 
 void Planet::OnTick()
 {
-	m_Transform.Position += m_Physics.LinearVelocity * Application::TPS_STEP;
+	m_Transform.Position += m_Physics.LinearVelocity * Application::TPS_STEP * Application::TPS_MULTIPLIER;
 }
 
 void Planet::OnConfigRender()

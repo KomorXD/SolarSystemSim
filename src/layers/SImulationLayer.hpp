@@ -25,7 +25,6 @@ private:
 
 	std::unique_ptr<EditorScene> m_Scene;
 
-	float m_TimeScale			 = 1.0f;
 	float m_SimulationTimePassed = 0.0f;
 	float m_RealTimePassed		 = 0.0f;
 	

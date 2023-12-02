@@ -22,7 +22,7 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet->GetPhysics().Mass * other->GetPhysics().Mass / distanceSquared;
 
 				glm::vec3 linVel = planet->GetPhysics().LinearVelocity;
-				planet->GetPhysics().LinearVelocity = linVel + (Application::TPS_STEP * addAccel / planet->GetPhysics().Mass);
+				planet->GetPhysics().LinearVelocity = linVel + (Application::TPS_STEP * Application::TPS_MULTIPLIER * addAccel / planet->GetPhysics().Mass);
 			});
 	}				  
 }					  
@@ -61,7 +61,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<std::uniqu
 
 		for (auto& planet : planetsCopy)
 		{
-			planet->OnUpdate(Application::TPS_STEP);
+			planet->OnTick();
 		}
 
 		if (i % 2 == 0)
@@ -118,7 +118,7 @@ std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<st
 
 		for (auto& planet : planetsCopy)
 		{
-			planet->OnUpdate(Application::TPS_STEP);
+			planet->OnTick();
 		}
 
 		relToPlanetVectors.emplace_back(targetCopy->GetTransform().Position - targetRelCopy->GetTransform().Position);

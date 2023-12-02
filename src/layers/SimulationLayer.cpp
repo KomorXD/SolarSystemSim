@@ -60,7 +60,7 @@ void SimulationLayer::OnUpdate(float ts)
 {
 	if (m_IsRunning)
 	{
-		m_SimulationTimePassed += ts * 3.0f * m_TimeScale;
+		m_SimulationTimePassed += ts * 3.0f * Application::TPS_MULTIPLIER;
 		m_RealTimePassed += ts;
 	}
 		
@@ -138,7 +138,7 @@ void SimulationLayer::RenderControlBar()
 
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(128.0f);
-	ImGui::DragFloat("Time scale", &m_TimeScale, 0.05f, 0.0f, FLT_MAX, "%.2f");
+	ImGui::DragFloat("Time scale", &Application::TPS_MULTIPLIER, 0.05f, 0.0f, FLT_MAX, "%.2f");
 
 	ImGui::SameLine();
 	ImGui::Text("Real time passed: %.3fs", m_RealTimePassed);

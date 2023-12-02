@@ -35,6 +35,7 @@ public:
 	
 	inline static constexpr uint32_t TPS = 240;
 	inline static constexpr float TPS_STEP = 1.0f / TPS;
+	inline static float TPS_MULTIPLIER = 1.0f;
 
 private:
 	void SetWindowCallbacks();
