@@ -1,4 +1,5 @@
 #include "Planet.hpp"
+#include "../Application.hpp"
 
 #include <imgui/imgui.h>
 
@@ -20,11 +21,11 @@ Planet::Planet(const Planet& other)
 
 void Planet::OnUpdate(float ts)
 {
-	m_Transform.Position += m_Physics.LinearVelocity * ts;
 }
 
 void Planet::OnTick()
 {
+	m_Transform.Position += m_Physics.LinearVelocity * Application::TPS_STEP;
 }
 
 void Planet::OnConfigRender()
@@ -43,18 +44,29 @@ void Planet::OnConfigRender()
 	ImGui::Columns(1);
 	ImGui::PopItemWidth();
 	ImGui::Unindent(16.0f);
+
 	ImGui::NewLine();
-	
 	m_Transform.OnImGuiRender();
+
 	ImGui::NewLine();
-	
 	m_Physics.OnImGuiRender();
+
 	ImGui::NewLine();
-		
 	m_Material.OnImGuiRender();
-	ImGui::NewLine();
 		
 	ImGui::EndChild();
+}
+
+void Planet::OnSimDataRender()
+{
+	ImGui::SetNextWindowSize({ 500.0f, 312.0f }, ImGuiCond_FirstUseEver);
+	ImGui::Begin(m_Tag.c_str());
+
+	m_Transform.OnImGuiRender();
+	ImGui::NewLine();
+	m_Physics.OnImGuiRender();
+
+	ImGui::End();
 }
 
 std::unique_ptr<Planet> Planet::Clone()

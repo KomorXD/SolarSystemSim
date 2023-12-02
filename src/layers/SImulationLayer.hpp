@@ -20,6 +20,9 @@ public:
 	virtual void OnAttach()			override {};
 
 private:
+	void RenderControlBar();
+	void RenderViewport();
+
 	std::unique_ptr<EditorScene> m_Scene;
 
 	float m_TimeScale			 = 1.0f;
@@ -28,4 +31,5 @@ private:
 	
 	float m_ControlBarHeight = 40.0f;
 	bool m_IsRunning = false;
+	bool m_IsViewportFocused = true;
 };

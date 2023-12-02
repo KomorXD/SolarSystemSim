@@ -74,7 +74,7 @@ void EditorLayer::OnUpdate(float ts)
 
 void EditorLayer::OnTick()
 {
-	m_Scene->OnTick();
+	;
 }
 
 void EditorLayer::OnImGuiRender()
@@ -205,8 +205,6 @@ void EditorLayer::RenderScenePanel()
 
 	ImGui::NewLine();
 	ImGui::Separator();
-	ImGui::NewLine();
-	ImGui::Checkbox("Simulate", &m_Scene->m_Simulate);
 
 	ImGui::DragFloat("TS Scalar", &EditorScene::TS_MULTIPLIER);
 	ImGui::NewLine();

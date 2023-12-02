@@ -33,7 +33,7 @@ public:
 
 	inline static Application* GetInstance() { return s_Instance; }
 	
-	inline static constexpr uint32_t TPS = 60;
+	inline static constexpr uint32_t TPS = 120;
 	inline static constexpr float TPS_STEP = 1.0f / TPS;
 
 private:

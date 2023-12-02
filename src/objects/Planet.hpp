@@ -14,6 +14,7 @@ public:
 	virtual void OnUpdate(float ts) override;
 	virtual void OnTick()			override;
 	virtual void OnConfigRender()	override;
+	virtual void OnSimDataRender();
 
 	virtual std::unique_ptr<Planet> Clone();
 

@@ -2,6 +2,7 @@
 #include "../Application.hpp"
 #include "../scenes/EditorScene.hpp"
 #include "../TextureManager.hpp"
+#include "../objects/Sun.hpp"
 
 #include <imgui/imgui.h>
 
@@ -34,12 +35,18 @@ void SimulationLayer::OnEvent(Event& ev)
 		return;
 	}
 
-	m_Scene->OnEvent(ev);
+	if (m_IsViewportFocused)
+	{
+		m_Scene->OnEvent(ev);
+	}
 }
 
 void SimulationLayer::OnInput()
 {
-	m_Scene->OnInput();
+	if (m_IsViewportFocused)
+	{
+		m_Scene->OnInput();
+	}
 }
 
 void SimulationLayer::OnUpdate(float ts)
@@ -62,6 +69,18 @@ void SimulationLayer::OnTick()
 }
 
 void SimulationLayer::OnImGuiRender()
+{
+	RenderViewport();
+	
+	if (m_Scene->m_SelectedPlanet)
+	{
+		m_Scene->m_SelectedPlanet->OnSimDataRender();
+	}
+	
+	RenderControlBar();
+}
+
+void SimulationLayer::RenderControlBar()
 {
 	WindowSpec windowSpec = Application::GetInstance()->GetWindowSpec();
 
@@ -105,7 +124,7 @@ void SimulationLayer::OnImGuiRender()
 		Application::GetInstance()->PopLayer();
 		ImGui::PopID();
 		ImGui::End();
-	
+
 		return;
 	}
 	ImGui::PopID();
@@ -121,6 +140,11 @@ void SimulationLayer::OnImGuiRender()
 	ImGui::Text("Simulation time passed: %.3fs", m_SimulationTimePassed);
 
 	ImGui::End();
+}
+
+void SimulationLayer::RenderViewport()
+{
+	WindowSpec windowSpec = Application::GetInstance()->GetWindowSpec();
 
 	ImGui::SetNextWindowPos({ 0.0f, 0.0f });
 	ImGui::SetNextWindowSize({ (float)windowSpec.Width, (float)windowSpec.Height - m_ControlBarHeight });
@@ -128,6 +152,7 @@ void SimulationLayer::OnImGuiRender()
 	ImGui::Begin("Viewport", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
 	m_Scene->OnRender();
+	m_IsViewportFocused = ImGui::IsWindowHovered();
 	ImGui::Image((ImTextureID)m_Scene->GetFramebufferTextureID(), ImGui::GetContentRegionAvail(), { 0.0f, 1.0f }, { 1.0f, 0.0f });
 
 	ImGui::End();
