@@ -86,6 +86,7 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 		{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
 		{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
 
+	stbi_image_free(buffer);
 	return s_Textures.back();
 }
 

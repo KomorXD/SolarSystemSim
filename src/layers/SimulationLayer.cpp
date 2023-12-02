@@ -1,3 +1,4 @@
+#include "../scenes/states/EditorSceneStates.hpp"
 #include "SimulationLayer.hpp"
 #include "../Application.hpp"
 #include "../scenes/EditorScene.hpp"
@@ -37,6 +38,12 @@ void SimulationLayer::OnEvent(Event& ev)
 
 	if (m_IsViewportFocused)
 	{
+		if (ev.Type == Event::KeyPressed && ev.Key.Code == Key::G 
+			&& m_Scene->SelectedPlanet() && m_Scene->m_ActiveState == nullptr)
+		{
+			m_Scene->SetState(std::make_unique<FollowingPlanetState>(m_Scene.get(), &m_Scene->m_Camera, m_Scene->SelectedPlanet()));
+		}
+
 		m_Scene->OnEvent(ev);
 	}
 }

@@ -29,6 +29,8 @@ public:
 	void SetYaw(float yaw);
 	void SetCameraControlType(CameraControlType controlType);
 
+	void LookAt(const glm::vec3& point);
+
 	glm::vec3 GetUpDirection()		const;
 	glm::vec3 GetRightDirection()	const;
 	glm::vec3 GetForwardDirection() const;

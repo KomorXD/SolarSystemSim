@@ -190,11 +190,6 @@ void EditorScene::OnUpdate(float ts)
 
 void EditorScene::OnTick()
 {
-	if (m_ActiveState)
-	{
-		m_ActiveState->OnTick();
-	}
-
 	SimPhysics::ProgressAllOneStep(m_Planets);
 
 	for (auto& planet : m_Planets)

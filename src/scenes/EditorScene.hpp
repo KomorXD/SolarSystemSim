@@ -29,6 +29,7 @@ public:
 	virtual uint32_t GetFramebufferTextureID() const override;
 
 	inline std::vector<std::unique_ptr<Planet>>& GetPlanetsRef() { return m_Planets; }
+	inline Planet* SelectedPlanet() { return m_SelectedPlanet; }
 
 	void SetViewportOffset(const glm::vec2& offset);
 	void CancelState();

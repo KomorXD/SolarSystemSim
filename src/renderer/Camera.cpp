@@ -4,6 +4,7 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 Camera::Camera()
 {
@@ -84,6 +85,14 @@ void Camera::SetYaw(float yaw)
 void Camera::SetCameraControlType(CameraControlType controlType)
 {
 	m_ControlType = controlType;
+}
+
+void Camera::LookAt(const glm::vec3& point)
+{
+	glm::vec3 direction = glm::normalize(point - m_Position);
+
+	m_Yaw   = glm::degrees(std::atan2f(direction.x, direction.z));
+	m_Pitch = glm::degrees(std::asinf(-direction.y));
 }
 
 glm::vec3 Camera::GetUpDirection() const
