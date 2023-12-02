@@ -24,6 +24,7 @@ EditorLayer::EditorLayer()
 	
 	m_Scene = std::make_unique<EditorScene>();
 	m_Scene->OnEvent(dummyEv);
+	m_Scene->SetViewportOffset({ spec.Width * 0.2f, 0.0f });
 }
 
 void EditorLayer::OnEvent(Event& ev)
@@ -35,6 +36,7 @@ void EditorLayer::OnEvent(Event& ev)
 		ev.Size.Width = (uint32_t)(ev.Size.Width * 0.6f);
 		ev.Size.Height -= m_TopbarHeight;
 		m_Scene->OnEvent(ev);
+		m_Scene->SetViewportOffset({ spec.Width * 0.2f, 0.0f });
 
 		return;
 	}
@@ -134,6 +136,7 @@ void EditorLayer::RenderScenePanel()
 
 				m_Scene = std::make_unique<EditorScene>(std::move(newScene.value()));
 				m_Scene->OnEvent(dummyEv);
+				m_Scene->SetViewportOffset({ spec.Width * 0.2f, 0.0f });
 
 				LOG_INFO("Loaded new scene");
 			}

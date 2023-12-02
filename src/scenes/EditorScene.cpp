@@ -51,7 +51,6 @@ EditorScene::EditorScene(const EditorScene& other)
 	FUNC_PROFILE();
 
 	m_Camera = other.m_Camera;
-	m_Camera.SetCameraControlType(CameraControlType::WorldControl);
 	m_Planets.reserve(other.m_Planets.size());
 				   
 	for (auto& planetPtr : other.m_Planets)
@@ -107,13 +106,6 @@ void EditorScene::OnEvent(Event& ev)
 		}
 	}
 
-	if (ev.Type == Event::MouseButtonReleased && ev.MouseButton.Button == MouseButton::Right)
-	{
-		Input::ShowCursor();
-
-		return;
-	}
-
 	if (ev.Type == Event::WindowResized)
 	{
 		m_FB->BindBuffer();
@@ -158,7 +150,7 @@ void EditorScene::OnEvent(Event& ev)
 		case Key::LeftAlt:
 			if (m_SelectedPlanet && !m_ActiveState)
 			{
-				m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet);
+				m_ActiveState = std::make_unique<SettingVelocityState>(this, &m_Camera, m_SelectedPlanet, m_ViewportOffset);
 			}
 
 			break;
@@ -330,6 +322,11 @@ uint32_t EditorScene::GetFramebufferTextureID() const
 	return m_FB->GetTextureID();
 }
 
+void EditorScene::SetViewportOffset(const glm::vec2& offset)
+{
+	m_ViewportOffset = offset;
+}
+
 void EditorScene::CancelState()
 {
 	m_ActiveState.reset();
@@ -372,10 +369,9 @@ void EditorScene::CheckForPlanetSelect()
 	}
 
 	Renderer::SceneEnd();
-
-	WindowSpec spec = Application::GetInstance()->GetWindowSpec();
-	uint8_t pixelColor = m_FB->GetPixelAt(Input::GetMousePosition()).r;
-
+	
+	glm::vec2 mousePos = Input::GetMousePosition() - m_ViewportOffset;
+	uint8_t pixelColor = m_FB->GetPixelAt(mousePos).r;
 	for (auto& planet : m_Planets)
 	{
 		if (planet->GetEntityID() == pixelColor)

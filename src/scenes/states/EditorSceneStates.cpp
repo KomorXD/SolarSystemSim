@@ -89,8 +89,8 @@ void InterpolateViewState::OnRender()
 {
 }
 
-SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet)
-	: m_TargetPlanet(targetPlanet), m_EditorCamera(camera), m_ParentScene(scene)
+SettingVelocityState::SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet, const glm::vec2& offset)
+	: m_TargetPlanet(targetPlanet), m_Offset(offset), m_EditorCamera(camera), m_ParentScene(scene)
 {
 }
 
@@ -121,7 +121,7 @@ void SettingVelocityState::OnUpdate(float ts)
 	}
 
 	glm::vec3 planetScreenPos = Renderer::WorldToScreenCoords(m_TargetPlanet->GetTransform().Position);
-	glm::vec2 mouseScreenPos = Input::GetMousePosition();
+	glm::vec2 mouseScreenPos = Input::GetMousePosition() - m_Offset;
 	glm::vec3 mouseWorldPos = Renderer::ScreenToWorldCoords(mouseScreenPos, planetScreenPos.z);
 
 	m_Velocity = m_TargetPlanet->GetTransform().Position - mouseWorldPos;
@@ -144,9 +144,11 @@ void SettingVelocityState::OnRender()
 	Renderer::DisableDepth();
 	Renderer::DrawLine(m_TargetPlanet->GetTransform().Position, m_TargetPlanet->GetTransform().Position - m_Velocity, { 1.0f, 0.0f, 0.0f, 1.0f });
 
+	glm::vec3 relativePos = m_TargetPlanet->GetRelativePlanet() ?
+		m_TargetPlanet->GetRelativePlanet()->GetTransform().Position : glm::vec3(0.0f, 0.0f, 0.0f);
 	for (size_t i = 1; i < m_ApproximatedPath.size(); i++)
 	{
-		Renderer::DrawLine(m_ApproximatedPath[i - 1], m_ApproximatedPath[i], { 0.0f, 1.0f, 0.0f, 1.0f });
+		Renderer::DrawLine(m_ApproximatedPath[i - 1] + relativePos, m_ApproximatedPath[i] + relativePos, { 0.0f, 1.0f, 0.0f, 1.0f });
 	}
 
 	Renderer::SceneEnd();

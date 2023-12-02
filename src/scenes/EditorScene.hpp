@@ -30,6 +30,7 @@ public:
 
 	inline std::vector<std::unique_ptr<Planet>>& GetPlanetsRef() { return m_Planets; }
 
+	void SetViewportOffset(const glm::vec2& offset);
 	void CancelState();
 
 private:
@@ -50,6 +51,7 @@ private:
 	std::unique_ptr<Framebuffer> m_FB;
 	std::unique_ptr<MultisampledFramebuffer> m_MFB;
 	std::shared_ptr<Cubemap> m_SkyboxTex;
+	glm::vec2 m_ViewportOffset;
 
 	float m_TS = 0.0f;
 	bool  m_RenderGrid = true;
@@ -60,5 +62,6 @@ private:
 	static inline float TS_MULTIPLIER = 1.0f;
 
 	friend class EditorLayer;
+	friend class SimulationLayer;
 	friend class SceneSerializer;
 };

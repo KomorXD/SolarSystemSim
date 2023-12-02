@@ -37,6 +37,9 @@ public:
 	constexpr static uint32_t DEFAULT_SPECULAR  = 3;
 	constexpr static uint32_t NEW_PLANET_ICON	= 4;
 	constexpr static uint32_t NEW_SUN_ICON		= 5;
+	constexpr static uint32_t PLAY_ICON			= 6;
+	constexpr static uint32_t PAUSE_ICON		= 7;
+	constexpr static uint32_t STOP_ICON			= 8;
 
 private:
 	TextureManager() = default;

@@ -26,6 +26,9 @@ void TextureManager::Init()
 
 	AddTexture("res/textures/icons/new-planet.png");
 	AddTexture("res/textures/icons/new-sun.png");
+	AddTexture("res/textures/icons/play.png");
+	AddTexture("res/textures/icons/pause.png");
+	AddTexture("res/textures/icons/stop.png");
 }
 
 void TextureManager::ReInit()

@@ -49,7 +49,7 @@ private:
 class SettingVelocityState : public SceneState
 {
 public:
-	SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet);
+	SettingVelocityState(EditorScene* scene, Camera* camera, Planet* targetPlanet, const glm::vec2& offset);
 
 	virtual void OnEvent(Event& ev) override;
 	virtual void OnUpdate(float ts) override;
@@ -58,6 +58,7 @@ public:
 
 private:
 	glm::vec3 m_Velocity = { 0.0f, 0.0f, 0.0f };
+	glm::vec2 m_Offset   = { 0.0f, 0.0f };
 	std::vector<glm::vec3> m_ApproximatedPath;
 	std::future<std::vector<glm::vec3>> m_PathFuture;
 
