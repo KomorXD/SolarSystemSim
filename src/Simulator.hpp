@@ -11,6 +11,18 @@ public:
 	static std::vector<glm::vec3> ApproximateNextNPoints(std::vector<std::unique_ptr<Planet>>& planets, Planet* target, uint32_t N);
 	static std::vector<glm::vec3> ApproximateRelativeNextNPoints(std::vector<std::unique_ptr<Planet>>& planets, Planet* target, uint32_t N);
 
-	static inline constexpr float G_CONSTANT = 6.6743e-2f;
-	static inline constexpr float G_CONSTANT_MULTIPLIER = 1.0f;
+	static inline constexpr double G_CONSTANT = 6.674e-11;
+	static inline double G_CONSTANT_MULTIPLIER = 1.0;
+
+	// 1 mass unit = sun's mass [kg]
+	static inline constexpr double SUN_MASS = 1.989e30;
+
+	// 10 distance units = sun to earth distance [meters]
+	static inline constexpr double SUN_TO_EARTH_DIST = 1.496e10;
+
+	// Distance the Earth travels per day [meters]
+	static inline constexpr double EARTH_DIST_PER_DAY = 19e9;
+
+	// Factor to scale forces by
+	static inline constexpr double SCALE_FACTOR = (G_CONSTANT * SUN_MASS * SUN_MASS) / (SUN_TO_EARTH_DIST * SUN_TO_EARTH_DIST);
 };

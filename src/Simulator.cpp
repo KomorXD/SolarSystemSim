@@ -10,19 +10,25 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 {
 	for (auto& planet : planets)
 	{
-			std::for_each(std::execution::par, planets.begin(), planets.end(), [&](std::unique_ptr<Planet>& other)
+		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](std::unique_ptr<Planet>& other)
 			{
 				if (other == planet)
 				{
 					return;
 				}
 
-				float distanceSquared = glm::distance2(planet->GetTransform().Position, other->GetTransform().Position);
-				glm::vec3 dir = glm::normalize(other->GetTransform().Position - planet->GetTransform().Position);
-				glm::vec3 addAccel = dir * G_CONSTANT * G_CONSTANT_MULTIPLIER * planet->GetPhysics().Mass * other->GetPhysics().Mass / distanceSquared;
+				glm::dvec3 dir = glm::normalize(other->GetTransform().Position - planet->GetTransform().Position);
+				double distance2 = glm::distance2(planet->GetTransform().Position, other->GetTransform().Position);
+				double mass1 = (double)planet->GetPhysics().Mass;
+				double mass2 = (double)other->GetPhysics().Mass;
+
+				glm::dvec3 F = dir * mass1 * mass2 / distance2;
+				F *= SCALE_FACTOR;
+				glm::dvec3 addAccel = F / (mass1 * SUN_MASS);
+				glm::vec3 fAddAccel = addAccel * 3.0;
 
 				glm::vec3 linVel = planet->GetPhysics().LinearVelocity;
-				planet->GetPhysics().LinearVelocity = linVel + (Application::TPS_STEP * Application::TPS_MULTIPLIER * addAccel / planet->GetPhysics().Mass);
+				planet->GetPhysics().LinearVelocity = linVel + (Application::TPS_STEP * Application::TPS_MULTIPLIER * fAddAccel);
 			});
 	}				  
 }					  

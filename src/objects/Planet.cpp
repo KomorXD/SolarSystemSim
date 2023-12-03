@@ -1,7 +1,9 @@
 #include "Planet.hpp"
 #include "../Application.hpp"
+#include "../Simulator.hpp"
 
 #include <imgui/imgui.h>
+#include <glm/gtc/constants.hpp>
 
 Planet::Planet()
 	: SceneObject()
@@ -25,7 +27,9 @@ void Planet::OnUpdate(float ts)
 
 void Planet::OnTick()
 {
-	m_Transform.Position += m_Physics.LinearVelocity * Application::TPS_STEP * Application::TPS_MULTIPLIER;
+	glm::vec3 move = m_Physics.LinearVelocity * Application::TPS_STEP * Application::TPS_MULTIPLIER;
+
+	m_Transform.Position += move * (20.0f * glm::pi<float>() / 365.0f);
 }
 
 void Planet::OnConfigRender()
