@@ -2515,7 +2515,7 @@ IMGUI_API void ImGui::PrettyDragFloat(const char* label, float* v, float min, fl
 	ImGui::Text(label);
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(ImGui::CalcItemWidth());
-	ImGui::DragFloat("##Value", v, 0.1f, min, max, "%.2f");
+	ImGui::DragFloat("##Value", v, 0.1f, min, max, "%.10f");
 	ImGui::Columns(1);
 	ImGui::PopItemWidth();
 	ImGui::PopID();
@@ -2544,7 +2544,7 @@ IMGUI_API void ImGui::PrettyDragFloat3(const char* label, float v[3], float rese
 
 	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-	ImGui::DragFloat("##X", &v[0], 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##X", &v[0], 0.1f, 0.0f, 0.0f, "%.4f");
 	ImGui::SameLine();
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.7f, 0.2f, 1.0f));
@@ -2558,7 +2558,7 @@ IMGUI_API void ImGui::PrettyDragFloat3(const char* label, float v[3], float rese
 
 	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-	ImGui::DragFloat("##Y", &v[1], 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##Y", &v[1], 0.1f, 0.0f, 0.0f, "%.4f");
 	ImGui::SameLine();
 
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.25f, 0.8f, 1.0f));
@@ -2572,7 +2572,7 @@ IMGUI_API void ImGui::PrettyDragFloat3(const char* label, float v[3], float rese
 
 	ImGui::PopStyleColor(3);
 	ImGui::SameLine();
-	ImGui::DragFloat("##Z", &v[2], 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##Z", &v[2], 0.1f, 0.0f, 0.0f, "%.4f");
 
 	ImGui::PopItemWidth();
 	ImGui::PopStyleVar();

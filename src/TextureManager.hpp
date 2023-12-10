@@ -40,6 +40,7 @@ public:
 	constexpr static uint32_t PLAY_ICON			= 6;
 	constexpr static uint32_t PAUSE_ICON		= 7;
 	constexpr static uint32_t STOP_ICON			= 8;
+	constexpr static uint32_t SETTINGS_ICON		= 9;
 
 private:
 	TextureManager() = default;

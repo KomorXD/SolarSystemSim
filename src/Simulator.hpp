@@ -12,7 +12,7 @@ public:
 	static std::vector<glm::vec3> ApproximateRelativeNextNPoints(std::vector<std::unique_ptr<Planet>>& planets, Planet* target, uint32_t N);
 
 	static inline constexpr double G_CONSTANT = 6.674e-11;
-	static inline double G_CONSTANT_MULTIPLIER = 1.0;
+	static inline float G_CONSTANT_MULTIPLIER = 1.0f;
 
 	// 1 mass unit = sun's mass [kg]
 	static inline constexpr double SUN_MASS = 1.989e30;

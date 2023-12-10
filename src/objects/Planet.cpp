@@ -1,6 +1,7 @@
 #include "Planet.hpp"
 #include "../Application.hpp"
 #include "../Simulator.hpp"
+#include "../TextureManager.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/gtc/constants.hpp>
@@ -63,12 +64,81 @@ void Planet::OnConfigRender()
 
 void Planet::OnSimDataRender()
 {
-	ImGui::SetNextWindowSize({ 500.0f, 312.0f }, ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize({ 512.0f, 640.0f }, ImGuiCond_FirstUseEver);
 	ImGui::Begin(m_Tag.c_str());
 
-	m_Transform.OnImGuiRender();
+	if (ImGui::CollapsingHeader("Object state", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Indent(16.0f);
+
+		if (ImGui::BeginTable("Potemxd", 2, ImGuiTableFlags_Borders))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("Position [X, Y, Z]");
+			ImGui::TableNextColumn();
+			ImGui::Text("[%f, %f, %f]", m_Transform.Position.x, m_Transform.Position.y, m_Transform.Position.z);
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("Velocity [km/s]");
+			ImGui::TableNextColumn();
+			ImGui::Text("%f", glm::length(m_Physics.LinearVelocity));
+
+			ImGui::EndTable();
+		}
+
+		ImGui::NewLine();
+		ImGui::PrettyDragFloat("Mass [* sun's mass]", &m_Physics.Mass, 0.0f, FLT_MAX, 150.0f);
+		ImGui::Unindent(16.0f);
+	}
+
 	ImGui::NewLine();
-	m_Physics.OnImGuiRender();
+
+	if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		if (ImGui::BeginTable("Textures", 3))
+		{
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::Text("Albedo");
+			ImGui::TableNextColumn();
+			ImGui::Text("Normal");
+			ImGui::TableNextColumn();
+			ImGui::Text("Specular");
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+
+			TextureInfo tex = TextureManager::GetTexture(m_Material.TextureID).value_or(
+				TextureManager::GetTexture(TextureManager::DEFAULT_ALBEDO).value()
+			);
+			ImGui::PushID(1);
+			ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+				ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+			ImGui::PopID();
+
+			ImGui::TableNextColumn();
+			tex = TextureManager::GetTexture(m_Material.NormalMapTextureID).value_or(
+				TextureManager::GetTexture(TextureManager::DEFAULT_NORMAL).value()
+			);
+			ImGui::PushID(2);
+			ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+				ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+			ImGui::PopID();
+
+			ImGui::TableNextColumn();
+			tex = TextureManager::GetTexture(m_Material.SpecularMapTextureID).value_or(
+				TextureManager::GetTexture(TextureManager::DEFAULT_SPECULAR).value()
+			);
+			ImGui::PushID(3);
+			ImGui::Image((ImTextureID)TextureManager::GetAtlasTextureID(), ImVec2(64.0f, 64.0f),
+				ImVec2(tex.UV.x, tex.UV.y), ImVec2(tex.UV.x + tex.Size.x, tex.UV.y + tex.Size.y));
+			ImGui::PopID();
+
+			ImGui::EndTable();
+		}
+	}
 
 	ImGui::End();
 }

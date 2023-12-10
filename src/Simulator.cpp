@@ -23,7 +23,7 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 				double mass2 = (double)other->GetPhysics().Mass;
 
 				glm::dvec3 F = dir * mass1 * mass2 / distance2;
-				F *= SCALE_FACTOR;
+				F *= (double)G_CONSTANT_MULTIPLIER * SCALE_FACTOR;
 				glm::dvec3 addAccel = F / (mass1 * SUN_MASS);
 				glm::vec3 fAddAccel = addAccel * 3.0;
 

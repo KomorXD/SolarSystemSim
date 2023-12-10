@@ -29,6 +29,7 @@ void TextureManager::Init()
 	AddTexture("res/textures/icons/play.png");
 	AddTexture("res/textures/icons/pause.png");
 	AddTexture("res/textures/icons/stop.png");
+	AddTexture("res/textures/icons/settings.png");
 }
 
 void TextureManager::ReInit()
