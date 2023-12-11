@@ -32,6 +32,8 @@ EditorScene::EditorScene()
 	m_Camera.SetPosition(glm::vec3(0.0f, 3.0f, 40.0f));
 	m_Camera.SetViewportSize({ (float)spec.Width * 0.6f, (float)spec.Height });
 
+	m_SceneName.reserve(24);
+
 	std::array<std::string, 6> faces =
 	{
 		"res/textures/skybox/right.png",

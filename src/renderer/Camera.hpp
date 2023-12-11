@@ -72,5 +72,6 @@ private:
 	glm::vec2 m_ViewportSize = { 1280.0f, 720.0f };
 
 	friend class EditorLayer;
+	friend class SimulationLayer;
 	friend class SceneSerializer;
 };

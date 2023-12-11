@@ -104,7 +104,7 @@ void EditorLayer::RenderScenePanel()
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.2f, windowSpec.Height * 1.0f });
 
 	ImGui::Begin("Scene panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-	ImGui::InputText("##SceneName", m_Scene->m_SceneName.data(), m_Scene->m_SceneName.length());
+	ImGui::InputText("##SceneName", m_Scene->m_SceneName.data(), m_Scene->m_SceneName.capacity() - 1);
 
 	if (ImGui::Button("Save scene"))
 	{
@@ -148,6 +148,8 @@ void EditorLayer::RenderScenePanel()
 
 		ImGuiFileDialog::Instance()->Close();
 	}
+
+	ImGui::NewLine();
 
 	ImVec2 avSpace = ImGui::GetContentRegionAvail();
 	Planet*& selectedPlanet = m_Scene->m_SelectedPlanet;

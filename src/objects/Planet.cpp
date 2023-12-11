@@ -81,6 +81,12 @@ void Planet::OnSimDataRender()
 
 			ImGui::TableNextRow();
 			ImGui::TableNextColumn();
+			ImGui::Text("Velocity [X, Y, Z] [km/s]");
+			ImGui::TableNextColumn();
+			ImGui::Text("[%f, %f, %f]", m_Physics.LinearVelocity.x, m_Physics.LinearVelocity.y, m_Physics.LinearVelocity.z);
+
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
 			ImGui::Text("Velocity [km/s]");
 			ImGui::TableNextColumn();
 			ImGui::Text("%f", glm::length(m_Physics.LinearVelocity));
@@ -90,6 +96,7 @@ void Planet::OnSimDataRender()
 
 		ImGui::NewLine();
 		ImGui::PrettyDragFloat("Mass [* sun's mass]", &m_Physics.Mass, 0.0f, FLT_MAX, 150.0f);
+
 		ImGui::Unindent(16.0f);
 	}
 
@@ -97,6 +104,8 @@ void Planet::OnSimDataRender()
 
 	if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		ImGui::Indent(16.0f);
+
 		if (ImGui::BeginTable("Textures", 3))
 		{
 			ImGui::TableNextRow();
@@ -138,6 +147,8 @@ void Planet::OnSimDataRender()
 
 			ImGui::EndTable();
 		}
+
+		ImGui::Unindent(16.0f);
 	}
 
 	ImGui::End();

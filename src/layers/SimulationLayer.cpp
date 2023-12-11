@@ -7,6 +7,7 @@
 #include "../objects/Sun.hpp"
 
 #include <imgui/imgui.h>
+#include <glm/gtc/type_ptr.hpp>
 
 SimulationLayer::SimulationLayer(std::unique_ptr<EditorScene>& scene)
 {
@@ -79,12 +80,12 @@ void SimulationLayer::OnTick()
 void SimulationLayer::OnImGuiRender()
 {
 	RenderViewport();
-	
+
 	if (m_Scene->m_SelectedPlanet)
 	{
 		m_Scene->m_SelectedPlanet->OnSimDataRender();
 	}
-	
+
 	RenderControlBar();
 }
 
@@ -154,9 +155,39 @@ void SimulationLayer::RenderControlBar()
 		ImGui::Begin("Simulation settings");
 		ImGui::PrettyDragFloat("G Constant Multiplier", &SimPhysics::G_CONSTANT_MULTIPLIER, 0.0f, 0.0f, 200.0f);
 		ImGui::PrettyDragFloat("Time scale (1.0 = 1 day)", &Application::TPS_MULTIPLIER, 0.0f, 365.0f, 200.0f);
+
 		ImGui::NewLine();
-		ImGui::Text("Simulation time passed: %.10f days", m_SimulationTimePassed / 365.0f);
-		ImGui::Text("Real time passed: %.10f seconds", m_RealTimePassed);
+		ImGui::Separator();
+		ImGui::NewLine();
+
+		ImGui::BeginTable("##SimThingies", 2);
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Simulation time passed [days]");
+		ImGui::TableNextColumn();
+		ImGui::Text("%.10f", m_SimulationTimePassed / 365.0f);
+		ImGui::TableNextRow();
+		ImGui::TableNextColumn();
+		ImGui::Text("Real time passed [seconds]");
+		ImGui::TableNextColumn();
+		ImGui::Text("%.10f", m_RealTimePassed);
+		ImGui::EndTable();
+
+		ImGui::NewLine();
+		ImGui::Separator();
+		ImGui::NewLine();
+
+		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			Camera& cam = m_Scene->m_Camera;
+
+			ImGui::Indent(16.0f);
+			ImGui::PrettyDragFloat3("Position", glm::value_ptr(cam.m_Position));
+			ImGui::PrettyDragFloat("Near clip", &cam.m_NearClip, 0.0f, cam.m_FarClip);
+			ImGui::PrettyDragFloat("Far clip", &cam.m_FarClip, cam.m_NearClip, 1000.0f);
+			ImGui::PrettyDragFloat("FOV", &cam.m_FOV, 0.0f, 113.0f);
+			ImGui::Unindent(16.0f);
+		}
 
 		ImGui::End();
 	}
