@@ -103,8 +103,13 @@ void EditorLayer::RenderScenePanel()
 	ImGui::SetNextWindowPos({ 0.0f, 0.0f });
 	ImGui::SetNextWindowSize({ windowSpec.Width * 0.2f, windowSpec.Height * 1.0f });
 
+	char buf[24];
+	strcpy_s(buf, 24, m_Scene->m_SceneName.data());
+
 	ImGui::Begin("Scene panel", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-	ImGui::InputText("##SceneName", m_Scene->m_SceneName.data(), m_Scene->m_SceneName.capacity() - 1);
+	ImGui::InputText("##SceneName", buf, 24);
+
+	m_Scene->m_SceneName = buf;
 
 	if (ImGui::Button("Save scene"))
 	{
