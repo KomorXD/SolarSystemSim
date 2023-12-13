@@ -46,6 +46,7 @@ private:
 	TextureManager() = default;
 
 	static void AddDefaults();
+	static void GrowAtlas();
 
 	static std::unique_ptr<Texture> s_Atlas;
 	static std::vector<TextureInfo> s_Textures;

@@ -18,7 +18,7 @@ void TextureManager::Init()
 {
 	FUNC_PROFILE();
 
-	s_Atlas = std::make_unique<Texture>(8192, 8192);
+	s_Atlas = std::make_unique<Texture>(512, 512);
 	s_Nodes.resize(256);
 
 	AddDefaults();
@@ -74,20 +74,27 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 	if (stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()))
 	{
 		LOG_INFO("Added texture");
+
+		texRect = s_Rects.back();
+
+		s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
+		s_Textures.push_back({ texRect.id, std::filesystem::relative(path).string(),
+			{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
+			{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
+
+		stbi_image_free(buffer);
 	}
 	else
 	{
-		LOG_ERROR("Texture did not fit");
+		s_Textures.push_back({ texRect.id, std::filesystem::relative(path).string(),
+			{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
+			{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
+
+		GrowAtlas();
+
+		LOG_INFO("Atlas resized");
 	}
 
-	texRect = s_Rects.back();
-
-	s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
-	s_Textures.push_back({ texRect.id, std::filesystem::relative(path).string(),
-		{ texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() },
-		{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
-
-	stbi_image_free(buffer);
 	return s_Textures.back();
 }
 
@@ -191,4 +198,79 @@ void TextureManager::AddDefaults()
 	s_Textures.push_back({ rect.id, "Default Specular", 
 		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
 		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } });
+}
+
+void TextureManager::GrowAtlas()
+{
+	std::vector<stbrp_rect> rectsCopy = s_Rects;
+	
+	do
+	{
+		s_Nodes.clear();
+		s_Nodes.resize(256);
+		s_Atlas = std::make_unique<Texture>(s_Atlas->GetWidth() * 2, s_Atlas->GetHeight() * 2);
+		stbrp_init_target(&s_Context, s_Atlas->GetWidth(), s_Atlas->GetHeight(), s_Nodes.data(), s_Nodes.size());
+	} while (!stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()));
+
+	stbrp_rect rect{};
+
+	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
+	rect = *std::find_if(s_Rects.begin(), s_Rects.end(),
+		[](const stbrp_rect& rect)
+		{ 
+			return rect.id == DEFAULT_ALBEDO; 
+		});
+	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures[0] = { rect.id, "Default Albedo",
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } };
+
+	uint8_t normalMapPixelData[4] = { 127, 127, 255, 255 };
+	rect = *std::find_if(s_Rects.begin(), s_Rects.end(),
+		[](const stbrp_rect& rect)
+		{
+			return rect.id == DEFAULT_NORMAL;
+		});
+	s_Atlas->SetSubtexture(normalMapPixelData, { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures[1] = { rect.id, "Default Normal",
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } };
+
+	rect = *std::find_if(s_Rects.begin(), s_Rects.end(),
+		[](const stbrp_rect& rect)
+		{
+			return rect.id == DEFAULT_SPECULAR;
+		});
+	s_Atlas->SetSubtexture(whitePixelData, { rect.x, rect.y }, { rect.w, rect.h });
+	s_Textures[2] = { rect.id, "Default Specular",
+		{ rect.x / (float)s_Atlas->GetWidth(), rect.y / (float)s_Atlas->GetHeight() },
+		{ rect.w / (float)s_Atlas->GetWidth(), rect.h / (float)s_Atlas->GetHeight() } };
+
+	for (TextureInfo& tex : s_Textures)
+	{
+		if (tex.TextureID < 4)
+		{
+			continue;
+		}
+
+		stbi_set_flip_vertically_on_load(0);
+		int32_t width{}, height{}, bpp{};
+		uint8_t* buffer = stbi_load(tex.Path.c_str(), &width, &height, &bpp, 4);
+
+		if (buffer == nullptr)
+		{
+			continue;
+		}
+
+		stbrp_rect texRect = *std::find_if(s_Rects.begin(), s_Rects.end(),
+			[&tex](const stbrp_rect& rect)
+			{
+				return rect.id == tex.TextureID;
+			});
+		s_Atlas->SetSubtexture(buffer, { texRect.x, texRect.y }, { texRect.w, texRect.h });
+		tex.Size = { texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() };
+		tex.UV = { texRect.x / (float)s_Atlas->GetWidth(), texRect.y / (float)s_Atlas->GetHeight() };
+
+		stbi_image_free(buffer);
+	}
 }
