@@ -25,7 +25,7 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 				glm::dvec3 F = dir * mass1 * mass2 / distance2;
 				F *= (double)G_CONSTANT_MULTIPLIER * SCALE_FACTOR;
 				glm::dvec3 addAccel = F / (mass1 * SUN_MASS);
-				glm::vec3 fAddAccel = addAccel * 3.0;
+				glm::vec3 fAddAccel = addAccel;
 
 				glm::vec3 linVel = planet->GetPhysics().LinearVelocity;
 				planet->GetPhysics().LinearVelocity = linVel + (Application::TPS_STEP * Application::TPS_MULTIPLIER * fAddAccel);
@@ -35,6 +35,9 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 
 std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<std::unique_ptr<Planet>>& planets, Planet* target, uint32_t N)
 {
+	float tpsMultiplier = Application::TPS_MULTIPLIER;
+	Application::TPS_MULTIPLIER = 100.0f;
+
 	std::vector<glm::vec3> points;
 	std::vector<std::unique_ptr<Planet>> planetsCopy;
 
@@ -76,11 +79,15 @@ std::vector<glm::vec3> SimPhysics::ApproximateNextNPoints(std::vector<std::uniqu
 		}
 	}
 
+	Application::TPS_MULTIPLIER = tpsMultiplier;
 	return points;
 }
 
 std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<std::unique_ptr<Planet>>& planets, Planet* target, uint32_t N)
 {
+	float tpsMultiplier = Application::TPS_MULTIPLIER;
+	Application::TPS_MULTIPLIER = 100.0f;
+
 	Planet* parent = target->GetRelativePlanet();
 
 	if (parent == nullptr)
@@ -129,6 +136,8 @@ std::vector<glm::vec3> SimPhysics::ApproximateRelativeNextNPoints(std::vector<st
 
 		relToPlanetVectors.emplace_back(targetCopy->GetTransform().Position - targetRelCopy->GetTransform().Position);
 	}
+
+	Application::TPS_MULTIPLIER = tpsMultiplier;
 			 
 	return relToPlanetVectors;
 }

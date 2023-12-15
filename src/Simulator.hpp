@@ -20,9 +20,6 @@ public:
 	// 10 distance units = sun to earth distance [meters]
 	static inline constexpr double SUN_TO_EARTH_DIST = 1.496e10;
 
-	// Distance the Earth travels per day [meters]
-	static inline constexpr double EARTH_DIST_PER_DAY = 19e9;
-
 	// Factor to scale forces by
 	static inline constexpr double SCALE_FACTOR = (G_CONSTANT * SUN_MASS * SUN_MASS) / (SUN_TO_EARTH_DIST * SUN_TO_EARTH_DIST);
 };

@@ -18,7 +18,7 @@ void TextureManager::Init()
 {
 	FUNC_PROFILE();
 
-	s_Atlas = std::make_unique<Texture>(512, 512);
+	s_Atlas = std::make_unique<Texture>(2048, 2048);
 	s_Nodes.resize(256);
 
 	AddDefaults();
@@ -91,8 +91,6 @@ std::optional<TextureInfo> TextureManager::AddTexture(const std::string& path)
 			{ texRect.w / (float)s_Atlas->GetWidth(), texRect.h / (float)s_Atlas->GetHeight() } });
 
 		GrowAtlas();
-
-		LOG_INFO("Atlas resized");
 	}
 
 	return s_Textures.back();
@@ -206,14 +204,21 @@ void TextureManager::GrowAtlas()
 	
 	do
 	{
+		uint32_t newWidth = s_Atlas->GetWidth() * 2;
+		uint32_t newHeight = s_Atlas->GetHeight() * 2;
+
 		s_Nodes.clear();
 		s_Nodes.resize(256);
-		s_Atlas = std::make_unique<Texture>(s_Atlas->GetWidth() * 2, s_Atlas->GetHeight() * 2);
+
+		delete s_Atlas.release();
+		s_Atlas = std::make_unique<Texture>(newWidth, newHeight);
+		
 		stbrp_init_target(&s_Context, s_Atlas->GetWidth(), s_Atlas->GetHeight(), s_Nodes.data(), s_Nodes.size());
 	} while (!stbrp_pack_rects(&s_Context, s_Rects.data(), s_Rects.size()));
 
-	stbrp_rect rect{};
+	LOG_INFO("Atlas resized to {}x{}", s_Atlas->GetWidth(), s_Atlas->GetHeight());
 
+	stbrp_rect rect{};
 	uint8_t whitePixelData[4] = { 255, 255, 255, 255 };
 	rect = *std::find_if(s_Rects.begin(), s_Rects.end(),
 		[](const stbrp_rect& rect)
