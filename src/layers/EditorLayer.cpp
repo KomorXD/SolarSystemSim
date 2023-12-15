@@ -211,12 +211,6 @@ void EditorLayer::RenderScenePanel()
 	}
 
 	ImGui::NewLine();
-	ImGui::Separator();
-
-	ImGui::DragFloat("TS Scalar", &EditorScene::TS_MULTIPLIER);
-	ImGui::NewLine();
-	ImGui::Separator();
-	ImGui::NewLine();
 
 	ImGui::End();
 }
