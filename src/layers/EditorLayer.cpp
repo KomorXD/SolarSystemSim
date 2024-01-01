@@ -111,6 +111,14 @@ void EditorLayer::RenderScenePanel()
 
 	m_Scene->m_SceneName = buf;
 
+	if (ImGui::Button("Start simulation"))
+	{
+		Application::GetInstance()->PushLayer(std::make_unique<SimulationLayer>(m_Scene));
+		ImGui::End();
+
+		return;
+	}
+
 	if (ImGui::Button("Save scene"))
 	{
 		SceneSerializer::SaveScene(*m_Scene);
@@ -195,20 +203,14 @@ void EditorLayer::RenderScenePanel()
 		ImGui::NewLine();
 	}
 
-	if (ImGui::Button("Start simulation"))
-	{
-		Application::GetInstance()->PushLayer(std::make_unique<SimulationLayer>(m_Scene));
-		ImGui::End();
-
-		return;
-	}
-
+#ifdef CONF_DEBUG
 	ImGui::SameLine();
 
 	if (ImGui::Button("Reload shaders"))
 	{
 		Renderer::ReloadShaders();
 	}
+#endif
 
 	ImGui::NewLine();
 
