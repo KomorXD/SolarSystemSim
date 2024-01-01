@@ -136,6 +136,19 @@ void EditorScene::OnEvent(Event& ev)
 
 			break;
 
+		case Key::Delete:
+			if (m_SelectedPlanet)
+			{
+				m_Planets.erase(
+					std::find_if(m_Planets.begin(), m_Planets.end(), 
+						[this](const std::unique_ptr<Planet>& planet) { return planet.get() == m_SelectedPlanet; })
+				);
+
+				m_SelectedPlanet = nullptr;
+			}
+
+			break;
+
 		case Key::F:
 			if (m_SelectedPlanet)
 			{
