@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 project("SolarSystemSim" VERSION 0.0.3)
 
 add_subdirectory("src")
+add_subdirectory("tests")
 add_subdirectory("dependencies/glfw")
 add_subdirectory("dependencies/glm")
 add_subdirectory("dependencies/spdlog")

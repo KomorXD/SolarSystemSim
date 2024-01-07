@@ -8,6 +8,7 @@ option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
 
 add_executable(${PROJECT_NAME})
+add_library(${PROJECT_NAME}-LIB)
 
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS "*.cpp")
 file(GLOB_RECURSE PROJECT_HEADERS CONFIGURE_DEPENDS "*.hpp")
@@ -47,7 +48,24 @@ target_sources(${PROJECT_NAME}
         ${VENDORS_SOURCES}
 )
 
+target_sources(${PROJECT_NAME}-LIB
+    PRIVATE
+        ${PROJECT_SOURCES}
+        ${PROJECT_HEADERS}
+        ${PROJECT_CONFIGS}
+        ${VENDORS_SOURCES}
+)
+
 target_include_directories(${PROJECT_NAME}
+    PRIVATE
+        "${CMAKE_SOURCE_DIR}/dependencies/glfw/include/"
+        "${CMAKE_SOURCE_DIR}/dependencies/glad/include/"
+        "${CMAKE_SOURCE_DIR}/dependencies/glm/"
+        "${CMAKE_SOURCE_DIR}/dependencies/spdlog/include/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/vendors/"
+)
+
+target_include_directories(${PROJECT_NAME}-LIB
     PRIVATE
         "${CMAKE_SOURCE_DIR}/dependencies/glfw/include/"
         "${CMAKE_SOURCE_DIR}/dependencies/glad/include/"
@@ -63,7 +81,19 @@ target_link_libraries(${PROJECT_NAME}
         ${GLAD_LIBRARIES}
 )
 
+target_link_libraries(${PROJECT_NAME}-LIB
+    PRIVATE
+        glfw
+        ${GLFW_LIBRARIES}
+        ${GLAD_LIBRARIES}
+)
+
 set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out/bin/${BUILD_ARCHITECTURE}-${CMAKE_BUILD_TYPE}-${CMAKE_SYSTEM_NAME}/"
+)
+
+set_target_properties(${PROJECT_NAME}-LIB
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/out/bin/${BUILD_ARCHITECTURE}-${CMAKE_BUILD_TYPE}-${CMAKE_SYSTEM_NAME}/"
 )
