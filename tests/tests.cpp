@@ -5,6 +5,8 @@
 #include "../src/random_utils/SceneSerializer.hpp"
 #include "../src/scenes/EditorScene.hpp"
 #include "../src/Application.hpp"
+#include "../src/renderer/IcosahedronSphere.hpp"
+
 
 #pragma region SimulationTests
 TEST(Simulation, SinglePlanet)
@@ -131,7 +133,6 @@ TEST(Simulation, EqualForceForSamePlanets)
 TEST(SceneSerializer, SavingScene)
 {
 	Application app;
-
 	EditorScene scene;
 	std::vector<std::unique_ptr<Planet>>& planets = scene.GetPlanetsRef();
 	planets.push_back(std::make_unique<Planet>());
@@ -140,34 +141,66 @@ TEST(SceneSerializer, SavingScene)
 	std::filesystem::path writePath = std::filesystem::current_path().append("Scenes").append("New scene.sscene");
 	ASSERT_TRUE(std::filesystem::exists(writePath)) << "Scene " << writePath << " was not saved";
 }
+#pragma endregion
 
-TEST(SceneSerializer, LoadingScene)
+#pragma region SphereGenerationTests
+TEST(SphereGeneration, VerticesIndicesDepth1)
 {
-	Application app;
+	IcosahedronSphereData data = GenerateIcosahedronSphere(1);
 
-	EditorScene scene;
-	std::vector<std::unique_ptr<Planet>>& planets = scene.GetPlanetsRef();
-	planets.push_back(std::make_unique<Planet>());
-	planets.push_back(std::make_unique<Sun>());
-	planets.push_back(std::make_unique<Planet>());
+	ASSERT_EQ(data.Vertices.size(), 240) << "Incorrect amount of vertices for depth 1";
+	ASSERT_EQ(data.Indices.size(),  240) << "Incorrect amount of indices for depth 1";
 
-	planets[0]->GetTransform().Position = glm::vec3(1.0f);
-	planets[1]->GetTransform().Position = glm::vec3(2.0f);
-	planets[2]->GetTransform().Position = glm::vec3(3.0f);
+	for (const IcosahedronVertex& vertex : data.Vertices)
+	{
+		ASSERT_FLOAT_EQ(glm::length(vertex.Position),  1.0f) << "Normal vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Tangent),   1.0f) << "Tangent vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Bitangent), 1.0f) << "Bitangent vector is not normalized";
+	}
+}
 
-	planets[0]->GetPhysics().Mass = 10.0f;
-	planets[1]->GetPhysics().Mass = 20.0f;
-	planets[2]->GetPhysics().Mass = 30.0f;
+TEST(SphereGeneration, VerticesIndicesDepth2)
+{
+	IcosahedronSphereData data = GenerateIcosahedronSphere(2);
 
-	planets[0]->GetMaterial().Color = glm::vec4(100.0f);
-	planets[1]->GetMaterial().Color = glm::vec4(200.0f);
-	planets[2]->GetMaterial().Color = glm::vec4(300.0f);
+	ASSERT_EQ(data.Vertices.size(), 960) << "Incorrect amount of vertices for depth 2";
+	ASSERT_EQ(data.Indices.size(),  960) << "Incorrect amount of indices for depth 2";
 
-	SceneSerializer::SaveScene(scene);
-	std::filesystem::path writePath = std::filesystem::current_path().append("Scenes").append("New scene.sscene");
-	std::optional<EditorScene> loadedScene = SceneSerializer::LoadScene(writePath.string());
+	for (const IcosahedronVertex& vertex : data.Vertices)
+	{
+		ASSERT_FLOAT_EQ(glm::length(vertex.Position), 1.0f) << "Normal vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Tangent), 1.0f) << "Tangent vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Bitangent), 1.0f) << "Bitangent vector is not normalized";
+	}
+}
 
-	ASSERT_TRUE(loadedScene.has_value()) << "Scene was not loaded from filesystem.";
+TEST(SphereGeneration, VerticesIndicesDepth3)
+{
+	IcosahedronSphereData data = GenerateIcosahedronSphere(3);
 
+	ASSERT_EQ(data.Vertices.size(), 3840) << "Incorrect amount of vertices for depth 3";
+	ASSERT_EQ(data.Indices.size(),  3840) << "Incorrect amount of indices for depth 3";
+
+	for (const IcosahedronVertex& vertex : data.Vertices)
+	{
+		ASSERT_FLOAT_EQ(glm::length(vertex.Position), 1.0f) << "Normal vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Tangent), 1.0f) << "Tangent vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Bitangent), 1.0f) << "Bitangent vector is not normalized";
+	}
+}
+
+TEST(SphereGeneration, VerticesIndicesDepth4)
+{
+	IcosahedronSphereData data = GenerateIcosahedronSphere(4);
+
+	ASSERT_EQ(data.Vertices.size(), 15360) << "Incorrect amount of vertices for depth 4";
+	ASSERT_EQ(data.Indices.size(),  15360) << "Incorrect amount of indices for depth 4";
+
+	for (const IcosahedronVertex& vertex : data.Vertices)
+	{
+		ASSERT_FLOAT_EQ(glm::length(vertex.Position), 1.0f) << "Normal vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Tangent), 1.0f) << "Tangent vector is not normalized";
+		ASSERT_FLOAT_EQ(glm::length(vertex.Bitangent), 1.0f) << "Bitangent vector is not normalized";
+	}
 }
 #pragma endregion

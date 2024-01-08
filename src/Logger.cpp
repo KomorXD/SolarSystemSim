@@ -7,6 +7,11 @@ std::shared_ptr<spdlog::logger> Logger::s_Logger;
 
 void Logger::Init()
 {
+	if (s_Logger)
+	{
+		return;
+	}
+
 	std::vector<spdlog::sink_ptr> logSinks;
 
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("logs/core_logs.log", true));
