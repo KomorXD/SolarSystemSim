@@ -10,15 +10,26 @@ void SimPhysics::ProgressAllOneStep(std::vector<std::unique_ptr<Planet>>& planet
 {
 	for (auto& planet : planets)
 	{
+		if (planet->GetPhysics().Mass <= 0.0f)
+		{
+			continue;
+		}
+
 		std::for_each(std::execution::par, planets.begin(), planets.end(), [&](std::unique_ptr<Planet>& other)
 			{
-				if (other == planet)
+				if (other == planet || other->GetPhysics().Mass <= 0.0f)
 				{
 					return;
 				}
 
 				glm::dvec3 dir = glm::normalize(other->GetTransform().Position - planet->GetTransform().Position);
 				double distance2 = glm::distance2(planet->GetTransform().Position, other->GetTransform().Position);
+
+				if (distance2 <= 0.0f)
+				{
+					return;
+				}
+
 				double mass1 = (double)planet->GetPhysics().Mass;
 				double mass2 = (double)other->GetPhysics().Mass;
 
